@@ -111,7 +111,7 @@ say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
 - [`.remove($container,@path,:$v,:$p,:$force)`](#removecontainerpathvpforce)
 - [`.list($container,@path)`](#listcontainerpath)
 - [`.flatten($container,@path)`](#flattencontainerpath)
-- [`.transform($container,@path,$block)`](#transformblockcontainerpath)
+- [`.transform($container,@path,$block)`](#transformcontainerpathblock)
 
 <!-- end methods toc }}} -->
 

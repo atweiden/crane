@@ -1,6 +1,8 @@
 use v6;
 unit class Crane;
 
+# at {{{
+
 use MONKEY-TYPING;
 augment class Array { method at(*@steps) { at(self, @steps) } }
 augment class Hash { method at(*@steps) { at(self, @steps) } }
@@ -99,5 +101,7 @@ multi sub _at(Positional $data) is rw
 }
 
 # end Positional handling }}}
+
+# end at }}}
 
 # vim: ft=perl6 fdm=marker fdl=0

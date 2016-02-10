@@ -106,9 +106,12 @@ say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
 - [`.exists($container,@path,:$k,:$v)`](#existscontainerpathkv)
 - [`.get($container,@path,:$k,:$v,:$p)`](#getcontainerpathkvp)
 - [`.set($container,@path,$value,:$force)`](#setcontainerpathvalueforce)
-- [`.move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`](#movesrcsrcpathdestdestpathvpforce)
-- [`.copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`](#copysrcsrcpathdestdestpathvpforce)
-- [`.remove($container,@path,:$v,:$p,:$force)`](#removecontainerpathvpforce)
+- [`.add($container,@path,$value)`](#addcontainerpathvalue)
+- [`.remove($container,@path)`](#removecontainerpath)
+- [`.replace($container,@path,$value)`](#replacecontainerpathvalue)
+- [`.move($container,@srcpath,@destpath)`](#movecontainersrcpathdestpath)
+- [`.copy($container,@srcpath,@destpath)`](#copycontainersrcpathdestpath)
+- [`.test($container,@path,$value)`](#testcontainerpathvalue)
 - [`.list($container,@path)`](#listcontainerpath)
 - [`.flatten($container,@path)`](#flattencontainerpath)
 - [`.transform($container,@path,$block)`](#transformcontainerpathblock)
@@ -287,181 +290,117 @@ say $a.perl; # "foo"
 
 <!-- end .set($container,@path,$value,:$force) }}} -->
 
-<!-- .move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force) {{{ -->
+<!-- .add($container,@path,$value) {{{ -->
 
-### `.move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`
+### `.add($container,@path,$value)`
 
-Moves the source value identified by `@srcpath` in `$src` container to
-`$dest` destination container at location specified by `@destpath`.
+Adds a value to the container. If `@path` points to an existing item in
+the container, that item's value is replaced.
 
-The default behavior is to raise an error if the source and destination
-locations are the same.
+In the case of a `Positional` type, the value is inserted before the
+given index. Use the relative accessor (`*-0`) instead of an index
+(`Int`) for appending to the end of a `Positional`.
 
-The default behavior is to raise an error if the source is nonexistent.
-
-The default behavior is to raise an error if the destination has an
-existing value unless the `:force` flag is present.
-
-Use of the `:force` flag does not guarantee the operation will
-succeed, e.g. in the case of attempting to reassign [immutable
-values](http://doc.perl6.org/language/containers).
-
-The default behavior is to move only the value from the source container
-path unless the `:p` flag is present.
-
-If the source is of type `Associative` and the `:p` flag is not present,
-the default behavior is to move the source value to the destination,
-resetting the source value to `Any`.
-
-If the source is of type `Associative`, and the `:p` flag is present,
-the key-value pair at the source is moved to the destination.
-
-If the source is of type `Positional` and the `:p` flag is not present,
-the default behavior is to move the source value to the destination,
-resetting the source value to `Any`.
-
-If the source is of type `Positional` and the `:p` flag is present, the
-default behavior is to move the positional index (`Int`) as the key with
-its associated value to the destination, splicing it out from the source.
-
-_arguments:_
-
-* `$src`: _Container, required_ — the source container
-* `@srcpath`: _Path, required_ — a list of steps to the source
-* `$dest`: _Container, required_ — the destination container
-* `@destpath`: _Path, required_ — a list of steps to the destination
-* `:$v`: _Bool, optional, defaults to True_ — only move the source value
-* `:$p`: _Bool, optional_ — move the source key-value pair
-* `:$force`: _Bool, optional_ — indicates whether pre-existing values
-             at path are overwritten during the call
-
-_returns:_
-
-* The prior value at the destination's path — therefore, `Any` means
-  the destination's path was nonexistent.
-
-_What about operating on the root of the container?_
-
-Pass an empty list as path to operate on the root of the container.
-
-- if value assignment (`=`) to `$container` fails, abort move operation,
-  raise error and propogate the original error message
-  - value assignment will fail when assigning a List to a `$container`
-    of type Hash and vice versa
-- overwrite existing values if `:force` flag is passed
+Because this operation is designed to add to existing `Associative` types,
+its target location will often not exist. However, an `Associative`
+type or a `Positional` type containing it does need to exist, and it
+remains an error for that not to be the case. For example, a `.add`
+operation with a target location of `<a b>` starting with this Hash:
 
 ```perl6
-my $a = (1, 2, 3);
-my $b = (4, 5, 6);
-my $prior-b = Crane.move($a, [], $b, [], :force);
-say $prior-b.perl; # $(4, 5, 6)
-say $b.perl; # $(1, 2, 3)
-say $a.perl; # Any
-
-my $c;
-my $prior-c = Crane.move($b, [], $c, []);
-say $prior-c.perl; # Any
-say $c.perl; # $(1, 2, 3)
-say $b.perl; # Any
-say $a.perl; # Any
+{ :a({ :foo(1) }) }
 ```
 
-<!-- end .move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force) }}} -->
+is not an error, because "a" exists, and "b" will be added to its
+value. It is an error in this Hash:
 
-<!-- .copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force) {{{ -->
+```perl6
+{ :q({ :bar(2) }) }
+```
 
-### `.copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`
+because "a" does not exist.
 
-Copies the source value identified by `@srcpath` in `$src` container to
-`$dest` destination container at location specified by `@destpath`.
+Think of the `.add` operation as behaving similarly to `mkdir`, not
+`mkdir -p`. For example, you cannot do (in shell):
 
-The default behavior is to raise an error if the source and destination
-locations are the same.
+```
+$ ls # empty directory
+$ mkdir a/b/c
+mkdir: cannot create directory ‘a/b/c’: No such file or directory
+```
 
-The default behavior is to raise an error if the source is nonexistent.
+Without the `-p` flag, you'd have to do:
 
-The default behavior is to raise an error if the destination has an
-existing value unless the `:force` flag is present.
-
-If the source is of type `Associative` and the `:p` flag is not present,
-the default behavior is to copy the source value to the destination.
-
-If the source is of type `Associative`, and the `:p` flag is present,
-the key-value pair at the source is copied to the destination.
-
-If the source is of type `Positional` and the `:p` flag is not present,
-the default behavior is to copy the source value to the destination.
-
-If the source is of type `Positional` and the `:p` flag is present,
-the default behavior is to copy the positional index (`Int`) as the key
-with its associated value to the destination.
+```
+$ ls # empty directory
+$ mkdir a
+$ mkdir a/b
+$ mkdir a/b/c
+```
 
 _arguments:_
 
-* `$src`: _Container, required_ — the source container
-* `@srcpath`: _Path, required_ — a list of steps to the source
-* `$dest`: _Container, required_ — the destination container
-* `@destpath`: _Path, required_ — a list of steps to the destination
-* `:$v`: _Bool, optional, defaults to True_ — only copy the source value
-* `:$p`: _Bool, optional_ — copy the source key-value pair
-* `:$force`: _Bool, optional_ — indicates whether pre-existing values
-             at path are overwritten during the call
+* `$container`: _Container, required_ — the target container
+* `@path`: _Path, required_ — a list of steps for navigating container
+* `$value`: _Any_ — the value to be added/inserted at the specified path
 
 _returns:_
 
-* The prior value at the destination's path — therefore, `Any` means
-  the destination's path was nonexistent.
+* Updated container
 
 _example:_
 
 ```perl6
-my %h = :example<hello>;
-my $prior = Crane.copy(%h, qw<example>, %h, qw<sample>);
-say %h.perl # { :example("hello"), :sample("hello") }
-say $prior # (Any);
+my %legume = :name<carrots>, :unit<lbs>, :instock(3);
+my %data-new = Crane.add(%data, qw<legumes 0>, %legume);
 ```
 
 _What about operating on the root of the container?_
 
-Pass an empty list as path to operate on the root of the container. Has
-similar rules / considerations to `.move`.
+Pass an empty list as `@path` to operate on the root of the container.
 
-<!-- end .copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force) }}} -->
+- if value assignment (`=`) to `$container` fails, raise error and
+  propogate the original error message
+  - value assignment will fail when assigning a List to a `$container`
+    of type Hash and vice versa
 
-<!-- .remove($container,@path,:$v,:$p,:$force) {{{ -->
+```perl6
+my @a;
+my @b = Crane.add(@a, [], "foo");
+say @a.perl; # []
+say @b.perl; # ["foo"]
+```
 
-### `.remove($container,@path,:$v,:$p,:$force)`
+<!-- end .add($container,@path,$value) }}} -->
+
+<!-- .remove($container,@path) {{{ -->
+
+### `.remove($container,@path)`
 
 Removes the pair at path from `Associative`
 types, similar to the p6 Hash `:delete` [subscript
 adverb](http://doc.perl6.org/type/Hash#%3Adelete). Splices elements out
 from `Positional` types.
 
-Removes only the value at path from `Associative` types if the `:v`
-flag is passed, resetting the value to `Any`. Resets `Positional` type
-elements to `Any` if the `:v` flag is passed.
-
-The default behavior is to raise an error if path is nonexistent.
+The default behavior is to raise an error if the target location is
+nonexistent.
 
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
 * `@path`: _Path, required_ — a list of steps for walking container
-* `:$v`: _Bool, optional_ — only remove the value at path (reset to `Any`)
-* `:$p`: _Bool, defaults to True_ — remove the key-value pair at path
-* `:$force`: _Bool, optional_ — ignore nonexistent paths
 
 _returns:_
 
-* The prior value at the container's path
+* Updated container
 
 _example:_
 
 ```perl6
 my %h = :example<hello>;
-my $prior = Crane.remove(%h, qw<example>);
-say %h.perl; # {}
-say $prior.perl; # "hello"
+my %h2 = Crane.remove(%h, qw<example>);
+say %h.perl; # { :example<hello> }
+say %h2.perl; # {}
 ```
 
 This:
@@ -482,12 +421,163 @@ Pass an empty list as path to operate on the root of the container.
 
 ```perl6
 my $a = (1, 2, 3);
-my $prior = Crane.remove($a, []);
-say $prior.perl; $(1, 2, 3)
-say $a; # (Any)
+my $b = Crane.remove($a, []);
+say $a.perl; $(1, 2, 3)
+say $b; # (Any)
 ```
 
-<!-- end .remove($container,@path,:$v,:$p,:$force) }}} -->
+<!-- end .remove($container,@path) }}} -->
+
+<!-- .replace($container,@path,$value) {{{ -->
+
+### `.replace($container,@path,$value)`
+
+Replaces a value. This operation is functionally identical to a `.remove`
+operation for a value, followed immediately by a `.add` operation at
+the same location with the replacement value.
+
+The default behavior is to raise an error if the target location is
+nonexistent.
+
+_arguments:_
+
+* `$container`: _Container, required_ — the target container
+* `@path`: _Path, required_ — a list of steps for navigating container
+* `$value`: _Any_ — the value to be set at the specified path
+
+_returns:_
+
+* Updated container
+
+_example:_
+
+```perl6
+my %legume = :name<green beans>, :unit<lbs>, :instock(3);
+my %data-new = Crane.replace(%data, qw<legumes 0>, %legume);
+```
+
+_What about operating on the root of the container?_
+
+Pass an empty list as `@path` to operate on the root of the container.
+
+- if value assignment (`=`) to `$container` fails, raise error and
+  propogate the original error message
+  - value assignment will fail when assigning a List to a `$container`
+    of type Hash and vice versa
+
+```perl6
+my %a = :a<aaa>, :b<bbb>, :c<ccc>;
+my %b = Crane.replace(%a, [], { :vm<moar> });
+say %a.perl; # { :a<aaa>, :b<bbb>, :c<ccc> }
+say %b.perl; # { :vm<moar> }
+```
+
+<!-- end .replace($container,@path,$value) }}} -->
+
+<!-- .move($container,@srcpath,@destpath) {{{ -->
+
+### `.move($container,@srcpath,@destpath)`
+
+Moves the source value identified by `@srcpath` in container to
+destination location specified by `@destpath`. This operation is
+functionally identical to a `.remove` operation on the `@srcpath`
+location, followed immediately by a `.add` operation at the target
+location with the value that was just removed.
+
+The default behavior is to raise an error if the source is nonexistent.
+
+The default behavior is to raise an error if the `@srcpath` location is
+a proper prefix of the `@destpath` location; i.e., a location cannot be
+moved into one of its children.
+
+_arguments:_
+
+* `$container`: _Container, required_ — the target container
+* `@srcpath`: _Path, required_ — a list of steps to the source
+* `@destpath`: _Path, required_ — a list of steps to the destination
+
+_returns:_
+
+* Updated container
+
+_What about operating on the root of the container?_
+
+Pass an empty list as path to operate on the root of the container.
+
+- if value assignment (`=`) to `$container` fails, abort move operation,
+  raise error and propogate the original error message
+  - value assignment will fail when assigning a List to a `$container`
+    of type Hash and vice versa
+- overwrite existing values if `:force` flag is passed
+
+<!-- end .move($container,@srcpath,@destpath) }}} -->
+
+<!-- .copy($container,@srcpath,@destpath) {{{ -->
+
+### `.copy($container,@srcpath,@destpath)`
+
+Copies the source value identified by `@srcpath` in container to
+destination container at location specified by `@destpath`. This operation
+is functionally identical to a `.add` operation at the target location
+using the value specified in the `@srcpath`.
+
+The default behavior is to raise an error if the source is nonexistent.
+
+_arguments:_
+
+* `$container`: _Container, required_ — the target container
+* `@srcpath`: _Path, required_ — a list of steps to the source
+* `@destpath`: _Path, required_ — a list of steps to the destination
+
+_returns:_
+
+* Updated container
+
+_example:_
+
+```perl6
+my %h = :example<hello>;
+my %h2 = Crane.copy(%h, qw<example>, qw<sample>);
+say %h.perl; # { :example("hello") }
+say %h2.perl; # { :example("hello"), :sample("hello") }
+```
+
+_What about operating on the root of the container?_
+
+Pass an empty list as path to operate on the root of the container. Has
+similar rules / considerations to `.move`.
+
+<!-- end .copy($container,@srcpath,@destpath) }}} -->
+
+<!-- .test($container,@path,$value) {{{ -->
+
+### `.test($container,@path,$value)`
+
+Tests that the specified value is set at the target location in the
+document. Compares values with the Perl6 Test module's `is-deeply`
+subroutine.
+
+_arguments:_
+
+* `$container`: _Container, required_ — the target container
+* `@path`: _Path, required_ — a list of steps for navigating container
+* `$value`: _Any_ — the value expected at the specified path
+
+_returns:_
+
+* `True` if expected value exists at path, otherwise `False`
+
+_example:_
+
+```perl6
+say so Crane.test(%data, qw<legumes 0 name>, "green beans"); # True
+```
+
+_What about operating on the root of the container?_
+
+Pass an empty list as `@path` to operate on the root of the container.
+
+<!-- end .test($container,@path,$value) }}} -->
 
 <!-- .list($container,@path) {{{ -->
 
@@ -502,7 +592,7 @@ _arguments:_
 
 _returns:_
 
-* array of path:value hashes
+* array of path-value pairs
 
 _example:_
 

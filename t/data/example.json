@@ -1,0 +1,19 @@
+{
+  "legumes": [{
+    "name": "pinto beans",
+    "unit": "lbs",
+    "instock": 4
+  }, {
+    "name": "lima beans",
+    "unit": "lbs",
+    "instock": 21
+  }, {
+    "name": "black eyed peas",
+    "unit": "lbs",
+    "instock": 13
+  }, {
+    "name": "plit peas",
+    "unit": "lbs",
+    "instock": 8
+  }]
+}

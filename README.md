@@ -1,15 +1,19 @@
 # Crane
 
 <!-- intro {{{ -->
+
 Navigate Perl6 [containers](http://doc.perl6.org/language/containers)
 and perform tasks.
+
 <!-- end intro }}} -->
 
 
 <!-- synopsis {{{ -->
+
 ## Synopsis
 
 <!-- example code {{{ -->
+
 ```perl6
 use Crane;
 
@@ -24,13 +28,16 @@ my %inxi = :info({
 
 say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
 ```
+
 <!-- end example code }}} -->
 
 -------------------------------------------------------------------------------
+
 <!-- end synopsis }}} -->
 
 
 <!-- description {{{ -->
+
 ## Description
 
 Crane aims to be for Perl6 containers what [JSON
@@ -45,13 +52,16 @@ Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 - list the contents of a nested data structure in accessible format
 
 -------------------------------------------------------------------------------
+
 <!-- end description }}} -->
 
 
 <!-- exported subroutines {{{ -->
+
 ## Exported Subroutines
 
 <!-- at($container,@path) {{{ -->
+
 ### `at($container,@path)`
 
 Navigates to and returns container `is rw`.
@@ -79,28 +89,34 @@ at(%inxi, qw<info>)<uptime>:delete;
 
 say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
 ```
+
 <!-- end at($container,@path) }}} -->
 
 -------------------------------------------------------------------------------
+
 <!-- end exported subroutines }}} -->
 
 
 <!-- methods {{{ -->
+
 ## Methods
 
 <!-- methods toc {{{ -->
-- [`.exists($container,@path,:$k,:$v)`](#exists-container-path-k-v)
-- [`.get($container,@path,:$k,:$v,:$p)`](#get-container-path-k-v-p)
-- [`.set($container,@path,$value,:$force)`](#set-container-path-value-force)
-- [`.move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`](#move-src-srcpath-dest-destpath-v-p-force)
-- [`.copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`](#copy-src-srcpath-dest-destpath-v-p-force)
-- [`.remove($container,@path,:$v,:$p,:$force)`](#remove-container-path-v-p-force)
-- [`.list($container,@path)`](#list-container-path)
-- [`.flatten($container,@path)`](#flatten-container-path)
-- [`.transform($container,@path,$block)`](#transform-block-container-path)
+
+- [`.exists($container,@path,:$k,:$v)`](#existscontainerpathkv)
+- [`.get($container,@path,:$k,:$v,:$p)`](#getcontainerpathkvp)
+- [`.set($container,@path,$value,:$force)`](#setcontainerpathvalueforce)
+- [`.move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`](#movesrcsrcpathdestdestpathvpforce)
+- [`.copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`](#copysrcsrcpathdestdestpathvpforce)
+- [`.remove($container,@path,:$v,:$p,:$force)`](#removecontainerpathvpforce)
+- [`.list($container,@path)`](#listcontainerpath)
+- [`.flatten($container,@path)`](#flattencontainerpath)
+- [`.transform($container,@path,$block)`](#transformblockcontainerpath)
+
 <!-- end methods toc }}} -->
 
 <!-- example data structure {{{ -->
+
 All example code assumes `%data` has this structure:
 
 ```perl6
@@ -128,9 +144,11 @@ my %data =
         }
     ]);
 ```
+
 <!-- end example data structure }}} -->
 
 <!-- .exists($container,@path,:$k,:$v) {{{ -->
+
 ### `.exists($container,@path,:$k,:$v)`
 
 Determines whether a key exists in the container at the
@@ -160,9 +178,11 @@ Pass an empty list as `@path` to operate on the root of the container.
 - if `:k` flag passed (the default): raise error "Sorry, not possible
                                      to request key operations on the
                                      container root"
+
 <!-- end .exists($container,@path,:$k,:$v) }}} -->
 
 <!-- .get($container,@path,:$k,:$v,:$p) {{{ -->
+
 ### `.get($container,@path,:$k,:$v,:$p)`
 
 Gets the value from container at the specified path. The default
@@ -203,9 +223,11 @@ Pass an empty list as `@path` to operate on the root of the container.
                        operations on the container root"
 - if `:p` flag passed: raise error "Sorry, not possible to request key
                        operations on the container root"
+
 <!-- end .get($container,@path,:$k,:$v,:$p) }}} -->
 
 <!-- .set($container,@path,$value,:$force) {{{ -->
+
 ### `.set($container,@path,$value,:$force)`
 
 Sets the `value` at the specified path in the container. The default
@@ -262,9 +284,11 @@ my $prior = Crane.set($a, [], "foo", :force);
 say $prior.perl; $(1, 2, 3)
 say $a.perl; # "foo"
 ```
+
 <!-- end .set($container,@path,$value,:$force) }}} -->
 
 <!-- .move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force) {{{ -->
+
 ### `.move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`
 
 Moves the source value identified by `@srcpath` in `$src` container to
@@ -341,9 +365,11 @@ say $c.perl; # $(1, 2, 3)
 say $b.perl; # Any
 say $a.perl; # Any
 ```
+
 <!-- end .move($src,@srcpath,$dest,@destpath,:$v,:$p,:$force) }}} -->
 
 <!-- .copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force) {{{ -->
+
 ### `.copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force)`
 
 Copies the source value identified by `@srcpath` in `$src` container to
@@ -399,9 +425,11 @@ _What about operating on the root of the container?_
 
 Pass an empty list as path to operate on the root of the container. Has
 similar rules / considerations to `.move`.
+
 <!-- end .copy($src,@srcpath,$dest,@destpath,:$v,:$p,:$force) }}} -->
 
 <!-- .remove($container,@path,:$v,:$p,:$force) {{{ -->
+
 ### `.remove($container,@path,:$v,:$p,:$force)`
 
 Removes the pair at path from `Associative`
@@ -458,9 +486,11 @@ my $prior = Crane.remove($a, []);
 say $prior.perl; $(1, 2, 3)
 say $a; # (Any)
 ```
+
 <!-- end .remove($container,@path,:$v,:$p,:$force) }}} -->
 
 <!-- .list($container,@path) {{{ -->
+
 ### `.list($container,@path)`
 
 Lists all of the paths available in container.
@@ -525,9 +555,11 @@ say Crane.list($a);
     }
 ]
 ```
+
 <!-- end .list($container,@path) }}} -->
 
 <!-- .flatten($container,@path) {{{ -->
+
 ### `.flatten($container,@path)`
 
 Flattens a container into a single-level `Hash` of path-value pairs.
@@ -558,9 +590,11 @@ say Crane.flatten(%data);
     ['legumes', 3, 'instock'] => 8
 }
 ```
+
 <!-- end .flatten($container,@path) }}} -->
 
 <!-- .transform($container,@path,$block) {{{ -->
+
 ### `.transform($container,@path,$block)`
 
 _example:_
@@ -583,35 +617,45 @@ say so Crane.get(%market, @first-fruit) eq 'blueberries!'; # True
 Crane.transform(%market, @second-veggie, &oh-yeah);
 say so Crane.get(%market, @second-veggie) eq 'onions!'; # True
 ```
+
 <!-- end .transform($container,@path,$block) }}} -->
 
 -------------------------------------------------------------------------------
+
 <!-- end methods }}} -->
 
 
 <!-- classes {{{ -->
+
 ## Classes
 
 <!-- classes toc {{{ -->
+
 - [`Crane` Class](#crane-class)
+
 <!-- end classes toc }}} -->
 
 <!-- Crane Class {{{ -->
+
 ### `Crane` Class
 
 Encapsulates container related operations for a specified path.
 
 <!-- Crane Class attributes {{{ -->
+
 #### attributes:
 
 * `.path` : _Path_ — contains the `Crane`'s list of steps for walking
             a container
+
 <!-- end Crane Class attributes }}} -->
 
 <!-- Crane Class methods {{{ -->
+
 #### methods:
 
 <!-- .new(@path) {{{ -->
+
 ##### `.new(@path)`
 
 Instantiates `Crane` class.
@@ -629,6 +673,7 @@ _example:_
 ```perl6
 my $crane = Crane.new('legumes', 0);
 ```
+
 <!-- end .new(@path) }}} -->
 
 `Crane` classes get access to all methods documented above, with
@@ -636,17 +681,21 @@ the stipulation that the path to the source container is the `Crane`
 instance's `.path` attribute.
 
 <!-- end Crane Class methods }}} -->
+
 <!-- end Crane Class }}} -->
 
 -------------------------------------------------------------------------------
+
 <!-- end classes }}} -->
 
 
 <!-- licensing {{{ -->
+
 ## Licensing
 
 This is free and unencumbered public domain software. For more
 information, see http://unlicense.org/ or the accompanying UNLICENSE file.
+
 <!-- licensing }}} -->
 
 <!-- vim: ft=markdown fdm=marker fdl=0 -->

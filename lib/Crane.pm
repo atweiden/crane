@@ -22,7 +22,7 @@ sub at($data, *@steps) is rw is export
 multi sub _at(Associative $data, @steps where *.elems > 1) is rw
 {
     my $root := $data;
-    if defined $root{@steps[0]}
+    if $root{@steps[0]}:exists
     {
         $root := $root{@steps[0]};
     }
@@ -36,7 +36,7 @@ multi sub _at(Associative $data, @steps where *.elems > 1) is rw
 multi sub _at(Associative $data, @steps where *.elems == 1) is rw
 {
     my $root := $data;
-    if defined $root{@steps[0]}
+    if $root{@steps[0]}:exists
     {
         $root := $root{@steps[0]};
     }
@@ -64,7 +64,7 @@ multi sub _at(Associative $data) is rw
 multi sub _at(Positional $data, @steps where *.elems > 1) is rw
 {
     my $root := $data;
-    if defined $root[@steps[0]]
+    if $root[@steps[0]]:exists
     {
         $root := $root[@steps[0]];
     }
@@ -78,7 +78,7 @@ multi sub _at(Positional $data, @steps where *.elems > 1) is rw
 multi sub _at(Positional $data, @steps where *.elems == 1) is rw
 {
     my $root := $data;
-    if defined $root[@steps[0]]
+    if $root[@steps[0]]:exists
     {
         $root := $root[@steps[0]];
     }

@@ -165,22 +165,18 @@ _arguments:_
 * `$container`: _Container, required_ — the target container
 * `@path`: _Path, required_ — a list of steps for walking container
 * `:$k`: _Bool, optional, defaults to True_ — indicates whether to
-         check for a defined key at path
+         check for an existing key at path
 * `:$v`: _Bool, optional_ — indicates whether to check for a defined
          value at path
 
 _returns:_
 
-* `True` if defined or `False` if undefined
+* `True` if exists, otherwise `False`
 
 _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
-
-- if `:v` flag passed: test `if $container`
-- if `:k` flag passed (the default): raise error "Sorry, not possible
-                                     to request key operations on the
-                                     container root"
+Tests `if $container.defined`.
 
 <!-- end .exists($container,@path,:$k,:$v) }}} -->
 

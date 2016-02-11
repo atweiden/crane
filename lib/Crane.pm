@@ -104,4 +104,99 @@ multi sub _at(Positional $data) is rw
 
 # end at }}}
 
+# exists {{{
+
+method exists($container, @path, Bool :$k = True, Bool :$v) returns Bool
+{
+    $v.so ?? exists-value($container, @path) !! exists-key($container, @path);
+}
+
+# exists-key {{{
+
+multi sub exists-key($container, @path where *.elems > 1) returns Bool
+{
+    exists-key($container, [@path[0]])
+        ?? exists-key($container.at(@path[0]), @path[1..*])
+        !! False;
+}
+
+multi sub exists-key(
+    Associative $container,
+    @path where *.elems == 1
+) returns Bool
+{
+    $container{@path[0]}:exists;
+}
+
+multi sub exists-key(
+    Associative $container,
+    @path where *.elems == 0
+) returns Bool
+{
+    $container.defined;
+}
+
+multi sub exists-key(
+    Positional $container,
+    @path where *.elems == 1
+) returns Bool
+{
+    $container[@path[0]]:exists;
+}
+
+multi sub exists-key(
+    Positional $container,
+    @path where *.elems == 0
+) returns Bool
+{
+    $container.defined;
+}
+
+# end exists-key }}}
+
+# exists-value {{{
+
+multi sub exists-value($container, @path where *.elems > 1) returns Bool
+{
+    exists-value($container, [@path[0]])
+        ?? exists-value($container.at(@path[0]), @path[1..*])
+        !! False;
+}
+
+multi sub exists-value(
+    Associative $container,
+    @path where *.elems == 1
+) returns Bool
+{
+    $container{@path[0]}.defined;
+}
+
+multi sub exists-value(
+    Associative $container,
+    @path where *.elems == 0
+) returns Bool
+{
+    $container.defined;
+}
+
+multi sub exists-value(
+    Positional $container,
+    @path where *.elems == 1
+) returns Bool
+{
+    $container[@path[0]].defined;
+}
+
+multi sub exists-value(
+    Positional $container,
+    @path where *.elems == 0
+) returns Bool
+{
+    $container.defined;
+}
+
+# end exists-value }}}
+
+# end exists }}}
+
 # vim: ft=perl6 fdm=marker fdl=0

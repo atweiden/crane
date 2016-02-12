@@ -1,4 +1,5 @@
 use v6;
+use X::Crane;
 unit class Crane;
 
 # at {{{
@@ -28,7 +29,7 @@ multi sub _at(Associative $data, @steps where *.elems > 1) is rw
     }
     else
     {
-        die 'Sorry, Associative item DNE';
+        die X::Crane::AssociativeKeyDNE.new;
     }
     return-rw _at($root, @steps[1..*]);
 }
@@ -42,7 +43,7 @@ multi sub _at(Associative $data, @steps where *.elems == 1) is rw
     }
     else
     {
-        die 'Sorry, Associative item DNE';
+        die X::Crane::AssociativeKeyDNE.new;
     }
     return-rw $root;
 }
@@ -64,13 +65,30 @@ multi sub _at(Associative $data) is rw
 multi sub _at(Positional $data, @steps where *.elems > 1) is rw
 {
     my $root := $data;
+
+    try
+    {
+        unless is-valid-positional-index(@steps[0])
+        {
+            die X::Crane::PositionalIndexInvalid.new;
+        }
+
+        CATCH
+        {
+            default
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
     if $root[@steps[0]]:exists
     {
         $root := $root[@steps[0]];
     }
     else
     {
-        die 'Sorry, Positional item DNE';
+        die X::Crane::PositionalIndexDNE.new;
     }
     return-rw _at($root, @steps[1..*]);
 }
@@ -78,13 +96,30 @@ multi sub _at(Positional $data, @steps where *.elems > 1) is rw
 multi sub _at(Positional $data, @steps where *.elems == 1) is rw
 {
     my $root := $data;
+
+    try
+    {
+        unless is-valid-positional-index(@steps[0])
+        {
+            die X::Crane::PositionalIndexInvalid.new;
+        }
+
+        CATCH
+        {
+            default
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
     if $root[@steps[0]]:exists
     {
         $root := $root[@steps[0]];
     }
     else
     {
-        die 'Sorry, Positional item DNE';
+        die X::Crane::PositionalIndexDNE.new;
     }
     return-rw $root;
 }
@@ -98,6 +133,38 @@ multi sub _at(Positional $data, @steps where *.elems == 0) is rw
 multi sub _at(Positional $data) is rw
 {
     return-rw $data;
+}
+
+# check for non-integer positional index
+multi sub is-valid-positional-index(Int $step) returns Bool
+{
+    True;
+}
+
+# passing *-1 is ok
+multi sub is-valid-positional-index(WhateverCode $step) returns Bool
+{
+    True;
+}
+
+# passing stringified integers is ok
+multi sub is-valid-positional-index($step) returns Bool
+{
+    my $n;
+    try
+    {
+        # convert string into number
+        $n = +$step;
+        CATCH
+        {
+            when X::Str::Numeric
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
+    $n.isa: Int;
 }
 
 # end Positional handling }}}
@@ -141,6 +208,22 @@ multi sub exists-key(
     @path where *.elems == 1
 ) returns Bool
 {
+    try
+    {
+        unless is-valid-positional-index(@path[0])
+        {
+            die X::Crane::PositionalIndexInvalid.new;
+        }
+
+        CATCH
+        {
+            default
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
     $container[@path[0]]:exists;
 }
 
@@ -184,6 +267,22 @@ multi sub exists-value(
     @path where *.elems == 1
 ) returns Bool
 {
+    try
+    {
+        unless is-valid-positional-index(@path[0])
+        {
+            die X::Crane::PositionalIndexInvalid.new;
+        }
+
+        CATCH
+        {
+            default
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
     $container[@path[0]].defined;
 }
 
@@ -198,5 +297,195 @@ multi sub exists-value(
 # end exists-value }}}
 
 # end exists }}}
+
+# get {{{
+
+multi method get(
+    $container,
+    @path,
+    Bool :$k! where *.so,
+    Bool :$v where *.not,
+    Bool :$p where *.not
+) returns Any
+{
+    get-key($container, @path);
+}
+
+multi method get(
+    $container,
+    @path,
+    Bool :$k where *.not,
+    Bool :$v = True,
+    Bool :$p where *.not
+) returns Any
+{
+    get-value($container, @path);
+}
+
+multi method get(
+    $container,
+    @path,
+    Bool :$k where *.not,
+    Bool :$v where *.not,
+    Bool :$p! where *.so
+) returns Any
+{
+    get-pair($container, @path);
+}
+
+# get-key {{{
+
+multi sub get-key($container, @path where *.elems > 1) returns Any
+{
+    exists-key($container, [@path[0]])
+        ?? get-key($container.at(@path[0]), @path[1..*])
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-key(Associative $container, @path where *.elems == 1) returns Any
+{
+    exists-key($container, [@path[0]])
+        ?? ($container{@path[0]}:!k)
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-key(Associative $container, @path where *.elems == 0) returns Any
+{
+    die X::Crane::RootContainerKeyOp.new;
+}
+
+multi sub get-key(Positional $container, @path where *.elems == 1) returns Any
+{
+    try
+    {
+        unless is-valid-positional-index(@path[0])
+        {
+            die X::Crane::PositionalIndexInvalid.new;
+        }
+
+        CATCH
+        {
+            default
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
+    exists-key($container, [@path[0]])
+        ?? ($container[@path[0]]:!k)
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-key(Positional $container, @path where *.elems == 0) returns Any
+{
+    die X::Crane::RootContainerKeyOp.new;
+}
+
+# end get-key }}}
+
+# get-value {{{
+
+multi sub get-value($container, @path where *.elems > 1) returns Any
+{
+    exists-key($container, [@path[0]])
+        ?? get-value($container.at(@path[0]), @path[1..*])
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-value(Associative $container, @path where *.elems == 1) returns Any
+{
+    exists-key($container, [@path[0]])
+        ?? ($container{@path[0]}:!v)
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-value(Associative $container, @path where *.elems == 0) returns Any
+{
+    $container;
+}
+
+multi sub get-value(Positional $container, @path where *.elems == 1) returns Any
+{
+    try
+    {
+        unless is-valid-positional-index(@path[0])
+        {
+            die X::Crane::PositionalIndexInvalid.new;
+        }
+
+        CATCH
+        {
+            default
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
+    exists-key($container, [@path[0]])
+        ?? ($container[@path[0]]:!v)
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-value(Positional $container, @path where *.elems == 0) returns Any
+{
+    $container;
+}
+
+# end get-value }}}
+
+# get-pair {{{
+
+multi sub get-pair($container, @path where *.elems > 1) returns Any
+{
+    exists-key($container, [@path[0]])
+        ?? get-pair($container.at(@path[0]), @path[1..*])
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-pair(Associative $container, @path where *.elems == 1) returns Any
+{
+    exists-key($container, [@path[0]])
+        ?? ($container{@path[0]}:!p)
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-pair(Associative $container, @path where *.elems == 0) returns Any
+{
+    die X::Crane::RootContainerKeyOp.new;
+}
+
+multi sub get-pair(Positional $container, @path where *.elems == 1) returns Any
+{
+    try
+    {
+        unless is-valid-positional-index(@path[0])
+        {
+            die X::Crane::PositionalIndexInvalid.new;
+        }
+
+        CATCH
+        {
+            default
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
+    exists-key($container, [@path[0]])
+        ?? ($container[@path[0]]:!p)
+        !! die X::Crane::PathDNE.new;
+}
+
+multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
+{
+    die X::Crane::RootContainerKeyOp.new;
+}
+
+# end get-pair }}}
+
+# end get }}}
 
 # vim: ft=perl6 fdm=marker fdl=0

@@ -1,0 +1,66 @@
+use v6;
+use lib 'lib';
+use lib 't/lib';
+use Test;
+use Crane;
+use TestCrane;
+
+plan 1;
+
+subtest
+{
+    my %data = %TestCrane::data;
+
+    is-deeply Crane.get(%data, []), %data,
+        'Get operation on root container value succeeds';
+    throws-like {Crane.get(%data, [], :k)}, X::Crane::RootContainerKeyOp,
+        'Get operation on root container key fails';
+    throws-like {Crane.get(%data, [], :p)}, X::Crane::RootContainerKeyOp,
+        'Get operation on root container pair fails';
+    throws-like {Crane.get(%data, qw<legumes foo>)},
+        X::Crane::PositionalIndexInvalid,
+        'Get operation on invalid positional index fails';
+    throws-like {Crane.get(%data, ['foo'])}, X::Crane::PathDNE,
+        'Get operation on nonexistent path fails';
+    throws-like {Crane.get(%data, qw<legumes 99>)}, X::Crane::PathDNE,
+        'Get operation on nonexistent path fails';
+    throws-like {Crane.get(%data, qw<legumes 0 bar>)}, X::Crane::PathDNE,
+        'Get operation on nonexistent path fails';
+    is-deeply Crane.get(%data, ['legumes']), %data<legumes>,
+        'Is expected value';
+    is-deeply Crane.get(%data, ['legumes'], :k), %data<legumes>:!k,
+        'Is expected key';
+    is-deeply Crane.get(%data, ['legumes'], :p), %data<legumes>:!p,
+        'Is expected pair';
+    is-deeply Crane.get(%data, qw<legumes 0>), %data<legumes>[0],
+        'Is expected value';
+    is-deeply Crane.get(%data, qw<legumes 0>, :k), %data<legumes>[0]:!k,
+        'Is expected key';
+    is-deeply Crane.get(%data, qw<legumes 0>, :p), %data<legumes>[0]:!p,
+        'Is expected pair';
+    is Crane.get(%data, qw<legumes 0 instock>), 4,
+        'Is expected value';
+    is Crane.get(%data, qw<legumes 0 instock>, :k), 'instock',
+        'Is expected key';
+    is Crane.get(%data, qw<legumes 0 instock>, :p), {:instock(4)},
+        'Is expected pair';
+    is Crane.get(%data, qw<legumes 0 name>), 'pinto beans',
+        'Is expected value';
+    is Crane.get(%data, qw<legumes 0 name>, :k), 'name',
+        'Is expected key';
+    is Crane.get(%data, qw<legumes 0 name>, :p), {:name<pinto beans>},
+        'Is expected pair';
+    is Crane.get(%data, qw<legumes 0 unit>), 'lbs',
+        'Is expected value';
+    is Crane.get(%data, qw<legumes 0 unit>, :k), 'unit',
+        'Is expected key';
+    is Crane.get(%data, qw<legumes 0 unit>, :p), {:unit<lbs>},
+        'Is expected pair';
+    is Crane.get(%data, ['legumes', *-1, 'name']), 'split peas',
+        'Is expected value';
+    my @path = 'legumes', *-2, 'name';
+    is Crane.get(%data, @path), 'black eyed peas',
+        'Is expected value';
+}
+
+# vim: ft=perl6

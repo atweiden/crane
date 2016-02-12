@@ -173,7 +173,7 @@ multi sub is-valid-positional-index($step) returns Bool
 
 # exists {{{
 
-method exists($container, @path, Bool :$k = True, Bool :$v) returns Bool
+method exists($container, :@path!, Bool :$k = True, Bool :$v) returns Bool
 {
     $v.so ?? exists-value($container, @path) !! exists-key($container, @path);
 }
@@ -302,7 +302,7 @@ multi sub exists-value(
 
 multi method get(
     $container,
-    @path,
+    :@path!,
     Bool :$k! where *.so,
     Bool :$v where *.not,
     Bool :$p where *.not
@@ -313,7 +313,7 @@ multi method get(
 
 multi method get(
     $container,
-    @path,
+    :@path!,
     Bool :$k where *.not,
     Bool :$v = True,
     Bool :$p where *.not
@@ -324,7 +324,7 @@ multi method get(
 
 multi method get(
     $container,
-    @path,
+    :@path!,
     Bool :$k where *.not,
     Bool :$v where *.not,
     Bool :$p! where *.so

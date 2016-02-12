@@ -60,16 +60,16 @@ Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 
 ## Exported Subroutines
 
-<!-- at($container,@path) {{{ -->
+<!-- at($container,*@path) {{{ -->
 
-### `at($container,@path)`
+### `at($container,*@path)`
 
 Navigates to and returns container `is rw`.
 
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@path`: _Path, required_ — a list of steps for walking container
+* `*@path`: _Path, optional_ — a list of steps for navigating container
 
 _returns:_
 
@@ -90,7 +90,7 @@ at(%inxi, qw<info>)<uptime>:delete;
 say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
 ```
 
-<!-- end at($container,@path) }}} -->
+<!-- end at($container,*@path) }}} -->
 
 -------------------------------------------------------------------------------
 
@@ -103,18 +103,18 @@ say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
 
 <!-- methods toc {{{ -->
 
-- [`.exists($container,@path,:$k,:$v)`](#existscontainerpathkv)
-- [`.get($container,@path,:$k,:$v,:$p)`](#getcontainerpathkvp)
-- [`.set($container,@path,$value,:$force)`](#setcontainerpathvalueforce)
-- [`.add($container,@path,$value)`](#addcontainerpathvalue)
-- [`.remove($container,@path)`](#removecontainerpath)
-- [`.replace($container,@path,$value)`](#replacecontainerpathvalue)
-- [`.move($container,@srcpath,@destpath)`](#movecontainersrcpathdestpath)
-- [`.copy($container,@srcpath,@destpath)`](#copycontainersrcpathdestpath)
-- [`.test($container,@path,$value)`](#testcontainerpathvalue)
-- [`.list($container,@path)`](#listcontainerpath)
-- [`.flatten($container,@path)`](#flattencontainerpath)
-- [`.transform($container,@path,$block)`](#transformcontainerpathblock)
+- [`.exists($container,:@path!,:$k,:$v)`](#existscontainerpathkv)
+- [`.get($container,:@path!,:$k,:$v,:$p)`](#getcontainerpathkvp)
+- [`.set($container,:@path!,:$value!,:$force)`](#setcontainerpathvalueforce)
+- [`.add($container,:@path!,:$value!)`](#addcontainerpathvalue)
+- [`.remove($container,:@path!)`](#removecontainerpath)
+- [`.replace($container,:@path!,:$value!)`](#replacecontainerpathvalue)
+- [`.move($container,:@from!,:@path!)`](#movecontainersrcpathdestpath)
+- [`.copy($container,:@from!,:@path!)`](#copycontainersrcpathdestpath)
+- [`.test($container,:@path!,:$value!)`](#testcontainerpathvalue)
+- [`.list($container,:@path!)`](#listcontainerpath)
+- [`.flatten($container,:@path!)`](#flattencontainerpath)
+- [`.transform($container,:@path!,:$block!)`](#transformcontainerpathblock)
 
 <!-- end methods toc }}} -->
 
@@ -150,9 +150,9 @@ my %data =
 
 <!-- end example data structure }}} -->
 
-<!-- .exists($container,@path,:$k,:$v) {{{ -->
+<!-- .exists($container,:@path!,:$k,:$v) {{{ -->
 
-### `.exists($container,@path,:$k,:$v)`
+### `.exists($container,:@path!,:$k,:$v)`
 
 Determines whether a key exists in the container at the
 specified path. Works similar to the p6 Hash `:exists` [subscript
@@ -163,7 +163,7 @@ path.
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@path`: _Path, required_ — a list of steps for walking container
+* `:@path!`: _Path, required_ — a list of steps for navigating container
 * `:$k`: _Bool, optional, defaults to True_ — indicates whether to
          check for an existing key at path
 * `:$v`: _Bool, optional_ — indicates whether to check for a defined
@@ -178,11 +178,11 @@ _What about operating on the root of the container?_
 Pass an empty list as `@path` to operate on the root of the container.
 Tests `if $container.defined`.
 
-<!-- end .exists($container,@path,:$k,:$v) }}} -->
+<!-- end .exists($container,:@path!,:$k,:$v) }}} -->
 
-<!-- .get($container,@path,:$k,:$v,:$p) {{{ -->
+<!-- .get($container,:@path!,:$k,:$v,:$p) {{{ -->
 
-### `.get($container,@path,:$k,:$v,:$p)`
+### `.get($container,:@path!,:$k,:$v,:$p)`
 
 Gets the value from container at the specified path. The default
 behavior is to raise an error if path is nonexistent.
@@ -190,7 +190,7 @@ behavior is to raise an error if path is nonexistent.
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@path`: _Path, required_ — a list of steps for walking container
+* `:@path!`: _Path, required_ — a list of steps for navigating container
 * `:$k`: _Bool, optional_ — only return the key at path
 * `:$v`: _Bool, optional, defaults to True_ — only return the value
          at path
@@ -203,13 +203,13 @@ _returns:_
 _example:_
 
 ```perl6
-my $value = Crane.get(%data, ['legumes', 1]);
+my $value = Crane.get(%data, :path('legumes', 1));
 say $value.perl; # { :instock(21), :name("lima beans"), :unit("lbs") }
 
-my $value-k = Crane.get(%data, ['legumes', 1], :k);
+my $value-k = Crane.get(%data, :path('legumes', 1), :k);
 say $value-k.perl; # 1
 
-my $value-p = Crane.get(%data, ['legumes', 1], :p);
+my $value-p = Crane.get(%data, :path('legumes', 1), :p);
 say $value-p.perl; # 1 => { :instock(21), :name("lima beans"), :unit("lbs") }
 ```
 
@@ -223,36 +223,37 @@ Pass an empty list as `@path` to operate on the root of the container.
 - if `:p` flag passed: raise error "Sorry, not possible to request key
                        operations on the container root"
 
-<!-- end .get($container,@path,:$k,:$v,:$p) }}} -->
+<!-- end .get($container,:@path!,:$k,:$v,:$p) }}} -->
 
-<!-- .set($container,@path,$value,:$force) {{{ -->
+<!-- .set($container,:@path!,:$value!,:$force) {{{ -->
 
-### `.set($container,@path,$value,:$force)`
+### `.set($container,:@path!,:$value!,:$force)`
 
-Sets the `value` at the specified path in the container. The default
+Sets the value at the specified path in the container. The default
 behavior is to raise an error if a value at path exists.
 
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@path`: _Path, required_ — a list of steps for navigating container
-* `$value`: _Any_ — the value to be set at the specified path
-* `:$force`: _Bool, optional_ — indicates whether pre-existing values
-             at path are overwritten during the call
+* `:@path!`: _Path, required_ — a list of steps for navigating container
+* `:$value!`: _Any, required_ — the value to be set at the specified path
+* `:$force`: _Bool, optional_ — indicates whether nonexistent paths
+             should be written and existing paths and values overwritten
+             during the call
 
 _returns:_
 
 * The prior value at the container's path — therefore, `Any` means
-  the path was nonexistent.
+  the path was nonexistent (or the previous value was `Any`).
 
 _example:_
 
 ```perl6
 my %peters;
 
-my $prior1 = Crane.set(%peters, qw<peter piper>, 'man');
-my $prior2 = Crane.set(%peters, qw<peter pan>, 'boy');
-my $prior3 = Crane.set(%peters, qw<peter pickle>, 'dunno');
+my $prior1 = Crane.set(%peters, :path(qw<peter piper>), :value<man>);
+my $prior2 = Crane.set(%peters, :path(qw<peter pan>), :value<boy>);
+my $prior3 = Crane.set(%peters, :path(qw<peter pickle>), :value<dunno>);
 
 say $prior1; # (Any)
 say $prior2; # (Any)
@@ -263,7 +264,7 @@ say %peters.perl; # { :peter({ :pan("boy"), :pickle("dunno"), :piper("man") }) }
 example force:
 
 ```perl6
-my $prior = Crane.set(%data, ['legumes', 1, 'instock'], 50, :force);
+my $prior = Crane.set(%data, :path(qw<legumes 1 instock>), :value(50), :force);
 say $prior.perl; # 21
 ```
 
@@ -279,19 +280,19 @@ Pass an empty list as `@path` to operate on the root of the container.
 
 ```perl6
 my $a = (1, 2, 3);
-my $prior = Crane.set($a, [], "foo", :force);
+my $prior = Crane.set($a, :path(), :value<foo>, :force);
 say $prior.perl; $(1, 2, 3)
 say $a.perl; # "foo"
 ```
 
-<!-- end .set($container,@path,$value,:$force) }}} -->
+<!-- end .set($container,:@path!,:$value!,:$force) }}} -->
 
-<!-- .add($container,@path,$value) {{{ -->
+<!-- .add($container,:@path!,:$value!) {{{ -->
 
-### `.add($container,@path,$value)`
+### `.add($container,:@path!,:$value!)`
 
-Adds a value to the container. If `@path` points to an existing item in
-the container, that item's value is replaced.
+Adds a value to the container. If `:@path` points to an existing item
+in the container, that item's value is replaced.
 
 In the case of a `Positional` type, the value is inserted before the
 given index. Use the relative accessor (`*-0`) instead of an index
@@ -337,8 +338,9 @@ $ mkdir a/b/c
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@path`: _Path, required_ — a list of steps for navigating container
-* `$value`: _Any_ — the value to be added/inserted at the specified path
+* `:@path!`: _Path, required_ — a list of steps for navigating container
+* `:$value!`: _Any, required_ — the value to be added/inserted at the
+              specified path
 
 _returns:_
 
@@ -348,7 +350,7 @@ _example:_
 
 ```perl6
 my %legume = :name<carrots>, :unit<lbs>, :instock(3);
-my %data-new = Crane.add(%data, qw<legumes 0>, %legume);
+my %data-new = Crane.add(%data, :path(qw<legumes 0>), :value(%legume));
 ```
 
 _What about operating on the root of the container?_
@@ -362,16 +364,16 @@ Pass an empty list as `@path` to operate on the root of the container.
 
 ```perl6
 my @a;
-my @b = Crane.add(@a, [], "foo");
+my @b = Crane.add(@a, :path([]), :value<foo>);
 say @a.perl; # []
 say @b.perl; # ["foo"]
 ```
 
-<!-- end .add($container,@path,$value) }}} -->
+<!-- end .add($container,:@path!,:$value!) }}} -->
 
-<!-- .remove($container,@path) {{{ -->
+<!-- .remove($container,:@path!) {{{ -->
 
-### `.remove($container,@path)`
+### `.remove($container,:@path!)`
 
 Removes the pair at path from `Associative`
 types, similar to the p6 Hash `:delete` [subscript
@@ -384,7 +386,7 @@ nonexistent.
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@path`: _Path, required_ — a list of steps for walking container
+* `:@path!`: _Path, required_ — a list of steps for navigating container
 
 _returns:_
 
@@ -394,7 +396,7 @@ _example:_
 
 ```perl6
 my %h = :example<hello>;
-my %h2 = Crane.remove(%h, qw<example>);
+my %h2 = Crane.remove(%h, :path(['example']));
 say %h.perl; # { :example<hello> }
 say %h2.perl; # {}
 ```
@@ -408,25 +410,25 @@ This:
 is equivalent to this:
 
 ```perl6
-Crane.remove(%h, qw<a b>);
+Crane.remove(%h, :path(qw<a b>));
 ```
 
 _What about operating on the root of the container?_
 
-Pass an empty list as path to operate on the root of the container.
+Pass an empty list as `@path` to operate on the root of the container.
 
 ```perl6
-my $a = (1, 2, 3);
-my $b = Crane.remove($a, []);
-say $a.perl; $(1, 2, 3)
+my $a = [1, 2, 3];
+my $b = Crane.remove($a, :path([])); # equivalent to `$a = Empty`
+say $a.perl; [1, 2, 3]
 say $b; # (Any)
 ```
 
-<!-- end .remove($container,@path) }}} -->
+<!-- end .remove($container,:@path!) }}} -->
 
-<!-- .replace($container,@path,$value) {{{ -->
+<!-- .replace($container,:@path!,:$value!) {{{ -->
 
-### `.replace($container,@path,$value)`
+### `.replace($container,:@path!,:$value!)`
 
 Replaces a value. This operation is functionally identical to a `.remove`
 operation for a value, followed immediately by a `.add` operation at
@@ -438,8 +440,8 @@ nonexistent.
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@path`: _Path, required_ — a list of steps for navigating container
-* `$value`: _Any_ — the value to be set at the specified path
+* `:@path!`: _Path, required_ — a list of steps for navigating container
+* `:$value!`: _Any, required_ — the value to be set at the specified path
 
 _returns:_
 
@@ -449,7 +451,7 @@ _example:_
 
 ```perl6
 my %legume = :name<green beans>, :unit<lbs>, :instock(3);
-my %data-new = Crane.replace(%data, qw<legumes 0>, %legume);
+my %data-new = Crane.replace(%data, :path(qw<legumes 0>), :value(%legume));
 ```
 
 _What about operating on the root of the container?_
@@ -463,34 +465,34 @@ Pass an empty list as `@path` to operate on the root of the container.
 
 ```perl6
 my %a = :a<aaa>, :b<bbb>, :c<ccc>;
-my %b = Crane.replace(%a, [], { :vm<moar> });
+my %b = Crane.replace(%a, :path([]), :value({ :vm<moar> }));
 say %a.perl; # { :a<aaa>, :b<bbb>, :c<ccc> }
 say %b.perl; # { :vm<moar> }
 ```
 
-<!-- end .replace($container,@path,$value) }}} -->
+<!-- end .replace($container,:@path!,:$value!) }}} -->
 
-<!-- .move($container,@srcpath,@destpath) {{{ -->
+<!-- .move($container,:@from!,:@path!) {{{ -->
 
-### `.move($container,@srcpath,@destpath)`
+### `.move($container,:@from!,:@path!)`
 
-Moves the source value identified by `@srcpath` in container to
-destination location specified by `@destpath`. This operation is
-functionally identical to a `.remove` operation on the `@srcpath`
-location, followed immediately by a `.add` operation at the target
-location with the value that was just removed.
+Moves the source value identified by `@from` in container to destination
+location specified by `@path`. This operation is functionally identical
+to a `.remove` operation on the `@from` location, followed immediately
+by a `.add` operation at the `@path` location with the value that was
+just removed.
 
 The default behavior is to raise an error if the source is nonexistent.
 
-The default behavior is to raise an error if the `@srcpath` location is
-a proper prefix of the `@destpath` location; i.e., a location cannot be
-moved into one of its children.
+The default behavior is to raise an error if the `@from` location is a
+proper prefix of the `@path` location; i.e., a location cannot be moved
+into one of its children.
 
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@srcpath`: _Path, required_ — a list of steps to the source
-* `@destpath`: _Path, required_ — a list of steps to the destination
+* `:@from!`: _Path, required_ — a list of steps to the source
+* `:@path!`: _Path, required_ — a list of steps to the destination
 
 _returns:_
 
@@ -498,32 +500,33 @@ _returns:_
 
 _What about operating on the root of the container?_
 
-Pass an empty list as path to operate on the root of the container.
+Pass an empty list as `@from` or `@path` to operate on the root of
+the container.
 
 - if value assignment (`=`) to `$container` fails, abort move operation,
   raise error and propogate the original error message
   - value assignment will fail when assigning a List to a `$container`
     of type Hash and vice versa
-- overwrite existing values if `:force` flag is passed
 
-<!-- end .move($container,@srcpath,@destpath) }}} -->
+<!-- end .move($container,:@from!,:@path!) }}} -->
 
-<!-- .copy($container,@srcpath,@destpath) {{{ -->
+<!-- .copy($container,:@from!,:@path!) {{{ -->
 
-### `.copy($container,@srcpath,@destpath)`
+### `.copy($container,:@from!,:@path!)`
 
-Copies the source value identified by `@srcpath` in container to
-destination container at location specified by `@destpath`. This operation
-is functionally identical to a `.add` operation at the target location
-using the value specified in the `@srcpath`.
+Copies the source value identified by `@from` in container to destination
+container at location specified by `@path`. This operation is functionally
+identical to a `.add` operation at the `@path` location using the value
+specified in the `@from`.
 
-The default behavior is to raise an error if the source is nonexistent.
+The default behavior is to raise an error if the source at `@from`
+is nonexistent.
 
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@srcpath`: _Path, required_ — a list of steps to the source
-* `@destpath`: _Path, required_ — a list of steps to the destination
+* `:@from!`: _Path, required_ — a list of steps to the source
+* `:@path!`: _Path, required_ — a list of steps to the destination
 
 _returns:_
 
@@ -533,21 +536,21 @@ _example:_
 
 ```perl6
 my %h = :example<hello>;
-my %h2 = Crane.copy(%h, qw<example>, qw<sample>);
+my %h2 = Crane.copy(%h, :from(['example']), :path(['sample']));
 say %h.perl; # { :example("hello") }
 say %h2.perl; # { :example("hello"), :sample("hello") }
 ```
 
 _What about operating on the root of the container?_
 
-Pass an empty list as path to operate on the root of the container. Has
-similar rules / considerations to `.move`.
+Pass an empty list as `@from` or `@path` to operate on the root of the
+container. Has similar rules / considerations to `.move`.
 
-<!-- end .copy($container,@srcpath,@destpath) }}} -->
+<!-- end .copy($container,:@from!,:@path!) }}} -->
 
-<!-- .test($container,@path,$value) {{{ -->
+<!-- .test($container,:@path!,:$value!) {{{ -->
 
-### `.test($container,@path,$value)`
+### `.test($container,:@path!,:$value!)`
 
 Tests that the specified value is set at the target location in the
 document. Compares values with the Perl6 Test module's `is-deeply`
@@ -556,35 +559,35 @@ subroutine.
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
-* `@path`: _Path, required_ — a list of steps for navigating container
-* `$value`: _Any_ — the value expected at the specified path
+* `:@path!`: _Path, required_ — a list of steps for navigating container
+* `:$value!`: _Any, required_ — the value expected at the specified path
 
 _returns:_
 
-* `True` if expected value exists at path, otherwise `False`
+* `True` if expected value exists at `@path`, otherwise `False`
 
 _example:_
 
 ```perl6
-say so Crane.test(%data, qw<legumes 0 name>, "green beans"); # True
+say so Crane.test(%data, :path(qw<legumes 0 name>), :value<green beans>); # True
 ```
 
 _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
 
-<!-- end .test($container,@path,$value) }}} -->
+<!-- end .test($container,:@path!,:$value!) }}} -->
 
-<!-- .list($container,@path) {{{ -->
+<!-- .list($container,:@path) {{{ -->
 
-### `.list($container,@path)`
+### `.list($container,:@path)`
 
 Lists all of the paths available in container.
 
 _arguments:_
 
 * `$container` : _Container, required_ — the target container
-* `@path`: _Path, optional_ — a list of steps for navigating container
+* `:@path`: _Path, optional_ — a list of steps for navigating container
 
 _returns:_
 
@@ -642,18 +645,18 @@ say Crane.list($a);
 ]
 ```
 
-<!-- end .list($container,@path) }}} -->
+<!-- end .list($container,:@path) }}} -->
 
-<!-- .flatten($container,@path) {{{ -->
+<!-- .flatten($container,:@path) {{{ -->
 
-### `.flatten($container,@path)`
+### `.flatten($container,:@path)`
 
 Flattens a container into a single-level `Hash` of path-value pairs.
 
 _arguments:_
 
 * `$container` : _Container, required_ — the target container
-* `@path`: _Path, optional_ — a list of steps for navigating container
+* `:@path`: _Path, optional_ — a list of steps for navigating container
 
 _returns:_
 
@@ -677,11 +680,11 @@ say Crane.flatten(%data);
 }
 ```
 
-<!-- end .flatten($container,@path) }}} -->
+<!-- end .flatten($container,:@path) }}} -->
 
-<!-- .transform($container,@path,$block) {{{ -->
+<!-- .transform($container,:@path!,:$block!) {{{ -->
 
-### `.transform($container,@path,$block)`
+### `.transform($container,:@path!,:$block!)`
 
 _example:_
 
@@ -697,14 +700,14 @@ my @second-veggie = qw<foods veggies>, 1;
 
 my &oh-yeah = -> $s { say $s ~ '!' };
 
-Crane.transform(%market, @first-fruit, &oh-yeah);
-say so Crane.get(%market, @first-fruit) eq 'blueberries!'; # True
+Crane.transform(%market, :path(@first-fruit), :block(&oh-yeah));
+say so Crane.get(%market, :path(@first-fruit)) eq 'blueberries!'; # True
 
-Crane.transform(%market, @second-veggie, &oh-yeah);
-say so Crane.get(%market, @second-veggie) eq 'onions!'; # True
+Crane.transform(%market, :path(@second-veggie), :block(&oh-yeah));
+say so Crane.get(%market, :path(@second-veggie)) eq 'onions!'; # True
 ```
 
-<!-- end .transform($container,@path,$block) }}} -->
+<!-- end .transform($container,:@path!,:$block!) }}} -->
 
 -------------------------------------------------------------------------------
 
@@ -731,8 +734,8 @@ Encapsulates container related operations for a specified path.
 
 #### attributes:
 
-* `.path` : _Path_ — contains the `Crane`'s list of steps for walking
-            a container
+* `.path` : _Path_ — contains the `Crane`'s list of steps for navigating
+            container
 
 <!-- end Crane Class attributes }}} -->
 
@@ -748,7 +751,7 @@ Instantiates `Crane` class.
 
 _arguments:_
 
-* `@path` : _Path, required_ — a list of steps for walking a container
+* `@path` : _Path, required_ — a list of steps for navigating container
 
 _returns:_
 

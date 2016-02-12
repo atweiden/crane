@@ -696,7 +696,7 @@ my %market =
     });
 
 my @first-fruit = |qw<foods fruits>, 0;
-my @second-veggie = qw<foods veggies>, 1;
+my @second-veggie = |qw<foods veggies>, 1;
 
 my &oh-yeah = -> $s { say $s ~ '!' };
 

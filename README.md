@@ -60,6 +60,13 @@ Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 
 ## Exported Subroutines
 
+<!-- exported subroutines toc {{{ -->
+
+- [`.at($container,*@path)`](#atcontainerpath)
+- [`.at-rw($container,*@path)`](#at-rwcontainerpath)
+
+<!-- end exported subroutines toc }}} -->
+
 <!-- at($container,*@path) {{{ -->
 
 ### `at($container,*@path)`

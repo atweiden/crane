@@ -200,7 +200,7 @@ sub at-rw($container, *@steps) is rw is export
                     $root := at-rw(
                         $container,
                         @steps-taken,
-                        null-step(@steps[$i]), # change *-0 to 0
+                        null-step($container.at(@steps-taken), @steps[$i]),
                         @steps[$i+1..*]
                     );
                     last;
@@ -213,8 +213,11 @@ sub at-rw($container, *@steps) is rw is export
         }
         else
         {
-            # step succeeded
-            push @steps-taken, @steps[$i];
+            # step succeeded (convert would-be WhateverCode Positional
+            # indices into hard-coded Int indices)
+            push @steps-taken, @steps[$i].isa(WhateverCode)
+                ?? null-step($container.at(@steps-taken), @steps[$i])
+                !! @steps[$i];
         }
     }
 
@@ -640,22 +643,13 @@ multi sub is-valid-positional-index($step) returns Bool
     $n.isa: Int;
 }
 
-# prevents infinite loops arising when *-0 accessors are present
-sub null-step(WhateverCode $step)
+# convert WhateverCode to Int Positional index
+# helps prevent infinite loops
+sub null-step(Positional $container, WhateverCode $step) returns Int
 {
-    # <atweiden> is it possible to smart match whatevercode
-    #            values? e.g. can you check for *-0 vs *-1 in a list?
-    # <atweiden> m: my @wecodes = [*-0, *-1, *-2, *-3];
-    #               say @wecodes.grep({$_ === *-1}).perl
-    # <jnthn> smart-matching against a piece of code calls it
-    # <jnthn> with the thing on the lhs of the smartmatch as an argument
-    # <jnthn> m: say [*-0,*-1,*-2,*-3].grep({.(0) == -1})
-    # <jnthn> something like that would work
-    # <jnthn> (that is, is this a bit of code where, if i give it a 0,
-    #         it spits out a -1)
-    # <jnthn> in general though, code is not comparable...
-    # jnthn hides behind a huge "halting problem" sign :)
-    $step.(0) == 0 ?? 0 !! $step;
+    # $container.elems for *-0
+    my Int $elems = $container.elems // 0;
+    my Int $null-index = $container[$step]:k ?? ($container[$step]:k) !! $elems;
 }
 
 # end helper functions }}}

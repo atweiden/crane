@@ -13,6 +13,42 @@ class AssociativeKeyDNE is Exception
 
 # end X::Crane::AssociativeKeyDNE }}}
 
+# X::Crane::AtRwInvalidStep {{{
+
+class AtRwInvalidStep is Exception
+{
+    has $.error;
+    method message()
+    {
+        my Str $message = qq:to/EOF/;
+        ✗ Crane error: at-rw requested invalid step
+        ✗ Causative error message:「{$.error.payload}」
+        ✗ Causative error type:「{$.error.WHAT.perl}」
+        EOF
+        say $message.trim;
+    }
+}
+
+# end X::Crane::AtRwInvalidStep }}}
+
+# X::Crane::NonAssociativeKeyAssociative {{{
+
+class NonAssociativeKeyAssociative is Exception {*}
+
+# end X::Crane::NonAssociativeKeyAssociative }}}
+
+# X::Crane::NonPositionalIndexInt {{{
+
+class NonPositionalIndexInt is Exception {*}
+
+# end X::Crane::NonPositionalIndexInt }}}
+
+# X::Crane::NonPositionalIndexWhateverCode {{{
+
+class NonPositionalIndexWhateverCode is Exception {*}
+
+# end X::Crane::NonPositionalIndexWhateverCode }}}
+
 # X::Crane::PathDNE {{{
 
 class PathDNE is Exception

@@ -26,7 +26,7 @@ my %inxi = :info({
 %inxi.at(qw<info>)<uptime>:delete;
 %inxi.at(qw<info memory>)[0] = 31868.0;
 
-say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
+say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) })
 ```
 
 <!-- end example code }}} -->
@@ -87,10 +87,47 @@ my %inxi = :info({
 at(%inxi, qw<info>)<uptime>:delete;
 %inxi.at(qw<info memory>)[0] = 31868.0;
 
-say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
+say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) })
 ```
 
 <!-- end at($container,*@path) }}} -->
+
+<!-- at-rw($container,*@path) {{{ -->
+
+### `at-rw($container,*@path)`
+
+Navigates to and returns container `is rw`, creating keys and overwriting
+values along the way (recursively).
+
+If the given `@path` calls for overwriting values in `$container`,
+those values will be overwritten even when the rest of the operation
+fails and even when not assigning values to the returned container.
+
+Use with caution.
+
+_arguments:_
+
+* `$container`: _Container, required_ — the target container
+* `*@path`: _Path, optional_ — a list of steps for navigating container
+
+_returns:_
+
+* Container at path (`is rw`)
+
+_example:_
+
+```perl6
+my %archversion = :bamboo({ :up<0.0.1>, :aur<0.0.2> });
+at-rw(%archversion, qw<fzf up>) = '0.11.3';
+at-rw(%archversion, qw<fzf aur>) = '0.11.3';
+say %archversion.perl;
+{
+    :bamboo({ :aur<0.0.2>, :up<0.0.1> }),
+    :fzf({ :aur<0.11.3>, :up<0.11.3> })
+}
+```
+
+<!-- end at-rw($container,*@path) }}} -->
 
 -------------------------------------------------------------------------------
 
@@ -105,7 +142,7 @@ say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) });
 
 - [`.exists($container,:@path!,:$k,:$v)`](#existscontainerpathkv)
 - [`.get($container,:@path!,:$k,:$v,:$p)`](#getcontainerpathkvp)
-- [`.set($container,:@path!,:$value!,:$force)`](#setcontainerpathvalueforce)
+- [`.set($container,:@path!,:$value!)`](#setcontainerpathvalue)
 - [`.add($container,:@path!,:$value!)`](#addcontainerpathvalue)
 - [`.remove($container,:@path!)`](#removecontainerpath)
 - [`.replace($container,:@path!,:$value!)`](#replacecontainerpathvalue)
@@ -225,47 +262,36 @@ Pass an empty list as `@path` to operate on the root of the container.
 
 <!-- end .get($container,:@path!,:$k,:$v,:$p) }}} -->
 
-<!-- .set($container,:@path!,:$value!,:$force) {{{ -->
+<!-- .set($container,:@path!,:$value!) {{{ -->
 
-### `.set($container,:@path!,:$value!,:$force)`
+### `.set($container,:@path!,:$value!)`
 
 Sets the value at the specified path in the container. The default
-behavior is to raise an error if a value at path exists.
+behavior is to create nonexistent paths (similar to `mkdir -p`) and to
+overwrite existing values where necessary.
 
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
 * `:@path!`: _Path, required_ — a list of steps for navigating container
 * `:$value!`: _Any, required_ — the value to be set at the specified path
-* `:$force`: _Bool, optional_ — indicates whether nonexistent paths
-             should be written and existing paths and values overwritten
-             during the call
 
 _returns:_
 
-* The prior value at the container's path — therefore, `Any` means
-  the path was nonexistent (or the previous value was `Any`).
+* New container (original is unmodified)
 
 _example:_
 
 ```perl6
-my %peters;
+my %p0;
+my %p1 = Crane.set(%p0, :path(qw<peter piper>), :value<man>);
+my %p2 = Crane.set(%p1, :path(qw<peter pan>), :value<boy>);
+my %p3 = Crane.set(%p2, :path(qw<peter pickle>), :value<dunno>);
 
-my $prior1 = Crane.set(%peters, :path(qw<peter piper>), :value<man>);
-my $prior2 = Crane.set(%peters, :path(qw<peter pan>), :value<boy>);
-my $prior3 = Crane.set(%peters, :path(qw<peter pickle>), :value<dunno>);
-
-say $prior1; # (Any)
-say $prior2; # (Any)
-say $prior3; # (Any)
-say %peters.perl; # { :peter({ :pan("boy"), :pickle("dunno"), :piper("man") }) }
-```
-
-example force:
-
-```perl6
-my $prior = Crane.set(%data, :path(qw<legumes 1 instock>), :value(50), :force);
-say $prior.perl; # 21
+say %p0.perl; # {}
+say %p1.perl; # { :peter({ :piper("man") }) }
+say %p2.perl; # { :peter({ :pan("boy"), :piper("man") }) }
+say %p3.perl; # { :peter({ :pan("boy"), :pickle("dunno"), :piper("man") }) }
 ```
 
 _What about operating on the root of the container?_
@@ -276,16 +302,15 @@ Pass an empty list as `@path` to operate on the root of the container.
   propogate the original error message
   - value assignment will fail when assigning a List to a `$container`
     of type Hash and vice versa
-- overwrite existing values if `:force` flag is passed
 
 ```perl6
 my $a = (1, 2, 3);
-my $prior = Crane.set($a, :path(), :value<foo>, :force);
-say $prior.perl; $(1, 2, 3)
-say $a.perl; # "foo"
+my $b = Crane.set($a, :path(), :value<foo>);
+say $a; # (1, 2, 3)
+say $b; # foo
 ```
 
-<!-- end .set($container,:@path!,:$value!,:$force) }}} -->
+<!-- end .set($container,:@path!,:$value!) }}} -->
 
 <!-- .add($container,:@path!,:$value!) {{{ -->
 
@@ -344,7 +369,7 @@ _arguments:_
 
 _returns:_
 
-* Updated container
+* New container (original is unmodified)
 
 _example:_
 
@@ -390,7 +415,7 @@ _arguments:_
 
 _returns:_
 
-* Updated container
+* New container (original is unmodified)
 
 _example:_
 
@@ -445,7 +470,7 @@ _arguments:_
 
 _returns:_
 
-* Updated container
+* New container (original is unmodified)
 
 _example:_
 
@@ -496,7 +521,7 @@ _arguments:_
 
 _returns:_
 
-* Updated container
+* New container (original is unmodified)
 
 _What about operating on the root of the container?_
 
@@ -530,7 +555,7 @@ _arguments:_
 
 _returns:_
 
-* Updated container
+* New container (original is unmodified)
 
 _example:_
 

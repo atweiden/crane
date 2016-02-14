@@ -135,41 +135,159 @@ multi sub _at(Positional $data) is rw
     return-rw $data;
 }
 
-# check for non-integer positional index
-multi sub is-valid-positional-index(Int $step) returns Bool
-{
-    True;
-}
-
-# passing *-1 is ok
-multi sub is-valid-positional-index(WhateverCode $step) returns Bool
-{
-    True;
-}
-
-# passing stringified integers is ok
-multi sub is-valid-positional-index($step) returns Bool
-{
-    my $n;
-    try
-    {
-        # convert string into number
-        $n = +$step;
-        CATCH
-        {
-            when X::Str::Numeric
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
-    $n.isa: Int;
-}
-
 # end Positional handling }}}
 
 # end at }}}
+
+# at-rw {{{
+
+sub at-rw($container, *@steps) is rw is export
+{
+    my $root := $container;
+
+    my @steps-taken; # for backtracing steps
+    loop (my Int $i = 0; $i < @steps.elems; $i++)
+    {
+        my Bool %failed; # for storing exception type encountered
+        CATCH
+        {
+            when X::Crane::NonAssociativeKeyAssociative
+            {
+                %failed{.^name}++;
+                .resume;
+            }
+            when X::Crane::NonPositionalIndexInt
+            {
+                %failed{.^name}++;
+                .resume;
+            }
+            when X::Crane::NonPositionalIndexWhateverCode
+            {
+                %failed{.^name}++;
+                .resume;
+            }
+            default
+            {
+                die "✗ Crane accident:「{dd $_}」";
+            }
+        }
+
+        $root := step($root, @steps[$i]);
+
+        if %failed.keys.grep({.defined})
+        {
+            # assess why it failed
+            given %failed.keys.grep({.defined})[0]
+            {
+                when 'X::Crane::NonAssociativeKeyAssociative'
+                {
+                    # change last step to Associative type (overwrite)
+                    at-rw($container, @steps-taken) = {};
+                    $root := at-rw($container, @steps);
+                    last;
+                }
+                when 'X::Crane::NonPositionalIndexInt'
+                {
+                    # change last step to Positional type (overwrite)
+                    at-rw($container, @steps-taken) = [];
+                    $root := at-rw($container, @steps);
+                    last;
+                }
+                when 'X::Crane::NonPositionalIndexWhateverCode'
+                {
+                    # change last step to Positional type (overwrite)
+                    at-rw($container, @steps-taken) = [];
+                    $root := at-rw(
+                        $container,
+                        @steps-taken,
+                        null-step(@steps[$i]), # change *-0 to 0
+                        @steps[$i+1..*]
+                    );
+                    last;
+                }
+                default
+                {
+                    die "✗ Crane accident:「{dd $_}」";
+                }
+            }
+        }
+        else
+        {
+            # step succeeded
+            push @steps-taken, @steps[$i];
+        }
+    }
+
+    return-rw $root;
+}
+
+multi sub step($container where {$_ !~~ Positional}, Int $step)
+{
+    X::Crane::NonPositionalIndexInt.new.throw;
+}
+
+multi sub step($container where {$_ !~~ Positional}, WhateverCode $step)
+{
+    X::Crane::NonPositionalIndexWhateverCode.new.throw;
+}
+
+multi sub step(Positional $container, Int $step) is rw
+{
+    my $root := $container;
+    try
+    {
+        CATCH
+        {
+            default
+            {
+                die X::Crane::AtRwInvalidStep.new(:error($_));
+            }
+        }
+        $root := $root[$step];
+    }
+    return-rw $root;
+}
+
+multi sub step(Positional $container, WhateverCode $step) is rw
+{
+    my $root := $container;
+    try
+    {
+        CATCH
+        {
+            default
+            {
+                die X::Crane::AtRwInvalidStep.new(:error($_));
+            }
+        }
+        $root := $root[$step];
+    }
+    return-rw $root;
+}
+
+multi sub step($container where {$_ !~~ Associative}, $step)
+{
+    X::Crane::NonAssociativeKeyAssociative.new.throw;
+}
+
+multi sub step($container, $step) is rw
+{
+    my $root := $container;
+    try
+    {
+        CATCH
+        {
+            default
+            {
+                die X::Crane::AtRwInvalidStep.new(:error($_));
+            }
+        }
+        $root := $root{$step};
+    }
+    return-rw $root;
+}
+
+# end at-rw }}}
 
 # exists {{{
 
@@ -487,5 +605,59 @@ multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
 # end get-pair }}}
 
 # end get }}}
+
+# helper functions {{{
+
+# check for non-integer positional index
+multi sub is-valid-positional-index(Int $step) returns Bool
+{
+    True;
+}
+
+# passing *-1 is ok
+multi sub is-valid-positional-index(WhateverCode $step) returns Bool
+{
+    True;
+}
+
+# passing stringified integers is ok
+multi sub is-valid-positional-index($step) returns Bool
+{
+    my $n;
+    try
+    {
+        # convert string into number
+        $n = +$step;
+        CATCH
+        {
+            when X::Str::Numeric
+            {
+                die X::Crane::PositionalIndexInvalid.new;
+            }
+        }
+    }
+
+    $n.isa: Int;
+}
+
+# prevents infinite loops arising when *-0 accessors are present
+sub null-step(WhateverCode $step)
+{
+    # <atweiden> is it possible to smart match whatevercode
+    #            values? e.g. can you check for *-0 vs *-1 in a list?
+    # <atweiden> m: my @wecodes = [*-0, *-1, *-2, *-3];
+    #               say @wecodes.grep({$_ === *-1}).perl
+    # <jnthn> smart-matching against a piece of code calls it
+    # <jnthn> with the thing on the lhs of the smartmatch as an argument
+    # <jnthn> m: say [*-0,*-1,*-2,*-3].grep({.(0) == -1})
+    # <jnthn> something like that would work
+    # <jnthn> (that is, is this a bit of code where, if i give it a 0,
+    #         it spits out a -1)
+    # <jnthn> in general though, code is not comparable...
+    # jnthn hides behind a huge "halting problem" sign :)
+    $step.(0) == 0 ?? 0 !! $step;
+}
+
+# end helper functions }}}
 
 # vim: ft=perl6 fdm=marker fdl=0

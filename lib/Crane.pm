@@ -205,10 +205,6 @@ sub at-rw($container, *@steps) is rw is export
                     );
                     last;
                 }
-                default
-                {
-                    die "✗ Crane accident:「{dd $_}」";
-                }
             }
         }
         else

@@ -321,7 +321,7 @@ multi sub exists-key(
     @path where *.elems == 0
 ) returns Bool
 {
-    $container.defined;
+    die X::Crane::RootContainerKeyOp.new;
 }
 
 multi sub exists-key(
@@ -353,7 +353,7 @@ multi sub exists-key(
     @path where *.elems == 0
 ) returns Bool
 {
-    $container.defined;
+    die X::Crane::RootContainerKeyOp.new;
 }
 
 # end exists-key }}}

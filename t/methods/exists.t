@@ -10,7 +10,7 @@ plan 1;
 subtest
 {
     my %data = %TestCrane::data;
-    is Crane.exists(%data, :path([])), True, 'Exists';
+    is Crane.exists(%data, :path([]), :v), True, 'Exists';
     is Crane.exists(%data, :path(['legumes'])), True, 'Exists';
     is Crane.exists(%data, :path(qw<legumes 0>)), True, 'Exists';
     is Crane.exists(%data, :path(qw<legumes 0 instock>)), True, 'Exists';

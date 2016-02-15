@@ -635,11 +635,11 @@ say Crane.list(%data);
     # ...
     {
         :path('legumes', 2, 'unit'),
-        :value<ea>
+        :value<lbs>
     },
     {
         :path('legumes', 2, 'instock'),
-        :value(9340)
+        :value(13)
     },
     {
         :path('legumes', 3, 'name'),
@@ -704,8 +704,8 @@ say Crane.flatten(%data);
     ['legumes', 1, 'unit']    => "lbs",
     ['legumes', 1, 'instock'] => 21,
     ['legumes', 2, 'name']    => "black eyed peas",
-    ['legumes', 2, 'unit']    => "ea",
-    ['legumes', 2, 'instock'] => 9340,
+    ['legumes', 2, 'unit']    => "lbs",
+    ['legumes', 2, 'instock'] => 13,
     ['legumes', 3, 'name']    => "split peas",
     ['legumes', 3, 'unit']    => "lbs",
     ['legumes', 3, 'instock'] => 8
@@ -730,7 +730,7 @@ my %market =
 my @first-fruit = |qw<foods fruits>, 0;
 my @second-veggie = |qw<foods veggies>, 1;
 
-my &oh-yeah = -> $s { say $s ~ '!' };
+my &oh-yeah = -> $s { $s ~ '!' };
 
 Crane.transform(%market, :path(@first-fruit), :block(&oh-yeah));
 say so Crane.get(%market, :path(@first-fruit)) eq 'blueberries!'; # True

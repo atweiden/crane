@@ -45,6 +45,12 @@ subtest
     my %j;
     at-rw(%j, 'a', 0, 1, *-0, 'b', 0, 'a', 2, qw<8 9 10>, *-0, 1) = 9999999;
     is %j<a>[0][1][0]<b>[0]<a>[2]<8><9><10>[0][1], 9999999, 'Is expected value';
+    throws-like {at-rw(%j, 0)}, X::Crane::AtRwRequestedROContainerReassignment,
+        'Reassigning RO container fails';
+
+    throws-like {at-rw(my @a, 'a')},
+        X::Crane::AtRwRequestedROContainerReassignment,
+        'Reassigning RO container fails';
 
     my %data = %TestCrane::data;
     my %legume = :instock(43), :name<black beans>, :unit<lbs>;

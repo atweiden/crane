@@ -31,6 +31,18 @@ class AtRwInvalidStep is Exception
 
 # end X::Crane::AtRwInvalidStep }}}
 
+# X::Crane::AtRwRequestedROContainerReassignment {{{
+
+class AtRwRequestedROContainerReassignment is Exception
+{
+    method message()
+    {
+        say "✗ Crane accident: at-rw requested reassigning immutable container";
+    }
+}
+
+# end X::Crane::AtRwRequestedROContainerReassignment }}}
+
 # X::Crane::NonAssociativeKeyAssociative {{{
 
 class NonAssociativeKeyAssociative is Exception {*}

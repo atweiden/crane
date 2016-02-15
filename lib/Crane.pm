@@ -166,6 +166,10 @@ sub at-rw($container, *@steps) is rw is export
                 %failed{.^name}++;
                 .resume;
             }
+            when .payload eq "Cannot assign to a readonly variable or a value"
+            {
+                die X::Crane::AtRwRequestedROContainerReassignment.new;
+            }
             default
             {
                 die "✗ Crane accident:「{dd $_}」";

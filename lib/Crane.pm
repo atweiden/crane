@@ -65,23 +65,7 @@ multi sub _at(Associative $data) is rw
 multi sub _at(Positional $data, @steps where *.elems > 1) is rw
 {
     my $root := $data;
-
-    try
-    {
-        unless is-valid-positional-index(@steps[0])
-        {
-            die X::Crane::PositionalIndexInvalid.new;
-        }
-
-        CATCH
-        {
-            default
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
+    validate-positional-index(@steps[0]);
     if $root[@steps[0]]:exists
     {
         $root := $root[@steps[0]];
@@ -96,23 +80,7 @@ multi sub _at(Positional $data, @steps where *.elems > 1) is rw
 multi sub _at(Positional $data, @steps where *.elems == 1) is rw
 {
     my $root := $data;
-
-    try
-    {
-        unless is-valid-positional-index(@steps[0])
-        {
-            die X::Crane::PositionalIndexInvalid.new;
-        }
-
-        CATCH
-        {
-            default
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
+    validate-positional-index(@steps[0]);
     if $root[@steps[0]]:exists
     {
         $root := $root[@steps[0]];
@@ -329,22 +297,7 @@ multi sub exists-key(
     @path where *.elems == 1
 ) returns Bool
 {
-    try
-    {
-        unless is-valid-positional-index(@path[0])
-        {
-            die X::Crane::PositionalIndexInvalid.new;
-        }
-
-        CATCH
-        {
-            default
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
+    validate-positional-index(@path[0]);
     $container[@path[0]]:exists;
 }
 
@@ -388,22 +341,7 @@ multi sub exists-value(
     @path where *.elems == 1
 ) returns Bool
 {
-    try
-    {
-        unless is-valid-positional-index(@path[0])
-        {
-            die X::Crane::PositionalIndexInvalid.new;
-        }
-
-        CATCH
-        {
-            default
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
+    validate-positional-index(@path[0]);
     $container[@path[0]].defined;
 }
 
@@ -477,22 +415,7 @@ multi sub get-key(Associative $container, @path where *.elems == 0) returns Any
 
 multi sub get-key(Positional $container, @path where *.elems == 1) returns Any
 {
-    try
-    {
-        unless is-valid-positional-index(@path[0])
-        {
-            die X::Crane::PositionalIndexInvalid.new;
-        }
-
-        CATCH
-        {
-            default
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
+    validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!k)
         !! die X::Crane::PathDNE.new;
@@ -528,22 +451,7 @@ multi sub get-value(Associative $container, @path where *.elems == 0) returns An
 
 multi sub get-value(Positional $container, @path where *.elems == 1) returns Any
 {
-    try
-    {
-        unless is-valid-positional-index(@path[0])
-        {
-            die X::Crane::PositionalIndexInvalid.new;
-        }
-
-        CATCH
-        {
-            default
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
+    validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!v)
         !! die X::Crane::PathDNE.new;
@@ -579,22 +487,7 @@ multi sub get-pair(Associative $container, @path where *.elems == 0) returns Any
 
 multi sub get-pair(Positional $container, @path where *.elems == 1) returns Any
 {
-    try
-    {
-        unless is-valid-positional-index(@path[0])
-        {
-            die X::Crane::PositionalIndexInvalid.new;
-        }
-
-        CATCH
-        {
-            default
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
+    validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!p)
         !! die X::Crane::PathDNE.new;
@@ -611,36 +504,44 @@ multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
 
 # helper functions {{{
 
-# check for non-integer positional index
-multi sub is-valid-positional-index(Int $step) returns Bool
+# INT0P: Int where * >= 0 (valid)
+# WEC: WhateverCode (valid)
+# INTM: Int where * < 0 (invalid)
+# OTHER: everything else (invalid)
+enum Classifier <INT0P INTM OTHER WEC>;
+
+# classify positional index requests for better error messages
+multi sub get-positional-index-classifier(Int $ where * >= 0) returns Classifier
 {
-    True;
+    INT0P;
+}
+multi sub get-positional-index-classifier(Int $ where * < 0) returns Classifier
+{
+    INTM;
+}
+multi sub get-positional-index-classifier(WhateverCode $) returns Classifier
+{
+    WEC;
+}
+multi sub get-positional-index-classifier($) returns Classifier
+{
+    OTHER;
 }
 
-# passing *-1 is ok
-multi sub is-valid-positional-index(WhateverCode $step) returns Bool
+multi sub test-positional-index-classifier(INT0P) {*}
+multi sub test-positional-index-classifier(WEC) {*}
+multi sub test-positional-index-classifier(INTM)
 {
-    True;
+    die X::Crane::PositionalIndexInvalid.new(:classifier<INTM>);
+}
+multi sub test-positional-index-classifier(OTHER)
+{
+    die X::Crane::PositionalIndexInvalid.new(:classifier<OTHER>);
 }
 
-# passing stringified integers is ok
-multi sub is-valid-positional-index($step) returns Bool
+sub validate-positional-index($step)
 {
-    my $n;
-    try
-    {
-        # convert string into number
-        $n = +$step;
-        CATCH
-        {
-            when X::Str::Numeric
-            {
-                die X::Crane::PositionalIndexInvalid.new;
-            }
-        }
-    }
-
-    $n.isa: Int;
+    test-positional-index-classifier(get-positional-index-classifier($step));
 }
 
 # convert WhateverCode to Int Positional index

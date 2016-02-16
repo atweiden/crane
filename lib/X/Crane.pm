@@ -22,8 +22,8 @@ class AtRwInvalidStep is Exception
     {
         my Str $message = qq:to/EOF/;
         ✗ Crane error: at-rw requested invalid step
-        ✗ Causative error message:「{$.error.payload}」
-        ✗ Causative error type:「{$.error.WHAT.perl}」
+          Causative error message:「{$.error.payload}」
+          Causative error type:「{$.error.WHAT.perl}」
         EOF
         say $message.trim;
     }
@@ -37,7 +37,7 @@ class AtRwRequestedROContainerReassignment is Exception
 {
     method message()
     {
-        say "✗ Crane accident: at-rw requested reassigning immutable container";
+        say "✗ Crane error: at-rw requested reassigning immutable container";
     }
 }
 
@@ -79,7 +79,7 @@ class PositionalIndexDNE is Exception
 {
     method message()
     {
-        say '✗ Crane error: positional item does not exist';
+        say '✗ Crane error: positional index does not exist';
     }
 }
 
@@ -89,9 +89,23 @@ class PositionalIndexDNE is Exception
 
 class PositionalIndexInvalid is Exception
 {
+    has Str $.classifier;
     method message()
     {
-        say '✗ Crane error: cannot request non-integer positional index';
+        my Str $error-message;
+        given $.classifier
+        {
+            when 'INTM'
+            {
+                $error-message =
+                    'unsupported use of negative subscript to index Positional';
+            }
+            when 'OTHER'
+            {
+                $error-message = 'given Positional index invalid';
+            }
+        }
+        say "✗ Crane error: $error-message";
     }
 }
 

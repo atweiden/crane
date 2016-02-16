@@ -4,14 +4,6 @@ unit class Crane;
 
 # at {{{
 
-use MONKEY-TYPING;
-augment class Array { method at(*@steps) { at(self, @steps) } }
-augment class Hash { method at(*@steps) { at(self, @steps) } }
-augment class List { method at(*@steps) { at(self, @steps) } }
-augment class Map { method at(*@steps) { at(self, @steps) } }
-augment class Pair { method at(*@steps) { at(self, @steps) } }
-augment class Range { method at(*@steps) { at(self, @steps) } }
-
 sub at($data, *@steps) is rw is export
 {
     my $root := $data;
@@ -172,7 +164,7 @@ sub at-rw($container, *@steps) is rw is export
                     $root := at-rw(
                         $container,
                         @steps-taken,
-                        null-step($container.at(@steps-taken), @steps[$i]),
+                        null-step(at($container, @steps-taken), @steps[$i]),
                         @steps[$i+1..*]
                     );
                     last;
@@ -184,7 +176,7 @@ sub at-rw($container, *@steps) is rw is export
             # step succeeded (convert would-be WhateverCode Positional
             # indices into hard-coded Int indices)
             push @steps-taken, @steps[$i].isa(WhateverCode)
-                ?? null-step($container.at(@steps-taken), @steps[$i])
+                ?? null-step(at($container, @steps-taken), @steps[$i])
                 !! @steps[$i];
         }
     }
@@ -272,7 +264,7 @@ method exists($container, :@path!, Bool :$k = True, Bool :$v) returns Bool
 multi sub exists-key($container, @path where *.elems > 1) returns Bool
 {
     exists-key($container, [@path[0]])
-        ?? exists-key($container.at(@path[0]), @path[1..*])
+        ?? exists-key(at($container, @path[0]), @path[1..*])
         !! False;
 }
 
@@ -316,7 +308,7 @@ multi sub exists-key(
 multi sub exists-value($container, @path where *.elems > 1) returns Bool
 {
     exists-value($container, [@path[0]])
-        ?? exists-value($container.at(@path[0]), @path[1..*])
+        ?? exists-value(at($container, @path[0]), @path[1..*])
         !! False;
 }
 
@@ -397,7 +389,7 @@ multi method get(
 multi sub get-key($container, @path where *.elems > 1) returns Any
 {
     exists-key($container, [@path[0]])
-        ?? get-key($container.at(@path[0]), @path[1..*])
+        ?? get-key(at($container, @path[0]), @path[1..*])
         !! die X::Crane::PathDNE.new;
 }
 
@@ -433,7 +425,7 @@ multi sub get-key(Positional $container, @path where *.elems == 0) returns Any
 multi sub get-value($container, @path where *.elems > 1) returns Any
 {
     exists-key($container, [@path[0]])
-        ?? get-value($container.at(@path[0]), @path[1..*])
+        ?? get-value(at($container, @path[0]), @path[1..*])
         !! die X::Crane::PathDNE.new;
 }
 
@@ -469,7 +461,7 @@ multi sub get-value(Positional $container, @path where *.elems == 0) returns Any
 multi sub get-pair($container, @path where *.elems > 1) returns Any
 {
     exists-key($container, [@path[0]])
-        ?? get-pair($container.at(@path[0]), @path[1..*])
+        ?? get-pair(at($container, @path[0]), @path[1..*])
         !! die X::Crane::PathDNE.new;
 }
 

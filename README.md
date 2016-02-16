@@ -23,8 +23,8 @@ my %inxi = :info({
     :uptime<3:16>
 });
 
-%inxi.at(qw<info>)<uptime>:delete;
-%inxi.at(qw<info memory>)[0] = 31868.0;
+at(%inxi, 'info')<uptime>:delete;
+at(%inxi, qw<info memory>)[0] = 31868.0;
 
 say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) })
 ```
@@ -91,8 +91,8 @@ my %inxi = :info({
     :uptime<3:16>
 });
 
-at(%inxi, qw<info>)<uptime>:delete;
-%inxi.at(qw<info memory>)[0] = 31868.0;
+at(%inxi, 'info')<uptime>:delete;
+at(%inxi, qw<info memory>)[0] = 31868.0;
 
 say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) })
 ```

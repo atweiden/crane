@@ -23,9 +23,10 @@ at-rw(my @a, *-0, 0) = 'one'; # infinite loop here
 can do this repeatedly without issue:
 
 ```perl
-at-rw(my @a, *-0) = 'one'; # works
-at-rw(my @a, *-0) = 'one'; # works
-at-rw(my @a, *-0) = 'one'; # works
-at-rw(my @a, *-0) = 'one'; # works
-at-rw(my @a, *-0) = 'one'; # works
+my @a;
+at-rw(@a, *-0) = 'one'; # works
+at-rw(@a, *-0) = 'one'; # works
+at-rw(@a, *-0) = 'one'; # works
+at-rw(@a, *-0) = 'one'; # works
+at-rw(@a, *-0) = 'one'; # works
 ```

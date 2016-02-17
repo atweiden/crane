@@ -6,8 +6,8 @@ examples that don't work:
 
 ```perl6
 my %h;
-at-rw(%h, 'a', *-0, 0, *-0, *-0) = 'one'; # works once
-at-rw(%h, 'a', *-0, 0, *-0, *-0) = 'one'; # infinite loop here
+at-rw(%h, 'a', *-0, 0) = 'one'; # works once
+at-rw(%h, 'a', *-0, 0) = 'one'; # infinite loop here
 ```
 
 ```perl6

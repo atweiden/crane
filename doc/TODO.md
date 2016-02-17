@@ -12,8 +12,8 @@ at-rw(%h, 'a', *-0, 0, *-0, *-0) = 'one'; # infinite loop here
 
 ```perl6
 my %h;
-at-rw(%h, 'a', *-0, 'b', *-0) = 5; # works once
-at-rw(%h, 'a', *-0, 'b', *-0) = 5; # infinite loop here
+at-rw(%h, 'a', *-0, 'b') = 'z'; # works once
+at-rw(%h, 'a', *-0, 'b') = 'z'; # infinite loop here
 ```
 
 ```perl6

@@ -17,7 +17,7 @@ at-rw(%h, 'a', *-0, 'b') = 'z'; # infinite loop here
 ```
 
 ```perl6
-at-rw(my @a, *-0, 0) = 'one'; # infinite loop here
+at-rw(my @a, *-0, 0) = 'align'; # infinite loop here
 ```
 
 can do this repeatedly without issue:

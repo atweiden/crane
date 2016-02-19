@@ -494,6 +494,227 @@ multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
 
 # end get }}}
 
+# add {{{
+
+method add($container, :@path!, :$value!) returns Any
+{
+    #
+    # the Crane.add operation will fail when @path DNE in $container
+    # with rules similar to JSON Patch
+    #
+    # the Crane.add operation will fail when @path[*-1] is invalid for
+    # the container type according to Crane syntax rules:
+    #
+    #   if @path[*-2] is Associative, then @path[*-1] must not be
+    #   Int/WhateverCode
+    #
+    #   if @path[*-2] is Positional, then @path[*-1] must be
+    #   Int/WhateverCode
+    #
+    # the Crane.add operation will fail when it's invalid to set
+    # $container at @path to $value, such as when $container at @path
+    # is an immutable value
+    #
+
+    # CATCH
+    # {
+
+    # }
+
+    # route add operation based on path length
+    add($container, :@path, :$value);
+}
+
+multi sub add($container, :@path! where *.elems > 1, :$value!) returns Any
+{
+    unless Crane.exists($container, :path(@path[0..^*-1]), :v)
+    {
+        die '✗ Crane error: add operation failed, path not found in container';
+    }
+
+    # route add operation based on destination type
+    given at($container, @path[0..^*-1]).WHAT
+    {
+        when Associative
+        {
+            # add pair to existing Associative (or replace existing pair)
+            add-to-associative(
+                :$container,
+                :path(@path[0..^*-1]),
+                # step needs to be sanity checked for allowable Associative key
+                :step(@path[*-1]),
+                :$value
+            );
+        }
+        when Positional
+        {
+            # splice in $value to Positional
+            add-to-positional(
+                :$container,
+                :path(@path[0..^*-1]),
+                # step needs to be sanity checked for allowable Positional key
+                :step(@path[*-1]),
+                :$value
+            );
+        }
+        default
+        {
+            # invalid path request that should never happen
+            # how did we get here?
+            # if:
+            #
+            #     Crane.exists($container, :path(@path[0..^*-1]), :v)
+            #
+            # and we have a path with >1 elems, then we must be entering
+            # either an Associative or a Positional container
+            # at($container, @path[0..^*-1])
+            die '✗ Crane accident: add operation failed, invalid path';
+        }
+    }
+}
+
+multi sub add($container, :@path! where *.elems == 1, :$value!) returns Any
+{
+    unless Crane.exists($container, :path(), :v)
+    {
+        die '✗ Crane error: add operation failed, path not found in container';
+    }
+
+    # route add operation based on destination type
+    given $container.WHAT
+    {
+        when Associative
+        {
+            # add pair to existing Associative (or replace existing pair)
+            add-to-associative(:$container, :step(@path[*-1]), :$value);
+            # step needs to be sanity checked for allowable Associative key
+        }
+        when Positional
+        {
+            # splice in $value to Positional
+            add-to-positional(:$container, :step(@path[*-1]), :$value);
+            # step needs to be sanity checked for allowable Positional key
+        }
+        default
+        {
+            # invalid path request that should never happen
+            # how did we get here?
+            # if:
+            #
+            #     Crane.exists($container, :path(@path[0..^*-1]), :v)
+            #
+            # and we have a path with 1 elem, then we must be entering
+            # either an Associative or a Positional container
+            # at($container, @path[0..^*-1])
+            die '✗ Crane accident: add operation failed, invalid path';
+        }
+    }
+}
+
+multi sub add($container, :@path! where *.elems == 0, :$value!) returns Any
+{
+    given $container.WHAT
+    {
+        when Associative
+        {
+            add-to-associative(:$container, :$value);
+        }
+        when Positional
+        {
+            add-to-positional(:$container, :$value);
+        }
+        default
+        {
+            add-to-any(:$container, :$value);
+        }
+    }
+}
+
+# Associative handling {{{
+
+multi sub add-to-associative(:$container!, :@path!, :$step!, :$value!) returns Any
+{
+    my $root = $container.deepmap(*.clone);
+    at($root, @path){$step} = $value;
+    $root;
+}
+
+multi sub add-to-associative(:$container!, :$step!, :$value!) returns Any
+{
+    my $root = $container.deepmap(*.clone);
+    $root{$step} = $value;
+    $root;
+}
+
+multi sub add-to-associative(:$container!, :$value!) returns Any
+{
+    my $root = $container.deepmap(*.clone);
+    $root = $value;
+    $root;
+}
+
+# end Associative handling }}}
+
+# Positional handling {{{
+
+multi sub add-to-positional(:$container!, :@path!, :$step!, :$value!) returns Any
+{
+    my $root = $container.deepmap(*.clone);
+
+    # XXX when $value is a multi-dimensional array, splice ruins it by
+    # flattening it (splice's signature is *@target-to-splice-in)
+    #
+    # we have to inspect the structure of $value and work around this
+    # to provide a sane api
+    if $value ~~ Positional
+    {
+        my @value = $[ $value.deepmap(*.clone) ];
+        at($root, @path).splice($step, 0, @value);
+    }
+    else
+    {
+        at($root, @path).splice($step, 0, $value);
+    }
+    |$root;
+}
+
+multi sub add-to-positional(:$container!, :$step!, :$value!) returns Any
+{
+    my $root = $container.deepmap(*.clone);
+    if $value ~~ Positional
+    {
+        my @value = $[ $value.deepmap(*.clone) ];
+        $root.splice($step, 0, @value);
+    }
+    else
+    {
+        $root.splice($step, 0, $value);
+    }
+    |$root;
+}
+
+multi sub add-to-positional(:$container!, :$value!) returns Any
+{
+    my $root = $container.deepmap(*.clone);
+    $root = $value;
+    |$root;
+}
+
+# end Positional handling }}}
+
+# Any handling {{{
+
+sub add-to-any(:$container!, :$value!) returns Any
+{
+    my $root = $container.deepmap(*.clone);
+    $root = $value;
+    $root;
+}
+
+# end Any handling }}}
+
+# end add }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)

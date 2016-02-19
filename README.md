@@ -220,7 +220,8 @@ _returns:_
 _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
-Tests `if $container.defined`.
+Passing `:v` flag tests `if $container.defined`. Default behavior is to
+raise an error as key operations aren't permitted on root containers.
 
 <!-- end .exists($container,:@path!,:$k,:$v) }}} -->
 

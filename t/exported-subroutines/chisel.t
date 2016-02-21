@@ -11,50 +11,50 @@ subtest
 {
     my %h;
 
-    at-rw(%h, qw<a b c>) = 'Sea';
+    chisel(%h, qw<a b c>) = 'Sea';
     is %h<a><b><c>, 'Sea', 'Is expected value';
 
-    at-rw(%h, qw<d e f>) = 'Bass';
+    chisel(%h, qw<d e f>) = 'Bass';
     is %h<d><e><f>, 'Bass', 'Is expected value';
 
-    at-rw(%h, qw<d>, 0) = 'Fail?';
+    chisel(%h, qw<d>, 0) = 'Fail?';
     is %h<d>[0], 'Fail?', 'Is expected value';
 
-    at-rw(%h, qw<g>, 0) = 'Maybe this time?';
+    chisel(%h, qw<g>, 0) = 'Maybe this time?';
     is %h<g>[0], 'Maybe this time?', 'Is expected value';
 
-    at-rw(%h, qw<g h i j k l m n o p q r s t u v>, 10, 9, 8, 7, 6) = 'Y';
+    chisel(%h, qw<g h i j k l m n o p q r s t u v>, 10, 9, 8, 7, 6) = 'Y';
     is %h<g><h><i><j><k><l><m><n><o><p><q><r><s><t><u><v>[10][9][8][7][6], 'Y',
         'Is expected value';
 
-    at-rw(%h, qw<h>) = [];
+    chisel(%h, qw<h>) = [];
     is %h<h>, [], 'Is expected value';
 
-    at-rw(%h, qw<h 0 f>) = 'Hasselhoff';
+    chisel(%h, qw<h 0 f>) = 'Hasselhoff';
     is %h<h><0><f>, 'Hasselhoff', 'Is expected value';
 
-    at-rw(%h, qw<h 0 f>) = 'Not Hasselhoff';
+    chisel(%h, qw<h 0 f>) = 'Not Hasselhoff';
     is %h<h><0><f>, 'Not Hasselhoff', 'Is expected value';
 
     my %i;
-    at-rw(%i, qw<a b c>, *-0, *-0, *-0, *-0, *-0) = 'five';
-    at-rw(%i, qw<a b c>, *-0, *-0, *-0, *-0, *-0) = 'five again';
+    chisel(%i, qw<a b c>, *-0, *-0, *-0, *-0, *-0) = 'five';
+    chisel(%i, qw<a b c>, *-0, *-0, *-0, *-0, *-0) = 'five again';
     is %i<a><b><c>[0][0][0][0][0], 'five', 'Is expected value';
     is %i<a><b><c>[1][0][0][0][0], 'five again', 'Is expected value';
 
     my %j;
-    at-rw(%j, 'a', 0, 1, *-0, 'b', 0, 'a', 2, qw<8 9 10>, *-0, 1) = 9999999;
+    chisel(%j, 'a', 0, 1, *-0, 'b', 0, 'a', 2, qw<8 9 10>, *-0, 1) = 9999999;
     is %j<a>[0][1][0]<b>[0]<a>[2]<8><9><10>[0][1], 9999999, 'Is expected value';
-    throws-like {at-rw(%j, 0)}, X::Crane::AtRwRequestedROContainerReassignment,
+    throws-like {chisel(%j, 0)}, X::Crane::ChiselRequestedROContainerReassignment,
         'Reassigning RO container fails';
 
-    throws-like {at-rw(my @a, 'a')},
-        X::Crane::AtRwRequestedROContainerReassignment,
+    throws-like {chisel(my @a, 'a')},
+        X::Crane::ChiselRequestedROContainerReassignment,
         'Reassigning RO container fails';
 
     my %data = %TestCrane::data;
     my %legume = :instock(43), :name<black beans>, :unit<lbs>;
-    at-rw(%data, 'legumes', *-0) = %legume;
+    chisel(%data, 'legumes', *-0) = %legume;
     is %data<legumes>[0]<instock>, 4, 'Is expected value';
     is %data<legumes>[1]<instock>, 21, 'Is expected value';
     is %data<legumes>[2]<instock>, 13, 'Is expected value';

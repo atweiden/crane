@@ -99,9 +99,9 @@ multi sub _at(Positional $data) is rw
 
 # end at }}}
 
-# at-rw {{{
+# chisel {{{
 
-sub at-rw($container, *@steps) is rw is export
+sub chisel($container, *@steps) is rw is export
 {
     my $root := $container;
 
@@ -128,7 +128,7 @@ sub at-rw($container, *@steps) is rw is export
             }
             when .payload eq "Cannot assign to a readonly variable or a value"
             {
-                die X::Crane::AtRwRequestedROContainerReassignment.new;
+                die X::Crane::ChiselRequestedROContainerReassignment.new;
             }
             default
             {
@@ -146,22 +146,22 @@ sub at-rw($container, *@steps) is rw is export
                 when 'X::Crane::NonAssociativeKeyAssociative'
                 {
                     # change last step to Associative type (overwrite)
-                    at-rw($container, @steps-taken) = {};
-                    $root := at-rw($container, @steps);
+                    chisel($container, @steps-taken) = {};
+                    $root := chisel($container, @steps);
                     last;
                 }
                 when 'X::Crane::NonPositionalIndexInt'
                 {
                     # change last step to Positional type (overwrite)
-                    at-rw($container, @steps-taken) = [];
-                    $root := at-rw($container, @steps);
+                    chisel($container, @steps-taken) = [];
+                    $root := chisel($container, @steps);
                     last;
                 }
                 when 'X::Crane::NonPositionalIndexWhateverCode'
                 {
                     # change last step to Positional type (overwrite)
-                    at-rw($container, @steps-taken) = [];
-                    $root := at-rw(
+                    chisel($container, @steps-taken) = [];
+                    $root := chisel(
                         $container,
                         @steps-taken,
                         null-step(at($container, @steps-taken), @steps[$i]),
@@ -203,7 +203,7 @@ multi sub step(Positional $container, Int $step) is rw
         {
             default
             {
-                die X::Crane::AtRwInvalidStep.new(:error($_));
+                die X::Crane::ChiselInvalidStep.new(:error($_));
             }
         }
         $root := $root[$step];
@@ -220,7 +220,7 @@ multi sub step(Positional $container, WhateverCode $step) is rw
         {
             default
             {
-                die X::Crane::AtRwInvalidStep.new(:error($_));
+                die X::Crane::ChiselInvalidStep.new(:error($_));
             }
         }
         $root := $root[$step];
@@ -242,7 +242,7 @@ multi sub step($container, $step) is rw
         {
             default
             {
-                die X::Crane::AtRwInvalidStep.new(:error($_));
+                die X::Crane::ChiselInvalidStep.new(:error($_));
             }
         }
         $root := $root{$step};
@@ -250,7 +250,7 @@ multi sub step($container, $step) is rw
     return-rw $root;
 }
 
-# end at-rw }}}
+# end chisel }}}
 
 # exists {{{
 

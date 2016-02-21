@@ -38,15 +38,15 @@ class AssociativeKeyDNE is Exception
 
 # end X::Crane::AssociativeKeyDNE }}}
 
-# X::Crane::AtRwInvalidStep {{{
+# X::Crane::ChiselInvalidStep {{{
 
-class AtRwInvalidStep is Exception
+class ChiselInvalidStep is Exception
 {
     has $.error;
     method message()
     {
         my Str $message = qq:to/EOF/;
-        ✗ Crane error: at-rw requested invalid step
+        ✗ Crane error: chisel requested invalid step
           Causative error message:「{$.error.payload}」
           Causative error type:「{$.error.WHAT.perl}」
         EOF
@@ -54,19 +54,19 @@ class AtRwInvalidStep is Exception
     }
 }
 
-# end X::Crane::AtRwInvalidStep }}}
+# end X::Crane::ChiselInvalidStep }}}
 
-# X::Crane::AtRwRequestedROContainerReassignment {{{
+# X::Crane::ChiselRequestedROContainerReassignment {{{
 
-class AtRwRequestedROContainerReassignment is Exception
+class ChiselRequestedROContainerReassignment is Exception
 {
     method message()
     {
-        say "✗ Crane error: at-rw requested reassigning immutable container";
+        say "✗ Crane error: chisel requested reassigning immutable container";
     }
 }
 
-# end X::Crane::AtRwRequestedROContainerReassignment }}}
+# end X::Crane::ChiselRequestedROContainerReassignment }}}
 
 # X::Crane::NonAssociativeKeyAssociative {{{
 

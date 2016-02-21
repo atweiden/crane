@@ -63,7 +63,7 @@ Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 <!-- exported subroutines toc {{{ -->
 
 - [`at($container,*@path)`](#atcontainerpath)
-- [`at-rw($container,*@path)`](#at-rwcontainerpath)
+- [`chisel($container,*@path)`](#chiselcontainerpath)
 
 <!-- end exported subroutines toc }}} -->
 
@@ -99,18 +99,19 @@ say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) })
 
 <!-- end at($container,*@path) }}} -->
 
-<!-- at-rw($container,*@path) {{{ -->
+<!-- chisel($container,*@path) {{{ -->
 
-### `at-rw($container,*@path)`
+### `chisel($container,*@path)`
 
 Navigates to and returns container `is rw`, creating keys and overwriting
 values along the way (recursively).
 
+`chisel` makes changes to containers potentially many levels deep,
+and will change the structure of containers based on `@path` input.
+
 If the given `@path` calls for overwriting values in `$container`,
 those values will be overwritten even when the rest of the operation
 fails and even when not assigning values to the returned container.
-
-Use with caution.
 
 _arguments:_
 
@@ -125,8 +126,8 @@ _example:_
 
 ```perl6
 my %archversion = :bamboo({ :up<0.0.1>, :aur<0.0.2> });
-at-rw(%archversion, qw<fzf up>) = '0.11.3';
-at-rw(%archversion, qw<fzf aur>) = '0.11.3';
+chisel(%archversion, qw<fzf up>) = '0.11.3';
+chisel(%archversion, qw<fzf aur>) = '0.11.3';
 say %archversion.perl;
 {
     :bamboo({ :aur<0.0.2>, :up<0.0.1> }),
@@ -134,7 +135,7 @@ say %archversion.perl;
 }
 ```
 
-<!-- end at-rw($container,*@path) }}} -->
+<!-- end chisel($container,*@path) }}} -->
 
 -------------------------------------------------------------------------------
 

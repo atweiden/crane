@@ -6,29 +6,29 @@ examples that don't work:
 
 ```perl6
 my %h;
-at-rw(%h, 'a', *-0, 0) = 'one'; # works once
-at-rw(%h, 'a', *-0, 0) = 'one'; # infinite loop here
+chisel(%h, 'a', *-0, 0) = 'one'; # works once
+chisel(%h, 'a', *-0, 0) = 'one'; # infinite loop here
 ```
 
 ```perl6
 my %h;
-at-rw(%h, 'a', *-0, 'b') = 'z'; # works once
-at-rw(%h, 'a', *-0, 'b') = 'z'; # infinite loop here
+chisel(%h, 'a', *-0, 'b') = 'z'; # works once
+chisel(%h, 'a', *-0, 'b') = 'z'; # infinite loop here
 ```
 
 ```perl6
-at-rw(my @a, *-0, 0) = 'align'; # infinite loop here
+chisel(my @a, *-0, 0) = 'align'; # infinite loop here
 ```
 
 can do this repeatedly without issue:
 
 ```perl
 my @a;
-at-rw(@a, *-0) = 'one'; # works
-at-rw(@a, *-0) = 'one'; # works
-at-rw(@a, *-0) = 'one'; # works
-at-rw(@a, *-0) = 'one'; # works
-at-rw(@a, *-0) = 'one'; # works
+chisel(@a, *-0) = 'one'; # works
+chisel(@a, *-0) = 'one'; # works
+chisel(@a, *-0) = 'one'; # works
+chisel(@a, *-0) = 'one'; # works
+chisel(@a, *-0) = 'one'; # works
 ```
 
 ## warn about Range type handling

@@ -5,7 +5,7 @@ use Test;
 use Crane;
 use TestCrane;
 
-plan 5;
+plan 6;
 
 # testing Any root container add operations {{{
 
@@ -312,34 +312,36 @@ subtest
 
 # testing Exceptions {{{
 
-=begin pod
+subtest
+{
+    # documentation example
+    my %h = :q({ :bar(2) });
+    throws-like {Crane.add(%h, :path(qw<a b>), :value(7))},
+        X::Crane::AddPathNotFound,
+        'Add operation fails when path not found';
 
-    subtest
-    {
-
-        # documentation example
-        { :q({ :bar(2) }) }
-
-        # A Pair is not a Hash
-        my %h = :level-one(:level-two(:level-three(3)));
-        Crane.add(%h,
-            :path('level-one', 'level-two', 'is-level-two'),
-            :value(True)
-        );
-        throws-like
+    # A Pair is not a Hash
+    my %i = :level-one(:level-two(:level-three(3)));
+    throws-like
         {
-        %i<level-one><level-two><is-level-two>
+            Crane.add(
+                %i,
+                :path('level-one', 'level-two', 'is-level-two'),
+                :value(True)
+            );
         },
-        True,
-        'Is expected value';
+        X::Crane::Assignment::RO,
+        'Add operation fails when requests mutating immutable values';
 
-        throws-like {Crane.add($t, :path(), :value(True))},
-            X::Crane::AddOpExpectedAssociativeValue,
-            'fails';
-        say $u.perl;
-    }
-
-=end pod
+    # invalid Positional index
+    my @a = [qw<zero one two>];
+    throws-like {Crane.add(@a, :path(-1,), :value(True))},
+        X::Crane::PositionalIndexInvalid,
+        'Positional index invalid';
+    throws-like {Crane.add(@a, :path('0',), :value(True))},
+        X::Crane::PositionalIndexInvalid,
+        'Positional index invalid';
+}
 
 # end testing Exceptions }}}
 

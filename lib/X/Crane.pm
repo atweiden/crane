@@ -1,6 +1,31 @@
 use v6;
 unit module X::Crane;
 
+# X::Crane::AddPathNotFound {{{
+
+class AddPathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: add operation failed, path not found in container';
+    }
+}
+
+# end X::Crane::AddPathNotFound }}}
+
+# X::Crane::Assignment::RO {{{
+
+class Assignment::RO is Exception
+{
+    has $.typename;
+    method message()
+    {
+        say "✗ Crane error: requested modifying an immutable $.typename";
+    }
+}
+
+# end X::Crane::Assignment::RO }}}
+
 # X::Crane::AssociativeKeyDNE {{{
 
 class AssociativeKeyDNE is Exception

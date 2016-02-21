@@ -498,28 +498,25 @@ multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
 
 method add($container, :@path!, :$value!) returns Any
 {
-    #
     # the Crane.add operation will fail when @path DNE in $container
-    # with rules similar to JSON Patch
+    # with rules similar to JSON Patch (X::Crane::AddPathNotFound)
     #
     # the Crane.add operation will fail when @path[*-1] is invalid for
     # the container type according to Crane syntax rules:
-    #
-    #   if @path[*-2] is Associative, then @path[*-1] must not be
-    #   Int/WhateverCode
     #
     #   if @path[*-2] is Positional, then @path[*-1] must be
     #   Int/WhateverCode
     #
     # the Crane.add operation will fail when it's invalid to set
     # $container at @path to $value, such as when $container at @path
-    # is an immutable value
-    #
-
-    # CATCH
-    # {
-
-    # }
+    # is an immutable value (X::Crane::Assignment::RO)
+    CATCH
+    {
+        when X::Assignment::RO
+        {
+            die X::Crane::Assignment::RO.new(:typename(.typename));
+        }
+    }
 
     # route add operation based on path length
     add($container, :@path, :$value);
@@ -529,7 +526,7 @@ multi sub add($container, :@path! where *.elems > 1, :$value!) returns Any
 {
     unless Crane.exists($container, :path(@path[0..^*-1]), :v)
     {
-        die '✗ Crane error: add operation failed, path not found in container';
+        die X::Crane::AddPathNotFound.new;
     }
 
     # route add operation based on destination type
@@ -541,18 +538,18 @@ multi sub add($container, :@path! where *.elems > 1, :$value!) returns Any
             add-to-associative(
                 :$container,
                 :path(@path[0..^*-1]),
-                # step needs to be sanity checked for allowable Associative key
                 :step(@path[*-1]),
                 :$value
             );
         }
         when Positional
         {
+            validate-positional-index(@path[*-1]);
+
             # splice in $value to Positional
             add-to-positional(
                 :$container,
                 :path(@path[0..^*-1]),
-                # step needs to be sanity checked for allowable Positional key
                 :step(@path[*-1]),
                 :$value
             );
@@ -577,7 +574,7 @@ multi sub add($container, :@path! where *.elems == 1, :$value!) returns Any
 {
     unless Crane.exists($container, :path(), :v)
     {
-        die '✗ Crane error: add operation failed, path not found in container';
+        die X::Crane::AddPathNotFound.new;
     }
 
     # route add operation based on destination type
@@ -587,13 +584,13 @@ multi sub add($container, :@path! where *.elems == 1, :$value!) returns Any
         {
             # add pair to existing Associative (or replace existing pair)
             add-to-associative(:$container, :step(@path[*-1]), :$value);
-            # step needs to be sanity checked for allowable Associative key
         }
         when Positional
         {
+            validate-positional-index(@path[*-1]);
+
             # splice in $value to Positional
             add-to-positional(:$container, :step(@path[*-1]), :$value);
-            # step needs to be sanity checked for allowable Positional key
         }
         default
         {

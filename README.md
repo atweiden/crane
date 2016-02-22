@@ -150,16 +150,16 @@ say %archversion.perl;
 
 - [`.exists($container,:@path!,:$k,:$v)`](#existscontainerpathkv)
 - [`.get($container,:@path!,:$k,:$v,:$p)`](#getcontainerpathkvp)
-- [`.set($container,:@path!,:$value!)`](#setcontainerpathvalue)
-- [`.add($container,:@path!,:$value!)`](#addcontainerpathvalue)
-- [`.remove($container,:@path!)`](#removecontainerpath)
-- [`.replace($container,:@path!,:$value!)`](#replacecontainerpathvalue)
-- [`.move($container,:@from!,:@path!)`](#movecontainerfrompath)
-- [`.copy($container,:@from!,:@path!)`](#copycontainerfrompath)
+- [`.set($container,:@path!,:$value!,:$in-place)`](#setcontainerpathvaluein-place)
+- [`.add($container,:@path!,:$value!,:$in-place)`](#addcontainerpathvaluein-place)
+- [`.remove($container,:@path!,:$in-place)`](#removecontainerpathin-place)
+- [`.replace($container,:@path!,:$value!,:$in-place)`](#replacecontainerpathvaluein-place)
+- [`.move($container,:@from!,:@path!,:$in-place)`](#movecontainerfrompathin-place)
+- [`.copy($container,:@from!,:@path!,:$in-place)`](#copycontainerfrompathin-place)
 - [`.test($container,:@path!,:$value!)`](#testcontainerpathvalue)
 - [`.list($container,:@path!)`](#listcontainerpath)
 - [`.flatten($container,:@path!)`](#flattencontainerpath)
-- [`.transform($container,:@path!,:$block!)`](#transformcontainerpathblock)
+- [`.transform($container,:@path!,:$block!,:$in-place)`](#transformcontainerpathblockin-place)
 
 <!-- end methods toc }}} -->
 
@@ -271,9 +271,9 @@ Pass an empty list as `@path` to operate on the root of the container.
 
 <!-- end .get($container,:@path!,:$k,:$v,:$p) }}} -->
 
-<!-- .set($container,:@path!,:$value!) {{{ -->
+<!-- .set($container,:@path!,:$value!,:$in-place) {{{ -->
 
-### `.set($container,:@path!,:$value!)`
+### `.set($container,:@path!,:$value!,:$in-place)`
 
 Sets the value at the specified path in the container. The default
 behavior is to create nonexistent paths (similar to `mkdir -p`) and to
@@ -284,10 +284,13 @@ _arguments:_
 * `$container`: _Container, required_ — the target container
 * `:@path!`: _Path, required_ — a list of steps for navigating container
 * `:$value!`: _Any, required_ — the value to be set at the specified path
+* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+                `$container` in-place
 
 _returns:_
 
-* New container (original is unmodified)
+* Container (original container is unmodified unless `:in-place` flag
+  is passed)
 
 _example:_
 
@@ -319,11 +322,11 @@ say $a; # (1, 2, 3)
 say $b; # foo
 ```
 
-<!-- end .set($container,:@path!,:$value!) }}} -->
+<!-- end .set($container,:@path!,:$value!,:$in-place) }}} -->
 
-<!-- .add($container,:@path!,:$value!) {{{ -->
+<!-- .add($container,:@path!,:$value!,:$in-place) {{{ -->
 
-### `.add($container,:@path!,:$value!)`
+### `.add($container,:@path!,:$value!,:$in-place)`
 
 Adds a value to the container. If `:@path` points to an existing item
 in the container, that item's value is replaced.
@@ -375,10 +378,13 @@ _arguments:_
 * `:@path!`: _Path, required_ — a list of steps for navigating container
 * `:$value!`: _Any, required_ — the value to be added/inserted at the
               specified path
+* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+                `$container` in-place
 
 _returns:_
 
-* New container (original is unmodified)
+* Container (original container is unmodified unless `:in-place` flag
+  is passed)
 
 _example:_
 
@@ -403,11 +409,11 @@ say @a.perl; # []
 say @b.perl; # ["foo"]
 ```
 
-<!-- end .add($container,:@path!,:$value!) }}} -->
+<!-- end .add($container,:@path!,:$value!,:$in-place) }}} -->
 
-<!-- .remove($container,:@path!) {{{ -->
+<!-- .remove($container,:@path!,:$in-place) {{{ -->
 
-### `.remove($container,:@path!)`
+### `.remove($container,:@path!,:$in-place)`
 
 Removes the pair at path from `Associative`
 types, similar to the p6 Hash `:delete` [subscript
@@ -421,10 +427,13 @@ _arguments:_
 
 * `$container`: _Container, required_ — the target container
 * `:@path!`: _Path, required_ — a list of steps for navigating container
+* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+                `$container` in-place
 
 _returns:_
 
-* New container (original is unmodified)
+* Container (original container is unmodified unless `:in-place` flag
+  is passed)
 
 _example:_
 
@@ -458,11 +467,11 @@ say $a.perl; [1, 2, 3]
 say $b; # (Any)
 ```
 
-<!-- end .remove($container,:@path!) }}} -->
+<!-- end .remove($container,:@path!,:$in-place) }}} -->
 
-<!-- .replace($container,:@path!,:$value!) {{{ -->
+<!-- .replace($container,:@path!,:$value!,:$in-place) {{{ -->
 
-### `.replace($container,:@path!,:$value!)`
+### `.replace($container,:@path!,:$value!,:$in-place)`
 
 Replaces a value. This operation is functionally identical to a `.remove`
 operation for a value, followed immediately by a `.add` operation at
@@ -476,10 +485,13 @@ _arguments:_
 * `$container`: _Container, required_ — the target container
 * `:@path!`: _Path, required_ — a list of steps for navigating container
 * `:$value!`: _Any, required_ — the value to be set at the specified path
+* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+                `$container` in-place
 
 _returns:_
 
-* New container (original is unmodified)
+* Container (original container is unmodified unless `:in-place` flag
+  is passed)
 
 _example:_
 
@@ -504,11 +516,11 @@ say %a.perl; # { :a<aaa>, :b<bbb>, :c<ccc> }
 say %b.perl; # { :vm<moar> }
 ```
 
-<!-- end .replace($container,:@path!,:$value!) }}} -->
+<!-- end .replace($container,:@path!,:$value!,:$in-place) }}} -->
 
-<!-- .move($container,:@from!,:@path!) {{{ -->
+<!-- .move($container,:@from!,:@path!,:$in-place) {{{ -->
 
-### `.move($container,:@from!,:@path!)`
+### `.move($container,:@from!,:@path!,:$in-place)`
 
 Moves the source value identified by `@from` in container to destination
 location specified by `@path`. This operation is functionally identical
@@ -527,10 +539,13 @@ _arguments:_
 * `$container`: _Container, required_ — the target container
 * `:@from!`: _Path, required_ — a list of steps to the source
 * `:@path!`: _Path, required_ — a list of steps to the destination
+* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+                `$container` in-place
 
 _returns:_
 
-* New container (original is unmodified)
+* Container (original container is unmodified unless `:in-place` flag
+  is passed)
 
 _What about operating on the root of the container?_
 
@@ -542,11 +557,11 @@ the container.
   - value assignment will fail when assigning a List to a `$container`
     of type Hash and vice versa
 
-<!-- end .move($container,:@from!,:@path!) }}} -->
+<!-- end .move($container,:@from!,:@path!,:$in-place) }}} -->
 
-<!-- .copy($container,:@from!,:@path!) {{{ -->
+<!-- .copy($container,:@from!,:@path!,:$in-place) {{{ -->
 
-### `.copy($container,:@from!,:@path!)`
+### `.copy($container,:@from!,:@path!,:$in-place)`
 
 Copies the source value identified by `@from` in container to destination
 container at location specified by `@path`. This operation is functionally
@@ -561,10 +576,13 @@ _arguments:_
 * `$container`: _Container, required_ — the target container
 * `:@from!`: _Path, required_ — a list of steps to the source
 * `:@path!`: _Path, required_ — a list of steps to the destination
+* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+                `$container` in-place
 
 _returns:_
 
-* New container (original is unmodified)
+* Container (original container is unmodified unless `:in-place` flag
+  is passed)
 
 _example:_
 
@@ -580,7 +598,7 @@ _What about operating on the root of the container?_
 Pass an empty list as `@from` or `@path` to operate on the root of the
 container. Has similar rules / considerations to `.move`.
 
-<!-- end .copy($container,:@from!,:@path!) }}} -->
+<!-- end .copy($container,:@from!,:@path!,:$in-place) }}} -->
 
 <!-- .test($container,:@path!,:$value!) {{{ -->
 
@@ -716,9 +734,9 @@ say Crane.flatten(%data);
 
 <!-- end .flatten($container,:@path) }}} -->
 
-<!-- .transform($container,:@path!,:$block!) {{{ -->
+<!-- .transform($container,:@path!,:$block!,:$in-place) {{{ -->
 
-### `.transform($container,:@path!,:$block!)`
+### `.transform($container,:@path!,:$block!,:$in-place)`
 
 _example:_
 
@@ -741,7 +759,7 @@ Crane.transform(%market, :path(@second-veggie), :block(&oh-yeah));
 say so Crane.get(%market, :path(@second-veggie)) eq 'onions!'; # True
 ```
 
-<!-- end .transform($container,:@path!,:$block!) }}} -->
+<!-- end .transform($container,:@path!,:$block!,:$in-place) }}} -->
 
 -------------------------------------------------------------------------------
 

@@ -496,7 +496,7 @@ multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
 
 # add {{{
 
-method add($container, :@path!, :$value!) returns Any
+method add(\container, :@path!, :$value!, Bool :$in-place = False) returns Any
 {
     # the Crane.add operation will fail when @path DNE in $container
     # with rules similar to JSON Patch (X::Crane::AddPathNotFound)
@@ -519,27 +519,33 @@ method add($container, :@path!, :$value!) returns Any
     }
 
     # route add operation based on path length
-    add($container, :@path, :$value);
+    add(container, :@path, :$value, :$in-place);
 }
 
-multi sub add($container, :@path! where *.elems > 1, :$value!) returns Any
+multi sub add(
+    \container,
+    :@path! where *.elems > 1,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
 {
-    unless Crane.exists($container, :path(@path[0..^*-1]), :v)
+    unless Crane.exists(container, :path(@path[0..^*-1]), :v)
     {
         die X::Crane::AddPathNotFound.new;
     }
 
     # route add operation based on destination type
-    given at($container, @path[0..^*-1]).WHAT
+    given at(container, @path[0..^*-1]).WHAT
     {
         when Associative
         {
             # add pair to existing Associative (or replace existing pair)
             add-to-associative(
-                :$container,
+                container,
                 :path(@path[0..^*-1]),
                 :step(@path[*-1]),
-                :$value
+                :$value,
+                :$in-place
             );
         }
         when Positional
@@ -548,10 +554,11 @@ multi sub add($container, :@path! where *.elems > 1, :$value!) returns Any
 
             # splice in $value to Positional
             add-to-positional(
-                :$container,
+                container,
                 :path(@path[0..^*-1]),
                 :step(@path[*-1]),
-                :$value
+                :$value,
+                :$in-place
             );
         }
         default
@@ -570,27 +577,42 @@ multi sub add($container, :@path! where *.elems > 1, :$value!) returns Any
     }
 }
 
-multi sub add($container, :@path! where *.elems == 1, :$value!) returns Any
+multi sub add(
+    \container,
+    :@path! where *.elems == 1,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
 {
-    unless Crane.exists($container, :path(), :v)
+    unless Crane.exists(container, :path(), :v)
     {
         die X::Crane::AddPathNotFound.new;
     }
 
     # route add operation based on destination type
-    given $container.WHAT
+    given container.WHAT
     {
         when Associative
         {
             # add pair to existing Associative (or replace existing pair)
-            add-to-associative(:$container, :step(@path[*-1]), :$value);
+            add-to-associative(
+                container,
+                :step(@path[*-1]),
+                :$value,
+                :$in-place
+            );
         }
         when Positional
         {
             validate-positional-index(@path[*-1]);
 
             # splice in $value to Positional
-            add-to-positional(:$container, :step(@path[*-1]), :$value);
+            add-to-positional(
+                container,
+                :step(@path[*-1]),
+                :$value,
+                :$in-place
+            );
         }
         default
         {
@@ -608,55 +630,94 @@ multi sub add($container, :@path! where *.elems == 1, :$value!) returns Any
     }
 }
 
-multi sub add($container, :@path! where *.elems == 0, :$value!) returns Any
+multi sub add(
+    \container,
+    :@path! where *.elems == 0,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
 {
-    given $container.WHAT
+    given container.WHAT
     {
         when Associative
         {
-            add-to-associative(:$container, :$value);
+            add-to-associative(container, :$value, :$in-place);
         }
         when Positional
         {
-            add-to-positional(:$container, :$value);
+            add-to-positional(container, :$value, :$in-place);
         }
         default
         {
-            add-to-any(:$container, :$value);
+            add-to-any(container, :$value, :$in-place);
         }
     }
 }
 
 # Associative handling {{{
 
-multi sub add-to-associative(:$container!, :@path!, :$step!, :$value!) returns Any
+multi sub add-to-associative(
+    \container,
+    :@path!,
+    :$step!,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
 {
-    my $root = $container.deepmap(*.clone);
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
     at($root, @path){$step} = $value;
     $root;
 }
 
-multi sub add-to-associative(:$container!, :$step!, :$value!) returns Any
+multi sub add-to-associative(
+    \container,
+    :$step!,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
 {
-    my $root = $container.deepmap(*.clone);
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
     $root{$step} = $value;
     $root;
 }
 
-multi sub add-to-associative(:$container!, :$value!) returns Any
+multi sub add-to-associative(
+    \container,
+    :$value!,
+    Bool :$in-place where *.not
+) returns Any
 {
-    my $root = $container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone);
     $root = $value;
     $root;
+}
+
+multi sub add-to-associative(
+    \container,
+    :$value!,
+    Bool :$in-place where *.so
+) returns Any
+{
+    container = $value;
+    container;
 }
 
 # end Associative handling }}}
 
 # Positional handling {{{
 
-multi sub add-to-positional(:$container!, :@path!, :$step!, :$value!) returns Any
+multi sub add-to-positional(
+    \container,
+    :@path!,
+    :$step!,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
 {
-    my $root = $container.deepmap(*.clone);
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
 
     # XXX when $value is a multi-dimensional array, splice ruins it by
     # flattening it (splice's signature is *@target-to-splice-in)
@@ -675,9 +736,15 @@ multi sub add-to-positional(:$container!, :@path!, :$step!, :$value!) returns An
     |$root;
 }
 
-multi sub add-to-positional(:$container!, :$step!, :$value!) returns Any
+multi sub add-to-positional(
+    \container,
+    :$step!,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
 {
-    my $root = $container.deepmap(*.clone);
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
     if $value ~~ Positional
     {
         my @value = $value;
@@ -690,22 +757,50 @@ multi sub add-to-positional(:$container!, :$step!, :$value!) returns Any
     |$root;
 }
 
-multi sub add-to-positional(:$container!, :$value!) returns Any
+multi sub add-to-positional(
+    \container,
+    :$value!,
+    Bool :$in-place where *.not
+) returns Any
 {
-    my $root = $container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone);
     $root = $value;
     |$root;
+}
+
+multi sub add-to-positional(
+    \container,
+    :$value!,
+    Bool :$in-place where *.so
+) returns Any
+{
+    container = $value.clone;
+    |container;
 }
 
 # end Positional handling }}}
 
 # Any handling {{{
 
-sub add-to-any(:$container!, :$value!) returns Any
+multi sub add-to-any(
+    \container,
+    :$value!,
+    Bool :$in-place where *.not
+) returns Any
 {
-    my $root = $container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone);
     $root = $value;
     $root;
+}
+
+multi sub add-to-any(
+    \container is raw,
+    :$value!,
+    Bool :$in-place where *.so
+) returns Any
+{
+    container = $value;
+    container;
 }
 
 # end Any handling }}}

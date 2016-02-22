@@ -5,7 +5,7 @@ use Test;
 use Crane;
 use TestCrane;
 
-plan 6;
+plan 7;
 
 # testing Any root container add operations {{{
 
@@ -344,5 +344,40 @@ subtest
 }
 
 # end testing Exceptions }}}
+
+# testing in-place modifications {{{
+
+subtest
+{
+    my $x;
+    Crane.add($x, :path(), :value(1), :in-place);
+    is $x, 1, 'Is expected value';
+
+    my $y = {:a<alpha>,:b<bravo>,:c<charlie>};
+    Crane.add($y, :path('a',), :value<Alpha>, :in-place);
+    Crane.add($y, :path('d',), :value<delta>, :in-place);
+    is-deeply $y, {:a<Alpha>,:b<bravo>,:c<charlie>,:d<delta>},
+        'Is expected value';
+
+    my $z = [qw<zero one two>];
+    Crane.add($z, :path(*-0,), :value<three>, :in-place);
+    is-deeply $z, [qw<zero one two three>], 'Is expected value';
+
+    my @a;
+    Crane.add(@a, :path(), :value(qw<zero one two>), :in-place);
+    is-deeply @a, [qw<zero one two>], 'Is expected value';
+
+    my %h;
+    Crane.add(%h, :path(), :value({:a(1)}), :in-place);
+    is-deeply %h, {:a(1)}, 'Is expected value';
+
+    my %data = %TestCrane::data;
+    my %legume = :name<carrots>, :unit<lbs>, :instock(3);
+    Crane.add(%data, :path('legumes', 0), :value(%legume), :in-place);
+    is-deeply %data<legumes>[0], {:name<carrots>, :unit<lbs>, :instock(3)},
+        'Is expected value';
+}
+
+# end testing in-place modifications }}}
 
 # vim: ft=perl6 fdm=marker fdl=0

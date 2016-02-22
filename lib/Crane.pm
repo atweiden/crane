@@ -665,8 +665,8 @@ multi sub add-to-positional(:$container!, :@path!, :$step!, :$value!) returns An
     # to provide a sane api
     if $value ~~ Positional
     {
-        my @value = $[ $value.deepmap(*.clone) ];
-        at($root, @path).splice($step, 0, @value);
+        my @value = $value;
+        at($root, @path).splice($step, 0, $@value);
     }
     else
     {
@@ -680,8 +680,8 @@ multi sub add-to-positional(:$container!, :$step!, :$value!) returns Any
     my $root = $container.deepmap(*.clone);
     if $value ~~ Positional
     {
-        my @value = $[ $value.deepmap(*.clone) ];
-        $root.splice($step, 0, @value);
+        my @value = $value;
+        $root.splice($step, 0, $@value);
     }
     else
     {

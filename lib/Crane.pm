@@ -666,7 +666,7 @@ multi sub add-to-associative(
 {
     my $root;
     $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
-    at($root, @path){$step} = $value;
+    at($root, @path){$step} = $value.WHAT ~~ Positional ?? $value.clone !! $value;
     $root;
 }
 
@@ -679,7 +679,7 @@ multi sub add-to-associative(
 {
     my $root;
     $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
-    $root{$step} = $value;
+    $root{$step} = $value.WHAT ~~ Positional ?? $value.clone !! $value;
     $root;
 }
 
@@ -774,7 +774,7 @@ multi sub add-to-positional(
     Bool :$in-place where *.so
 ) returns Any
 {
-    container = $value.clone;
+    container = $value.WHAT ~~ Positional ?? $value.clone !! $value;
     |container;
 }
 

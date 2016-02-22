@@ -371,6 +371,10 @@ subtest
     Crane.add(%h, :path(), :value({:a(1)}), :in-place);
     is-deeply %h, {:a(1)}, 'Is expected value';
 
+    my %i = :a({:b(:c([qw<zero one two>]))});
+    Crane.add(%i, :path(qw<a b c>), :value(qw<zero one two three>), :in-place);
+    is-deeply %i, {:a({:b(:c([qw<zero one two three>]))})}, 'Is expected value';
+
     my %data = %TestCrane::data;
     my %legume = :name<carrots>, :unit<lbs>, :instock(3);
     Crane.add(%data, :path('legumes', 0), :value(%legume), :in-place);

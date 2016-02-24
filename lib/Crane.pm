@@ -794,7 +794,7 @@ multi sub add-to-any(
 }
 
 multi sub add-to-any(
-    \container is raw,
+    \container,
     :$value!,
     Bool :$in-place where *.so
 ) returns Any

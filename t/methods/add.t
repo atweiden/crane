@@ -333,6 +333,12 @@ subtest
         X::Crane::Assignment::RO,
         'Add operation fails when requests mutating immutable values';
 
+    # cannot splice non-Array type
+    my $list = qw<zero one two>;
+    throws-like {Crane.add($list, :path(*-0,), :value<three>)},
+        X::Crane::Assignment::RO,
+        'Add operation fails when requests splicing List type';
+
     # invalid Positional index
     my @a = [qw<zero one two>];
     throws-like {Crane.add(@a, :path(-1,), :value(True))},

@@ -516,6 +516,17 @@ method add(\container, :@path!, :$value!, Bool :$in-place = False) returns Any
         {
             die X::Crane::Assignment::RO.new(:typename(.typename));
         }
+        when X::Method::NotFound
+        {
+            my rule no-such-method-splice
+            {
+                No such method \'splice\' for invocant of type \'(\w+)\'
+            }
+            if .message ~~ &no-such-method-splice
+            {
+                die X::Crane::Assignment::RO.new(:typename(~$0));
+            }
+        }
     }
 
     # route add operation based on path length

@@ -136,6 +136,31 @@ class PositionalIndexInvalid is Exception
 
 # end X::Crane::PositionalIndexInvalid }}}
 
+# X::Crane::Remove::RO {{{
+
+class Remove::RO is Exception
+{
+    has $.typename;
+    method message()
+    {
+        say "✗ Crane error: requested remove operation on immutable $.typename";
+    }
+}
+
+# end X::Crane::Remove::RO }}}
+
+# X::Crane::RemovePathNotFound {{{
+
+class RemovePathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: remove operation failed, path not found in container';
+    }
+}
+
+# end X::Crane::RemovePathNotFound }}}
+
 # X::Crane::RootContainerKeyOp {{{
 
 class RootContainerKeyOp is Exception

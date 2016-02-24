@@ -807,6 +807,284 @@ multi sub add-to-any(
 
 # end add }}}
 
+# remove {{{
+
+method remove(\container, :@path!, Bool :$in-place = False) returns Any
+{
+    # the Crane.remove operation will fail when @path DNE in $container
+    # with rules similar to JSON Patch (X::Crane::RemovePathNotFound)
+    #
+    # the Crane.remove operation will fail when @path[*-1] is invalid for
+    # the container type according to Crane syntax rules:
+    #
+    #   if @path[*-2] is Positional, then @path[*-1] must be
+    #   Int/WhateverCode
+    #
+    # the Crane.remove operation will fail when it's invalid to remove
+    # from $container at @path, such as when $container at @path is an
+    # immutable value (X::Crane::Remove::RO)
+    CATCH
+    {
+        when X::AdHoc
+        {
+            my rule can-not-remove
+            {
+                Can not remove [values|elements] from a (\w+)
+            }
+            if .payload ~~ &can-not-remove
+            {
+                die X::Crane::Remove::RO.new(:typename(~$0));
+            }
+        }
+        when X::Method::NotFound
+        {
+            my rule no-such-method-splice
+            {
+                No such method \'splice\' for invocant of type \'(\w+)\'
+            }
+            if .message ~~ &no-such-method-splice
+            {
+                die X::Crane::Remove::RO.new(:typename(~$0));
+            }
+        }
+    }
+
+    # route remove operation based on path length
+    remove(container, :@path, :$in-place);
+}
+
+multi sub remove(
+    \container,
+    :@path! where *.elems > 1,
+    Bool :$in-place = False
+) returns Any
+{
+    unless Crane.exists(container, :@path)
+    {
+        die X::Crane::RemovePathNotFound.new;
+    }
+
+    # route remove operation based on destination type
+    given at(container, @path[0..^*-1]).WHAT
+    {
+        when Associative
+        {
+            # remove pair from Associative
+            remove-from-associative(
+                container,
+                :path(@path[0..^*-1]),
+                :step(@path[*-1]),
+                :$in-place
+            );
+        }
+        when Positional
+        {
+            validate-positional-index(@path[*-1]);
+
+            # remove element from Positional
+            remove-from-positional(
+                container,
+                :path(@path[0..^*-1]),
+                :step(@path[*-1]),
+                :$in-place
+            );
+        }
+        default
+        {
+            # invalid path request that should never happen
+            # how did we get here?
+            # if:
+            #
+            #     Crane.exists($container, :path(@path[0..^*-1]), :v)
+            #
+            # and we have a path with >1 elems, then we must be entering
+            # either an Associative or a Positional container
+            # at($container, @path[0..^*-1])
+            die '✗ Crane accident: remove operation failed, invalid path';
+        }
+    }
+}
+
+multi sub remove(
+    \container,
+    :@path! where *.elems == 1,
+    Bool :$in-place = False
+) returns Any
+{
+    unless Crane.exists(container, :@path)
+    {
+        die X::Crane::RemovePathNotFound.new;
+    }
+
+    # route remove operation based on destination type
+    given container.WHAT
+    {
+        when Associative
+        {
+            # remove pair from Associative
+            remove-from-associative(container, :step(@path[*-1]), :$in-place);
+        }
+        when Positional
+        {
+            validate-positional-index(@path[*-1]);
+
+            # remove element from Positional
+            remove-from-positional(container, :step(@path[*-1]), :$in-place);
+        }
+        default
+        {
+            # invalid path request that should never happen
+            # how did we get here?
+            # if:
+            #
+            #     Crane.exists($container, :path(@path[0..^*-1]), :v)
+            #
+            # and we have a path with 1 elem, then we must be entering
+            # either an Associative or a Positional container
+            # at($container, @path[0..^*-1])
+            die '✗ Crane accident: remove operation failed, invalid path';
+        }
+    }
+}
+
+multi sub remove(
+    \container,
+    :@path! where *.elems == 0,
+    Bool :$in-place = False
+) returns Any
+{
+    given container.WHAT
+    {
+        when Associative
+        {
+            remove-from-associative(container, :$in-place);
+        }
+        when Positional
+        {
+            remove-from-positional(container, :$in-place);
+        }
+        default
+        {
+            remove-from-any(container, :$in-place);
+        }
+    }
+}
+
+# Associative handling {{{
+
+multi sub remove-from-associative(
+    \container,
+    :@path!,
+    :$step!,
+    Bool :$in-place = False
+) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    at($root, @path){$step}:delete;
+    $root;
+}
+
+multi sub remove-from-associative(
+    \container,
+    :$step!,
+    Bool :$in-place = False
+) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $root{$step}:delete;
+    $root;
+}
+
+multi sub remove-from-associative(
+    \container,
+    Bool :$in-place where *.not
+) returns Any
+{
+    my $root = container.deepmap(*.clone);
+    $root = Empty;
+    $root;
+}
+
+multi sub remove-from-associative(
+    \container,
+    Bool :$in-place where *.so
+) returns Any
+{
+    container = Empty;
+    container;
+}
+
+# end Associative handling }}}
+
+# Positional handling {{{
+
+multi sub remove-from-positional(
+    \container,
+    :@path!,
+    :$step!,
+    Bool :$in-place = False
+) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    at($root, @path).splice($step, 1);
+    |$root;
+}
+
+multi sub remove-from-positional(
+    \container,
+    :$step!,
+    Bool :$in-place = False
+) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $root.splice($step, 1);
+    |$root;
+}
+
+multi sub remove-from-positional(
+    \container,
+    Bool :$in-place where *.not
+) returns Any
+{
+    my $root = container.deepmap(*.clone);
+    $root = Empty;
+    |$root;
+}
+
+multi sub remove-from-positional(
+    \container,
+    Bool :$in-place where *.so
+) returns Any
+{
+    container = Empty;
+    |container;
+}
+
+# end Positional handling }}}
+
+# Any handling {{{
+
+multi sub remove-from-any(\container, Bool :$in-place where *.not) returns Any
+{
+    my $root = container.deepmap(*.clone);
+    $root = Nil;
+    $root;
+}
+
+multi sub remove-from-any(\container, Bool :$in-place where *.so) returns Any
+{
+    container = Nil;
+    container;
+}
+
+# end Any handling }}}
+
+# end remove }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)

@@ -161,6 +161,18 @@ class RemovePathNotFound is Exception
 
 # end X::Crane::RemovePathNotFound }}}
 
+# X::Crane::ReplacePathNotFound {{{
+
+class ReplacePathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: replace operation failed, path not found in container';
+    }
+}
+
+# end X::Crane::ReplacePathNotFound }}}
+
 # X::Crane::RootContainerKeyOp {{{
 
 class RootContainerKeyOp is Exception

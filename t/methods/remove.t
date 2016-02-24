@@ -86,11 +86,11 @@ subtest
         'Original container unchanged';
 
     # 3 levels deep
-    my @g = [ [ 'she', 'want', 'more', [ 'more', [ 'more', [ 'more' ] ] ] ] ];
+    my @g = [ 'she', 'want', 'more', [ 'more', [ 'more', [ 'more' ] ] ] ];
     my @h = Crane.remove(@g, :path(3, 1, 1));
-    is-deeply @h, [['she','want','more',['more',['more']]]],
+    is-deeply @h, ['she','want','more',['more',['more']]],
         'Is expected value';
-    is-deeply @g, [['she','want','more',['more',['more',['more']]]]],
+    is-deeply @g, ['she','want','more',['more',['more',['more']]]],
         'Original container is unchanged';
 
     # 7 levels deep

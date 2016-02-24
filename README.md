@@ -496,7 +496,7 @@ _returns:_
 _example:_
 
 ```perl6
-my %legume = :name<green beans>, :unit<lbs>, :instock(3);
+my %legume = :name("green beans"), :unit<lbs>, :instock(3);
 my %data-new = Crane.replace(%data, :path('legumes', 0), :value(%legume));
 ```
 
@@ -621,7 +621,7 @@ _returns:_
 _example:_
 
 ```perl6
-say so Crane.test(%data, :path('legumes', 0, 'name'), :value<green beans>); # True
+say so Crane.test(%data, :path('legumes', 0, 'name'), :value("green beans")); # True
 ```
 
 _What about operating on the root of the container?_

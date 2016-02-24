@@ -906,7 +906,7 @@ multi sub remove(
             # how did we get here?
             # if:
             #
-            #     Crane.exists($container, :path(@path[0..^*-1]), :v)
+            #     Crane.exists(container, :@path)
             #
             # and we have a path with >1 elems, then we must be entering
             # either an Associative or a Positional container
@@ -948,7 +948,7 @@ multi sub remove(
             # how did we get here?
             # if:
             #
-            #     Crane.exists($container, :path(@path[0..^*-1]), :v)
+            #     Crane.exists(container, :@path)
             #
             # and we have a path with 1 elem, then we must be entering
             # either an Associative or a Positional container
@@ -1095,6 +1095,324 @@ multi sub remove-from-any(\container, Bool :$in-place where *.so) returns Any
 # end Any handling }}}
 
 # end remove }}}
+
+# replace {{{
+
+method replace(\container, :@path!, :$value!, Bool :$in-place = False) returns Any
+{
+    # the Crane.replace operation will fail when @path DNE in $container
+    # with rules similar to JSON Patch (X::Crane::ReplacePathNotFound)
+    #
+    # the Crane.replace operation will fail when @path[*-1] is invalid
+    # for the container type according to Crane syntax rules:
+    #
+    #   if @path[*-2] is Positional, then @path[*-1] must be
+    #   Int/WhateverCode
+    #
+    # the Crane.replace operation will fail when it's invalid to set
+    # $container at @path to $value, such as when $container at @path
+    # is an immutable value (X::Crane::Assignment::RO)
+    CATCH
+    {
+        when X::Assignment::RO
+        {
+            die X::Crane::Assignment::RO.new(:typename(.typename));
+        }
+        when X::Method::NotFound
+        {
+            my rule no-such-method-splice
+            {
+                No such method \'splice\' for invocant of type \'(\w+)\'
+            }
+            if .message ~~ &no-such-method-splice
+            {
+                die X::Crane::Assignment::RO.new(:typename(~$0));
+            }
+        }
+    }
+
+    # route replace operation based on path length
+    replace(container, :@path, :$value, :$in-place);
+}
+
+multi sub replace(
+    \container,
+    :@path! where *.elems > 1,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
+{
+    unless Crane.exists(container, :@path)
+    {
+        die X::Crane::ReplacePathNotFound.new;
+    }
+
+    # route replace operation based on destination type
+    given at(container, @path[0..^*-1]).WHAT
+    {
+        when Associative
+        {
+            # replace pair in Associative
+            replace-in-associative(
+                container,
+                :path(@path[0..^*-1]),
+                :step(@path[*-1]),
+                :$value,
+                :$in-place
+            );
+        }
+        when Positional
+        {
+            validate-positional-index(@path[*-1]);
+
+            # splice in $value to Positional
+            replace-in-positional(
+                container,
+                :path(@path[0..^*-1]),
+                :step(@path[*-1]),
+                :$value,
+                :$in-place
+            );
+        }
+        default
+        {
+            # invalid path request that should never happen
+            # how did we get here?
+            # if:
+            #
+            #     Crane.exists(container, :@path)
+            #
+            # and we have a path with >1 elems, then we must be entering
+            # either an Associative or a Positional container
+            # at($container, @path[0..^*-1])
+            die '✗ Crane accident: replace operation failed, invalid path';
+        }
+    }
+}
+
+multi sub replace(
+    \container,
+    :@path! where *.elems == 1,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
+{
+    unless Crane.exists(container, :@path)
+    {
+        die X::Crane::ReplacePathNotFound.new;
+    }
+
+    # route replace operation based on destination type
+    given container.WHAT
+    {
+        when Associative
+        {
+            # replace pair in Associative
+            replace-in-associative(
+                container,
+                :step(@path[*-1]),
+                :$value,
+                :$in-place
+            );
+        }
+        when Positional
+        {
+            validate-positional-index(@path[*-1]);
+
+            # splice in $value to Positional
+            replace-in-positional(
+                container,
+                :step(@path[*-1]),
+                :$value,
+                :$in-place
+            );
+        }
+        default
+        {
+            # invalid path request that should never happen
+            # how did we get here?
+            # if:
+            #
+            #     Crane.exists(container, :@path)
+            #
+            # and we have a path with 1 elem, then we must be entering
+            # either an Associative or a Positional container
+            # at($container, @path[0..^*-1])
+            die '✗ Crane accident: replace operation failed, invalid path';
+        }
+    }
+}
+
+multi sub replace(
+    \container,
+    :@path! where *.elems == 0,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
+{
+    given container.WHAT
+    {
+        when Associative
+        {
+            replace-in-associative(container, :$value, :$in-place);
+        }
+        when Positional
+        {
+            replace-in-positional(container, :$value, :$in-place);
+        }
+        default
+        {
+            replace-in-any(container, :$value, :$in-place);
+        }
+    }
+}
+
+# Associative handling {{{
+
+multi sub replace-in-associative(
+    \container,
+    :@path!,
+    :$step!,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    at($root, @path){$step} = $value.WHAT ~~ Positional ?? $value.clone !! $value;
+    $root;
+}
+
+multi sub replace-in-associative(
+    \container,
+    :$step!,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $root{$step} = $value.WHAT ~~ Positional ?? $value.clone !! $value;
+    $root;
+}
+
+multi sub replace-in-associative(
+    \container,
+    :$value!,
+    Bool :$in-place where *.not
+) returns Any
+{
+    my $root = container.deepmap(*.clone);
+    $root = $value;
+    $root;
+}
+
+multi sub replace-in-associative(
+    \container,
+    :$value!,
+    Bool :$in-place where *.so
+) returns Any
+{
+    container = $value;
+    container;
+}
+
+# end Associative handling }}}
+
+# Positional handling {{{
+
+multi sub replace-in-positional(
+    \container,
+    :@path!,
+    :$step!,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    if $value ~~ Positional
+    {
+        my @value = $value;
+        at($root, @path).splice($step, 1, $@value);
+    }
+    else
+    {
+        at($root, @path).splice($step, 1, $value);
+    }
+    |$root;
+}
+
+multi sub replace-in-positional(
+    \container,
+    :$step!,
+    :$value!,
+    Bool :$in-place = False
+) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    if $value ~~ Positional
+    {
+        my @value = $value;
+        $root.splice($step, 1, $@value);
+    }
+    else
+    {
+        $root.splice($step, 1, $value);
+    }
+    |$root;
+}
+
+multi sub replace-in-positional(
+    \container,
+    :$value!,
+    Bool :$in-place where *.not
+) returns Any
+{
+    my $root = container.deepmap(*.clone);
+    $root = $value;
+    |$root;
+}
+
+multi sub replace-in-positional(
+    \container,
+    :$value!,
+    Bool :$in-place where *.so
+) returns Any
+{
+    container = $value.WHAT ~~ Positional ?? $value.clone !! $value;
+    |container;
+}
+
+# end Positional handling }}}
+
+# Any handling {{{
+
+multi sub replace-in-any(
+    \container,
+    :$value!,
+    Bool :$in-place where *.not
+) returns Any
+{
+    my $root = container.deepmap(*.clone);
+    $root = $value;
+    $root;
+}
+
+multi sub replace-in-any(
+    \container,
+    :$value!,
+    Bool :$in-place where *.so
+) returns Any
+{
+    container = $value;
+    container;
+}
+
+# end Any handling }}}
+
+# end replace }}}
 
 # helper functions {{{
 

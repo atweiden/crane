@@ -301,6 +301,11 @@ multi sub exists-key(
     die X::Crane::GetRootContainerKey.new;
 }
 
+multi sub exists-key($container, @path where *.elems > 0) returns Bool
+{
+    False;
+}
+
 # end exists-key }}}
 
 # exists-value {{{
@@ -343,6 +348,11 @@ multi sub exists-value(
 ) returns Bool
 {
     $container.defined;
+}
+
+multi sub exists-value($container, @path where *.elems > 0) returns Bool
+{
+    False;
 }
 
 # end exists-value }}}

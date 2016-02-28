@@ -28,6 +28,15 @@ subtest
     is Crane.exists(%data, :path('legumes', 3, 'instock')), True, 'Exists';
     is Crane.exists(%data, :path('legumes', 3, 'name')), True, 'Exists';
     is Crane.exists(%data, :path('legumes', 3, 'unit')), True, 'Exists';
+
+    my @a = 'she', 'want', 'more', [ 'more', [ 'more', [ 'more' ] ] ];
+    is Crane.exists(@a, :path(2,1,1,*-1)), False, 'Does not exist';
+    is Crane.exists(@a, :path(2,1,1,*-1), :v), False, 'Does not exist';
+
+    my %h = :a<alpha>,:b<bravo>,:c<charlie>;
+    is Crane.exists(%h, :path(qw<d e f>)), False, 'Does not exist';
+    is Crane.exists(%h, :path(qw<a alpha foo>)), False, 'Does not exist';
+    is Crane.exists(%h, :path(qw<a alpha foo bar>)), False, 'Does not exist';
 }
 
 # vim: ft=perl6

@@ -13,18 +13,18 @@ class AddPathNotFound is Exception
 
 # end X::Crane::AddPathNotFound }}}
 
-# X::Crane::Assignment::RO {{{
+# X::Crane::Add::RO {{{
 
-class Assignment::RO is Exception
+class Add::RO is Exception
 {
     has $.typename;
     method message()
     {
-        say "✗ Crane error: requested modifying an immutable $.typename";
+        say "✗ Crane error: add requested modifying an immutable $.typename";
     }
 }
 
-# end X::Crane::Assignment::RO }}}
+# end X::Crane::Add::RO }}}
 
 # X::Crane::AssociativeKeyDNE {{{
 
@@ -246,5 +246,18 @@ class ReplacePathNotFound is Exception
 }
 
 # end X::Crane::ReplacePathNotFound }}}
+
+# X::Crane::Replace::RO {{{
+
+class Replace::RO is Exception
+{
+    has $.typename;
+    method message()
+    {
+        say "✗ Crane error: replace requested modifying an immutable $.typename";
+    }
+}
+
+# end X::Crane::Replace::RO }}}
 
 # vim: ft=perl6 fdm=marker fdl=0

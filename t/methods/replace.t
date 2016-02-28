@@ -217,7 +217,7 @@ subtest
         'Replace operation fails when path not found';
     my %i = :a(:b(:c(True)));
     throws-like {Crane.replace(%i, :path(qw<a b c>), :value({:d(True)}))},
-        X::Crane::Assignment::RO,
+        X::Crane::Replace::RO,
         'Replace operation fails when target is immutable';
     my @a = qw<zero one two>;
     throws-like {Crane.replace(@a, :path(*-0,), :value<three>)},
@@ -225,7 +225,7 @@ subtest
         'Replace operation fails when path not found';
     my $list = (qw<zero one two>);
     throws-like {Crane.replace($list, :path(0,), :value<Zero>)},
-        X::Crane::Assignment::RO,
+        X::Crane::Replace::RO,
         'Replace operation fails when target is immutable';
     throws-like {Crane.replace($list, :path(9,), :value<nine>)},
         X::Crane::ReplacePathNotFound,

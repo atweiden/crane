@@ -514,12 +514,12 @@ method add(\container, :@path!, :$value!, Bool :$in-place = False) returns Any
     #
     # the Crane.add operation will fail when it's invalid to set
     # $container at @path to $value, such as when $container at @path
-    # is an immutable value (X::Crane::Assignment::RO)
+    # is an immutable value (X::Crane::Add::RO)
     CATCH
     {
         when X::Assignment::RO
         {
-            die X::Crane::Assignment::RO.new(:typename(.typename));
+            die X::Crane::Add::RO.new(:typename(.typename));
         }
         when X::Method::NotFound
         {
@@ -529,7 +529,7 @@ method add(\container, :@path!, :$value!, Bool :$in-place = False) returns Any
             }
             if .message ~~ &no-such-method-splice
             {
-                die X::Crane::Assignment::RO.new(:typename(~$0));
+                die X::Crane::Add::RO.new(:typename(~$0));
             }
         }
     }
@@ -1116,12 +1116,12 @@ method replace(\container, :@path!, :$value!, Bool :$in-place = False) returns A
     #
     # the Crane.replace operation will fail when it's invalid to set
     # $container at @path to $value, such as when $container at @path
-    # is an immutable value (X::Crane::Assignment::RO)
+    # is an immutable value (X::Crane::Replace::RO)
     CATCH
     {
         when X::Assignment::RO
         {
-            die X::Crane::Assignment::RO.new(:typename(.typename));
+            die X::Crane::Replace::RO.new(:typename(.typename));
         }
         when X::Method::NotFound
         {
@@ -1131,7 +1131,7 @@ method replace(\container, :@path!, :$value!, Bool :$in-place = False) returns A
             }
             if .message ~~ &no-such-method-splice
             {
-                die X::Crane::Assignment::RO.new(:typename(~$0));
+                die X::Crane::Replace::RO.new(:typename(~$0));
             }
         }
     }
@@ -1449,19 +1449,19 @@ method move(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
     # (X::Crane::MovePath::RO)
     CATCH
     {
-        when X::Crane::AddPathNotFound # Crane.add exception
+        when X::Crane::AddPathNotFound
         {
             die X::Crane::MovePathNotFound.new;
         }
-        when X::Crane::Assignment::RO # Crane.add exception
+        when X::Crane::Add::RO
         {
             die X::Crane::MovePath::RO.new(:typename(.typename));
         }
-        when X::Crane::GetPathNotFound # Crane.get exception
+        when X::Crane::GetPathNotFound
         {
             die X::Crane::MoveFromNotFound.new;
         }
-        when X::Crane::Remove::RO # Crane.remove exception
+        when X::Crane::Remove::RO
         {
             die X::Crane::MoveFrom::RO.new(:typename(.typename));
         }

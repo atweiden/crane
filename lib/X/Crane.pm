@@ -309,4 +309,16 @@ class Replace::RO is Exception
 
 # end X::Crane::Replace::RO }}}
 
+# X::Crane::TestPathNotFound {{{
+
+class TestPathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: test operation failed, path nonexistent';
+    }
+}
+
+# end X::Crane::TestPathNotFound }}}
+
 # vim: ft=perl6 fdm=marker fdl=0

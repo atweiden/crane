@@ -1550,6 +1550,19 @@ method copy(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
 
 # end copy }}}
 
+# test {{{
+
+method test($container, :@path!, :$value!) returns Bool
+{
+    unless Crane.exists($container, :@path)
+    {
+        die X::Crane::TestPathNotFound.new;
+    }
+    at($container, @path) eqv $value;
+}
+
+# end test }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)

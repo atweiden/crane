@@ -605,8 +605,7 @@ container. Has similar rules / considerations to `.move`.
 ### `.test($container,:@path!,:$value!)`
 
 Tests that the specified value is set at the target location in the
-document. Compares values with the Perl6 Test module's `is-deeply`
-subroutine.
+document.
 
 _arguments:_
 
@@ -621,7 +620,7 @@ _returns:_
 _example:_
 
 ```perl6
-say so Crane.test(%data, :path('legumes', 0, 'name'), :value("green beans")); # True
+say so Crane.test(%data, :path('legumes', 0, 'name'), :value("pinto beans")); # True
 ```
 
 _What about operating on the root of the container?_

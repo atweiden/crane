@@ -68,6 +68,55 @@ class ChiselRequestedROContainerReassignment is Exception
 
 # end X::Crane::ChiselRequestedROContainerReassignment }}}
 
+# X::Crane::CopyFromNotFound {{{
+
+class CopyFromNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: copy operation failed, from location nonexistent';
+    }
+}
+
+# end X::Crane::CopyFromNotFound }}}
+
+# X::Crane::CopyParentToChild {{{
+
+class CopyParentToChild is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: a location cannot be copied into one of its children';
+    }
+}
+
+# end X::Crane::CopyParentToChild }}}
+
+# X::Crane::CopyPathNotFound {{{
+
+class CopyPathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: copy operation failed, path nonexistent';
+    }
+}
+
+# end X::Crane::CopyPathNotFound }}}
+
+# X::Crane::CopyPath::RO {{{
+
+class CopyPath::RO is Exception
+{
+    has $.typename;
+    method message()
+    {
+        say "✗ Crane error: requested copy path is immutable $.typename";
+    }
+}
+
+# end X::Crane::CopyPath::RO }}}
+
 # X::Crane::GetPathNotFound {{{
 
 class GetPathNotFound is Exception

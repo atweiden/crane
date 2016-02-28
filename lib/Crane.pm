@@ -1484,6 +1484,62 @@ method move(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
 
 # end move }}}
 
+# copy {{{
+
+method copy(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
+{
+    # the Crane.copy operation will fail when @from or @path DNE in
+    # $container with rules similar to JSON Patch
+    # (X::Crane::CopyFromNotFound, X::Crane::CopyPathNotFound)
+    #
+    # the Crane.copy operation will fail when @from is to be copied into
+    # one of its children (X::Crane::CopyParentToChild)
+    #
+    # the Crane.copy operation will fail when @from[*-1] or @path[*-1]
+    # is invalid for the container type according to Crane syntax rules:
+    #
+    #   if @from[*-2] is Positional, then @from[*-1] must be
+    #   Int/WhateverCode
+    #
+    #   if @path[*-2] is Positional, then @path[*-1] must be
+    #   Int/WhateverCode
+    #
+    # the Crane.copy operation will fail when it's invalid to set
+    # $container at @path to the value of $container at @from,
+    # such as when $container at @path is an immutable value
+    # (X::Crane::CopyPath::RO)
+    CATCH
+    {
+        when X::Crane::AddPathNotFound
+        {
+            die X::Crane::CopyPathNotFound.new;
+        }
+        when X::Crane::Add::RO
+        {
+            die X::Crane::CopyPath::RO.new(:typename(.typename));
+        }
+        when X::Crane::GetPathNotFound
+        {
+            die X::Crane::CopyFromNotFound.new;
+        }
+    }
+
+    # a location cannot be copied into one of its children
+    if path-is-child-of-from(@from, @path)
+    {
+        die X::Crane::CopyParentToChild.new;
+    }
+
+    my $value = Crane.get(container, :path(@from), :v);
+
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    Crane.add($root, :@path, :$value, :in-place);
+    $root ~~ Positional ?? |$root !! $root;
+}
+
+# end copy }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)

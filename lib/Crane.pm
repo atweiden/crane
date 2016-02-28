@@ -281,7 +281,7 @@ multi sub exists-key(
     @path where *.elems == 0
 ) returns Bool
 {
-    die X::Crane::RootContainerKeyOp.new;
+    die X::Crane::GetRootContainerKey.new;
 }
 
 multi sub exists-key(
@@ -298,7 +298,7 @@ multi sub exists-key(
     @path where *.elems == 0
 ) returns Bool
 {
-    die X::Crane::RootContainerKeyOp.new;
+    die X::Crane::GetRootContainerKey.new;
 }
 
 # end exists-key }}}
@@ -390,19 +390,19 @@ multi sub get-key($container, @path where *.elems > 1) returns Any
 {
     exists-key($container, [@path[0]])
         ?? get-key(at($container, @path[0]), @path[1..*])
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-key(Associative $container, @path where *.elems == 1) returns Any
 {
     exists-key($container, [@path[0]])
         ?? ($container{@path[0]}:!k)
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-key(Associative $container, @path where *.elems == 0) returns Any
 {
-    die X::Crane::RootContainerKeyOp.new;
+    die X::Crane::GetRootContainerKey.new;
 }
 
 multi sub get-key(Positional $container, @path where *.elems == 1) returns Any
@@ -410,12 +410,12 @@ multi sub get-key(Positional $container, @path where *.elems == 1) returns Any
     validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!k)
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-key(Positional $container, @path where *.elems == 0) returns Any
 {
-    die X::Crane::RootContainerKeyOp.new;
+    die X::Crane::GetRootContainerKey.new;
 }
 
 # end get-key }}}
@@ -426,14 +426,14 @@ multi sub get-value($container, @path where *.elems > 1) returns Any
 {
     exists-key($container, [@path[0]])
         ?? get-value(at($container, @path[0]), @path[1..*])
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-value(Associative $container, @path where *.elems == 1) returns Any
 {
     exists-key($container, [@path[0]])
         ?? ($container{@path[0]}:!v)
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-value(Associative $container, @path where *.elems == 0) returns Any
@@ -446,10 +446,15 @@ multi sub get-value(Positional $container, @path where *.elems == 1) returns Any
     validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!v)
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-value(Positional $container, @path where *.elems == 0) returns Any
+{
+    $container;
+}
+
+multi sub get-value($container, @path where *.elems == 0) returns Any
 {
     $container;
 }
@@ -462,19 +467,19 @@ multi sub get-pair($container, @path where *.elems > 1) returns Any
 {
     exists-key($container, [@path[0]])
         ?? get-pair(at($container, @path[0]), @path[1..*])
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-pair(Associative $container, @path where *.elems == 1) returns Any
 {
     exists-key($container, [@path[0]])
         ?? ($container{@path[0]}:!p)
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-pair(Associative $container, @path where *.elems == 0) returns Any
 {
-    die X::Crane::RootContainerKeyOp.new;
+    die X::Crane::GetRootContainerKey.new;
 }
 
 multi sub get-pair(Positional $container, @path where *.elems == 1) returns Any
@@ -482,12 +487,12 @@ multi sub get-pair(Positional $container, @path where *.elems == 1) returns Any
     validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!p)
-        !! die X::Crane::PathDNE.new;
+        !! die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
 {
-    die X::Crane::RootContainerKeyOp.new;
+    die X::Crane::GetRootContainerKey.new;
 }
 
 # end get-pair }}}
@@ -1414,6 +1419,71 @@ multi sub replace-in-any(
 
 # end replace }}}
 
+# move {{{
+
+method move(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
+{
+    # the Crane.move operation will fail when @from or @path DNE in
+    # $container with rules similar to JSON Patch
+    # (X::Crane::MoveFromNotFound, X::Crane::MovePathNotFound)
+    #
+    # the Crane.move operation will fail when @from is to be moved into
+    # one of its children (X::Crane::MoveParentToChild)
+    #
+    # the Crane.move operation will fail when @from[*-1] or @path[*-1]
+    # is invalid for the container type according to Crane syntax rules:
+    #
+    #   if @from[*-2] is Positional, then @from[*-1] must be
+    #   Int/WhateverCode
+    #
+    #   if @path[*-2] is Positional, then @path[*-1] must be
+    #   Int/WhateverCode
+    #
+    # the Crane.move operation will fail when it's invalid to move the
+    # value of $container at @from, such as when $container at @from is
+    # an immutable value (X::Crane::MoveFrom::RO)
+    #
+    # the Crane.move operation will fail when it's invalid to set
+    # $container at @path to the value of $container at @from,
+    # such as when $container at @path is an immutable value
+    # (X::Crane::MovePath::RO)
+    CATCH
+    {
+        when X::Crane::AddPathNotFound # Crane.add exception
+        {
+            die X::Crane::MovePathNotFound.new;
+        }
+        when X::Crane::Assignment::RO # Crane.add exception
+        {
+            die X::Crane::MovePath::RO.new(:typename(.typename));
+        }
+        when X::Crane::GetPathNotFound # Crane.get exception
+        {
+            die X::Crane::MoveFromNotFound.new;
+        }
+        when X::Crane::Remove::RO # Crane.remove exception
+        {
+            die X::Crane::MoveFrom::RO.new(:typename(.typename));
+        }
+    }
+
+    # a location cannot be moved into one of its children
+    if path-is-child-of-from(@from, @path)
+    {
+        die X::Crane::MoveParentToChild.new;
+    }
+
+    my $value = Crane.get(container, :path(@from), :v);
+
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    Crane.remove($root, :path(@from), :in-place);
+    Crane.add($root, :@path, :$value, :in-place);
+    $root ~~ Positional ?? |$root !! $root;
+}
+
+# end move }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)
@@ -1463,6 +1533,33 @@ sub null-step(Positional $container, WhateverCode $step) returns Int
     # $container.elems for *-0
     my Int $elems = $container.elems // 0;
     my Int $null-index = $container[$step]:k ?? ($container[$step]:k) !! $elems;
+}
+
+multi sub path-is-child-of-from(
+    @from,
+    @path where *.elems == @from.elems
+) returns Bool
+{
+    # @path can't be child of @from if both are at the same depth
+    False;
+}
+
+multi sub path-is-child-of-from(
+    @from,
+    @path where *.elems < @from.elems
+) returns Bool
+{
+    # @path can't be child of @from if @path is shallower than @from
+    False;
+}
+
+# @path is at deeper level than @from
+# verify @from[$_] !eqv @path[$_] for 0..@from.end
+multi sub path-is-child-of-from(@from, @path) returns Bool
+{
+    (@from[$_] eqv @path[$_] for 0..@from.end).grep(*.so).elems == @from.elems
+        ?? True
+        !! False;
 }
 
 # end helper functions }}}

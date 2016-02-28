@@ -68,6 +68,92 @@ class ChiselRequestedROContainerReassignment is Exception
 
 # end X::Crane::ChiselRequestedROContainerReassignment }}}
 
+# X::Crane::GetPathNotFound {{{
+
+class GetPathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: get operation failed, path nonexistent';
+    }
+}
+
+# end X::Crane::GetPathNotFound }}}
+
+# X::Crane::GetRootContainerKey {{{
+
+class GetRootContainerKey is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: cannot request key operations on container root';
+    }
+}
+
+# end X::Crane::GetRootContainerKey }}}
+
+# X::Crane::MoveFromNotFound {{{
+
+class MoveFromNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: move operation failed, from location nonexistent';
+    }
+}
+
+# end X::Crane::MoveFromNotFound }}}
+
+# X::Crane::MoveFrom::RO {{{
+
+class MoveFrom::RO is Exception
+{
+    has $.typename;
+    method message()
+    {
+        say "✗ Crane error: requested move from immutable $.typename";
+    }
+}
+
+# end X::Crane::MoveFrom::RO }}}
+
+# X::Crane::MoveParentToChild {{{
+
+class MoveParentToChild is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: a location cannot be moved into one of its children';
+    }
+}
+
+# end X::Crane::MoveParentToChild }}}
+
+# X::Crane::MovePathNotFound {{{
+
+class MovePathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: move operation failed, path nonexistent';
+    }
+}
+
+# end X::Crane::MovePathNotFound }}}
+
+# X::Crane::MovePath::RO {{{
+
+class MovePath::RO is Exception
+{
+    has $.typename;
+    method message()
+    {
+        say "✗ Crane error: requested move path is immutable $.typename";
+    }
+}
+
+# end X::Crane::MovePath::RO }}}
+
 # X::Crane::NonAssociativeKeyAssociative {{{
 
 class NonAssociativeKeyAssociative is Exception {*}
@@ -85,18 +171,6 @@ class NonPositionalIndexInt is Exception {*}
 class NonPositionalIndexWhateverCode is Exception {*}
 
 # end X::Crane::NonPositionalIndexWhateverCode }}}
-
-# X::Crane::PathDNE {{{
-
-class PathDNE is Exception
-{
-    method message()
-    {
-        say '✗ Crane error: path nonexistent';
-    }
-}
-
-# end X::Crane::PathDNE }}}
 
 # X::Crane::PositionalIndexDNE {{{
 
@@ -172,17 +246,5 @@ class ReplacePathNotFound is Exception
 }
 
 # end X::Crane::ReplacePathNotFound }}}
-
-# X::Crane::RootContainerKeyOp {{{
-
-class RootContainerKeyOp is Exception
-{
-    method message()
-    {
-        say '✗ Crane error: cannot request key operations on container root';
-    }
-}
-
-# end X::Crane::RootContainerKeyOp }}}
 
 # vim: ft=perl6 fdm=marker fdl=0

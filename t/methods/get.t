@@ -13,18 +13,20 @@ subtest
 
     is-deeply Crane.get(%data, :path()), %data,
         'Get operation on root container value succeeds';
-    throws-like {Crane.get(%data, :path(), :k)}, X::Crane::RootContainerKeyOp,
+    throws-like {Crane.get(%data, :path(), :k)}, X::Crane::GetRootContainerKey,
         'Get operation on root container key fails';
-    throws-like {Crane.get(%data, :path(), :p)}, X::Crane::RootContainerKeyOp,
+    throws-like {Crane.get(%data, :path(), :p)}, X::Crane::GetRootContainerKey,
         'Get operation on root container pair fails';
     throws-like {Crane.get(%data, :path(qw<legumes foo>))},
         X::Crane::PositionalIndexInvalid,
         'Get operation on invalid positional index fails';
-    throws-like {Crane.get(%data, :path('foo',))}, X::Crane::PathDNE,
+    throws-like {Crane.get(%data, :path('foo',))}, X::Crane::GetPathNotFound,
         'Get operation on nonexistent path fails';
-    throws-like {Crane.get(%data, :path('legumes', 99))}, X::Crane::PathDNE,
+    throws-like {Crane.get(%data, :path('legumes', 99))},
+        X::Crane::GetPathNotFound,
         'Get operation on nonexistent path fails';
-    throws-like {Crane.get(%data, :path('legumes', 0, 'bar'))}, X::Crane::PathDNE,
+    throws-like {Crane.get(%data, :path('legumes', 0, 'bar'))},
+        X::Crane::GetPathNotFound,
         'Get operation on nonexistent path fails';
     is-deeply Crane.get(%data, :path('legumes',)), %data<legumes>,
         'Is expected value';

@@ -46,9 +46,9 @@ Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 
 ### Features
 
-- access nested data structures with JSON Pointer inspired path notation
-- get / set values in nested data structures
-- diff / patch nested data structures
+- add, remove, replace, move, copy, test operations
+- get/set
+- diff/patch
 - list the contents of a nested data structure in accessible format
 
 -------------------------------------------------------------------------------
@@ -310,11 +310,6 @@ _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
 
-- if value assignment (`=`) to `$container` fails, raise error and
-  propogate the original error message
-  - value assignment will fail when assigning a List to a `$container`
-    of type Hash and vice versa
-
 ```perl6
 my $a = (1, 2, 3);
 my $b = Crane.set($a, :path(), :value<foo>);
@@ -396,11 +391,6 @@ my %data-new = Crane.add(%data, :path('legumes', 0), :value(%legume));
 _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
-
-- if value assignment (`=`) to `$container` fails, raise error and
-  propogate the original error message
-  - value assignment will fail when assigning a List to a `$container`
-    of type Hash and vice versa
 
 ```perl6
 my @a;
@@ -504,11 +494,6 @@ _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
 
-- if value assignment (`=`) to `$container` fails, raise error and
-  propogate the original error message
-  - value assignment will fail when assigning a List to a `$container`
-    of type Hash and vice versa
-
 ```perl6
 my %a = :a<aaa>, :b<bbb>, :c<ccc>;
 my %b = Crane.replace(%a, :path([]), :value({ :vm<moar> }));
@@ -551,11 +536,6 @@ _What about operating on the root of the container?_
 
 Pass an empty list as `@from` or `@path` to operate on the root of
 the container.
-
-- if value assignment (`=`) to `$container` fails, abort move operation,
-  raise error and propogate the original error message
-  - value assignment will fail when assigning a List to a `$container`
-    of type Hash and vice versa
 
 <!-- end .move($container,:@from!,:@path!,:$in-place) }}} -->
 

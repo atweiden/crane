@@ -1563,6 +1563,52 @@ method test($container, :@path!, :$value!) returns Bool
 
 # end test }}}
 
+# list {{{
+
+multi method list(Associative $container, :@path) returns List
+{
+    list(at($container, @path));
+}
+
+multi method list(Positional $container, :@path) returns List
+{
+    list(at($container, @path));
+}
+
+multi method list($container) returns List
+{
+    list($container);
+}
+
+multi sub list(Associative $container, :@carry = ()) returns List
+{
+    my @tree;
+    for $container.keys -> $toplevel
+    {
+        my @current = |@carry, $toplevel;
+        push @tree, |list(at($container, $toplevel), :carry(@current));
+    }
+    @tree.sort.List;
+}
+
+multi sub list(Positional $container, :@carry = ()) returns List
+{
+    my @tree;
+    for $container.keys -> $toplevel
+    {
+        my @current = |@carry, $toplevel;
+        push @tree, |list(at($container, $toplevel), :carry(@current));
+    }
+    @tree.sort.List;
+}
+
+multi sub list($container, :@carry = ()) returns List
+{
+    List({:path(@carry), :value($container)});
+}
+
+# end list }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)

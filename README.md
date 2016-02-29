@@ -633,7 +633,7 @@ Pass an empty list as `@path` to operate on the root of the container.
 
 ### `.list($container,:@path)`
 
-Lists all of the paths available in container.
+Lists all of the paths available in `$container`.
 
 _arguments:_
 
@@ -642,7 +642,7 @@ _arguments:_
 
 _returns:_
 
-* array of path-value pairs
+* List of path-value pairs
 
 _example:_
 
@@ -650,50 +650,77 @@ Listing a `Hash`:
 
 ```perl6
 say Crane.list(%data);
-[
-    # ...
+(
     {
-        :path('legumes', 2, 'unit'),
-        :value<lbs>
+        :path(["legumes", 0, "instock"]),
+        :value(4)
     },
     {
-        :path('legumes', 2, 'instock'),
+        :path(["legumes", 0, "name"]),
+        :value("pinto beans")
+    },
+    {
+        :path(["legumes", 0, "unit"]),
+        :value("lbs")
+    },
+    {
+        :path(["legumes", 1, "instock"]),
+        :value(21)
+    },
+    {
+        :path(["legumes", 1, "name"]),
+        :value("lima beans")
+    },
+    {
+        :path(["legumes", 1, "unit"]),
+        :value("lbs")
+    },
+    {
+        :path(["legumes", 2, "instock"]),
         :value(13)
     },
     {
-        :path('legumes', 3, 'name'),
-        :value<split peas>
+        :path(["legumes", 2, "name"]),
+        :value("black eyed peas")
     },
     {
-        :path('legumes', 3, 'unit'),
-        :value<lbs>
+        :path(["legumes", 2, "unit"]),
+        :value("lbs")
     },
     {
-        :path('legumes', 3, 'instock'),
+        :path(["legumes", 3, "instock"]),
         :value(8)
+    },
+    {
+        :path(["legumes", 3, "name"]),
+        :value("split peas")
+    },
+    {
+        :path(["legumes", 3, "unit"]),
+        :value("lbs")
     }
-]
+)
 ```
 
-Listing a list:
+Listing a List:
 
 ```perl6
 my $a = qw<zero one two>;
 say Crane.list($a);
-[
+(
     {
-        :path(0),
+        :path([0]),
         :value("zero")
     },
     {
-        :path(1),
+        :path([1]),
         :value("one")
     },
     {
-        :path(2),
+        :path([2]),
         :value("two")
     }
-]
+)
 ```
 
 <!-- end .list($container,:@path) }}} -->

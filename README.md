@@ -157,8 +157,8 @@ say %archversion.perl;
 - [`.move($container,:@from!,:@path!,:$in-place)`](#movecontainerfrompathin-place)
 - [`.copy($container,:@from!,:@path!,:$in-place)`](#copycontainerfrompathin-place)
 - [`.test($container,:@path!,:$value!)`](#testcontainerpathvalue)
-- [`.list($container,:@path!)`](#listcontainerpath)
-- [`.flatten($container,:@path!)`](#flattencontainerpath)
+- [`.list($container,:@path)`](#listcontainerpath)
+- [`.flatten($container,:@path)`](#flattencontainerpath)
 - [`.transform($container,:@path!,:$block!,:$in-place)`](#transformcontainerpathblockin-place)
 
 <!-- end methods toc }}} -->

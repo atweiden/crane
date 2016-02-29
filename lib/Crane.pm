@@ -1609,6 +1609,15 @@ multi sub list($container, :@carry = ()) returns List
 
 # end list }}}
 
+# flatten {{{
+
+method flatten($container, :@path) returns Hash[Any,List]
+{
+    my %tree{List} = Crane.list($container,:@path).map({$_<path> => $_<value>});
+}
+
+# end flatten }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)

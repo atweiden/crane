@@ -745,16 +745,18 @@ _example:_
 ```perl6
 say Crane.flatten(%data);
 {
-    # ...
-    ['legumes', 1, 'name']    => "lima beans",
-    ['legumes', 1, 'unit']    => "lbs",
-    ['legumes', 1, 'instock'] => 21,
-    ['legumes', 2, 'name']    => "black eyed peas",
-    ['legumes', 2, 'unit']    => "lbs",
-    ['legumes', 2, 'instock'] => 13,
-    ['legumes', 3, 'name']    => "split peas",
-    ['legumes', 3, 'unit']    => "lbs",
-    ['legumes', 3, 'instock'] => 8
+    ("legumes", 0, "instock") => 4,
+    ("legumes", 0, "name")    => "pinto beans",
+    ("legumes", 0, "unit")    => "lbs",
+    ("legumes", 1, "instock") => 21,
+    ("legumes", 1, "name")    => "lima beans",
+    ("legumes", 1, "unit")    => "lbs",
+    ("legumes", 2, "instock") => 13,
+    ("legumes", 2, "name")    => "black eyed peas",
+    ("legumes", 2, "unit")    => "lbs",
+    ("legumes", 3, "instock") => 8,
+    ("legumes", 3, "name")    => "split peas",
+    ("legumes", 3, "unit")    => "lbs"
 }
 ```
 

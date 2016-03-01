@@ -159,7 +159,7 @@ say %archversion.perl;
 - [`.test($container,:@path!,:$value!)`](#testcontainerpathvalue)
 - [`.list($container,:@path)`](#listcontainerpath)
 - [`.flatten($container,:@path)`](#flattencontainerpath)
-- [`.transform($container,:@path!,:$block!,:$in-place)`](#transformcontainerpathblockin-place)
+- [`.transform($container,:@path!,:&with!,:$in-place)`](#transformcontainerpathwithin-place)
 
 <!-- end methods toc }}} -->
 
@@ -742,17 +742,37 @@ say Crane.flatten(%data);
 
 <!-- end .flatten($container,:@path) }}} -->
 
-<!-- .transform($container,:@path!,:$block!,:$in-place) {{{ -->
+<!-- .transform($container,:@path!,:&with!,:$in-place) {{{ -->
 
-### `.transform($container,:@path!,:$block!,:$in-place)`
+### `.transform($container,:@path!,:&with!,:$in-place)`
+
+Functionally identical to a `replace` operation with the replacement value
+being the return value of `with` applied to the value of `$container`
+at `@path`.
+
+The Callable passed in `with` should take one argument and return a value.
+
+_arguments:_
+
+* `$container`: _Container, required_ — the target container
+* `:@path!`: _Path, required_ — a list of steps to the destination
+* `:&with!`: _Callable, required_ — instructions for changing the
+             value at `@path`
+* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+                `$container` in-place
+
+_returns:_
+
+* Container (original container is unmodified unless `:in-place` flag
+  is passed)
 
 _example:_
 
 ```perl6
 my %market =
     :foods({
-        :fruits(qw<blueberries marionberries>),
-        :veggies(qw<collards onions>)
+        :fruits([qw<blueberries marionberries>]),
+        :veggies([qw<collards onions>])
     });
 
 my @first-fruit = |qw<foods fruits>, 0;
@@ -760,14 +780,14 @@ my @second-veggie = |qw<foods veggies>, 1;
 
 my &oh-yeah = -> $s { $s ~ '!' };
 
-Crane.transform(%market, :path(@first-fruit), :block(&oh-yeah));
+Crane.transform(%market, :path(@first-fruit), :with(&oh-yeah));
 say so Crane.get(%market, :path(@first-fruit)) eq 'blueberries!'; # True
 
-Crane.transform(%market, :path(@second-veggie), :block(&oh-yeah));
+Crane.transform(%market, :path(@second-veggie), :with(&oh-yeah));
 say so Crane.get(%market, :path(@second-veggie)) eq 'onions!'; # True
 ```
 
-<!-- end .transform($container,:@path!,:$block!,:$in-place) }}} -->
+<!-- end .transform($container,:@path!,:&with!,:$in-place) }}} -->
 
 -------------------------------------------------------------------------------
 

@@ -1618,6 +1618,65 @@ method flatten($container, :@path) returns Hash[Any,List]
 
 # end flatten }}}
 
+# transform {{{
+
+method transform(
+    \container,
+    :@path!,
+    :&with!,
+    Bool :$in-place = False
+) returns Any
+{
+    unless is-valid-callable-signature(&with)
+    {
+        die X::Crane::TransformCallableSignatureParams.new;
+    }
+
+    if @path.elems > 0
+    {
+        unless Crane.exists(container, :@path)
+        {
+            die X::Crane::TransformPathNotFound.new;
+        }
+    }
+
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+
+    my $value;
+    try
+    {
+        CATCH
+        {
+            default
+            {
+                die X::Crane::TransformCallableRaisedException.new;
+            }
+        }
+        $value = with(at($root, @path));
+    }
+
+    try
+    {
+        CATCH
+        {
+            when X::Crane::Replace::RO
+            {
+                die X::Crane::Transform::RO.new(:typename(.typename));
+            }
+            default
+            {
+                die '✗ Crane error: something went wrong during transform';
+            }
+        }
+        Crane.replace($root, :@path, :$value, :in-place);
+    }
+
+    $root;
+}
+
+# end transform }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)
@@ -1694,6 +1753,12 @@ multi sub path-is-child-of-from(@from, @path) returns Bool
     (@from[$_] eqv @path[$_] for 0..@from.end).grep(*.so).elems == @from.elems
         ?? True
         !! False;
+}
+
+sub is-valid-callable-signature(&c) returns Bool
+{
+    &c.signature.params.elems == 1
+        && &c.signature.params.grep(*.positional).elems == 1;
 }
 
 # end helper functions }}}

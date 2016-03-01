@@ -259,6 +259,18 @@ class PositionalIndexInvalid is Exception
 
 # end X::Crane::PositionalIndexInvalid }}}
 
+# X::Crane::RemovePathNotFound {{{
+
+class RemovePathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: remove operation failed, path not found in container';
+    }
+}
+
+# end X::Crane::RemovePathNotFound }}}
+
 # X::Crane::Remove::RO {{{
 
 class Remove::RO is Exception
@@ -271,18 +283,6 @@ class Remove::RO is Exception
 }
 
 # end X::Crane::Remove::RO }}}
-
-# X::Crane::RemovePathNotFound {{{
-
-class RemovePathNotFound is Exception
-{
-    method message()
-    {
-        say '✗ Crane error: remove operation failed, path not found in container';
-    }
-}
-
-# end X::Crane::RemovePathNotFound }}}
 
 # X::Crane::ReplacePathNotFound {{{
 
@@ -320,5 +320,54 @@ class TestPathNotFound is Exception
 }
 
 # end X::Crane::TestPathNotFound }}}
+
+# X::Crane::TransformCallableRaisedException {{{
+
+class TransformCallableRaisedException is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: transform operation failed, callable raised exception';
+    }
+}
+
+# end X::Crane::TransformCallableRaisedException }}}
+
+# X::Crane::TransformCallableSignatureParams {{{
+
+class TransformCallableSignatureParams is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: transform operation failed, faulty callable signature';
+    }
+}
+
+# end X::Crane::TransformCallableSignatureParams }}}
+
+# X::Crane::TransformPathNotFound {{{
+
+class TransformPathNotFound is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: transform operation failed, path nonexistent';
+    }
+}
+
+# end X::Crane::TransformPathNotFound }}}
+
+# X::Crane::Transform::RO {{{
+
+class Transform::RO is Exception
+{
+    has $.typename;
+    method message()
+    {
+        say "✗ Crane error: transform requested modifying an immutable $.typename";
+    }
+}
+
+# end X::Crane::Transform::RO }}}
 
 # vim: ft=perl6 fdm=marker fdl=0

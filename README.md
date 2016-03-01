@@ -750,7 +750,8 @@ Functionally identical to a `replace` operation with the replacement value
 being the return value of `with` applied to the value of `$container`
 at `@path`.
 
-The Callable passed in `with` should take one argument and return a value.
+The Callable passed in `with` must take one (optional) positional argument
+and return a value.
 
 _arguments:_
 

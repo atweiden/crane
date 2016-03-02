@@ -38,36 +38,6 @@ class AssociativeKeyDNE is Exception
 
 # end X::Crane::AssociativeKeyDNE }}}
 
-# X::Crane::ChiselInvalidStep {{{
-
-class ChiselInvalidStep is Exception
-{
-    has $.error;
-    method message()
-    {
-        my Str $message = qq:to/EOF/;
-        ✗ Crane error: chisel requested invalid step
-          Causative error message:「{$.error.payload}」
-          Causative error type:「{$.error.WHAT.perl}」
-        EOF
-        say $message.trim;
-    }
-}
-
-# end X::Crane::ChiselInvalidStep }}}
-
-# X::Crane::ChiselRequestedROContainerReassignment {{{
-
-class ChiselRequestedROContainerReassignment is Exception
-{
-    method message()
-    {
-        say "✗ Crane error: chisel requested reassigning immutable container";
-    }
-}
-
-# end X::Crane::ChiselRequestedROContainerReassignment }}}
-
 # X::Crane::CopyFromNotFound {{{
 
 class CopyFromNotFound is Exception
@@ -141,6 +111,18 @@ class GetRootContainerKey is Exception
 
 # end X::Crane::GetRootContainerKey }}}
 
+# X::Crane::ExistsRootContainerKey {{{
+
+class ExistsRootContainerKey is Exception
+{
+    method message()
+    {
+        say '✗ Crane error: cannot request key operations on container root';
+    }
+}
+
+# end X::Crane::ExistsRootContainerKey }}}
+
 # X::Crane::MoveFromNotFound {{{
 
 class MoveFromNotFound is Exception
@@ -202,24 +184,6 @@ class MovePath::RO is Exception
 }
 
 # end X::Crane::MovePath::RO }}}
-
-# X::Crane::NonAssociativeKeyAssociative {{{
-
-class NonAssociativeKeyAssociative is Exception {*}
-
-# end X::Crane::NonAssociativeKeyAssociative }}}
-
-# X::Crane::NonPositionalIndexInt {{{
-
-class NonPositionalIndexInt is Exception {*}
-
-# end X::Crane::NonPositionalIndexInt }}}
-
-# X::Crane::NonPositionalIndexWhateverCode {{{
-
-class NonPositionalIndexWhateverCode is Exception {*}
-
-# end X::Crane::NonPositionalIndexWhateverCode }}}
 
 # X::Crane::PositionalIndexDNE {{{
 

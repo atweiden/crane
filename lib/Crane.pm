@@ -99,158 +99,117 @@ multi sub _at(Positional $data) is rw
 
 # end at }}}
 
-# chisel {{{
+# in {{{
 
-sub chisel($container, *@steps) is rw is export
+sub in(\container, *@steps) is rw is export
 {
-    my $root := $container;
+    return-rw _in(container, @steps);
+}
 
-    my @steps-taken; # for backtracing steps
-    loop (my Int $i = 0; $i < @steps.elems; $i++)
+# Associative handling {{{
+
+multi sub _in(Associative \container, @steps where *.elems > 1) is rw
+{
+    return-rw _in(container{@steps[0]}, @steps[1..*]);
+}
+
+multi sub _in(Associative \container, @steps where *.elems == 1) is rw
+{
+    return-rw container{@steps[0]};
+}
+
+multi sub _in(Associative \container, @steps where *.elems == 0) is rw
+{
+    return-rw container;
+}
+
+multi sub _in(Associative \container) is rw
+{
+    return-rw container;
+}
+
+# end Associative handling }}}
+
+# Positional handling {{{
+
+multi sub _in(Positional \container, @steps where *.elems > 1) is rw
+{
+    validate-positional-index(@steps[0]);
+    return-rw _in(container[@steps[0]], @steps[1..*]);
+}
+
+multi sub _in(Positional \container, @steps where *.elems == 1) is rw
+{
+    validate-positional-index(@steps[0]);
+    return-rw container[@steps[0]];
+}
+
+multi sub _in(Positional \container, @steps where *.elems == 0) is rw
+{
+    return-rw container;
+}
+
+
+multi sub _in(Positional \container) is rw
+{
+    return-rw container;
+}
+
+# end Positional handling }}}
+
+# Any handling {{{
+
+multi sub _in(\container, @steps where *.elems > 1) is rw
+{
+    given @steps[0]
     {
-        my Bool %failed; # for storing exception type encountered
-        CATCH
+        when Int && $_ >= 0
         {
-            when X::Crane::NonAssociativeKeyAssociative
-            {
-                %failed{.^name}++;
-                .resume;
-            }
-            when X::Crane::NonPositionalIndexInt
-            {
-                %failed{.^name}++;
-                .resume;
-            }
-            when X::Crane::NonPositionalIndexWhateverCode
-            {
-                %failed{.^name}++;
-                .resume;
-            }
-            when .payload eq "Cannot assign to a readonly variable or a value"
-            {
-                die X::Crane::ChiselRequestedROContainerReassignment.new;
-            }
-            default
-            {
-                die "✗ Crane accident:「{dd $_}」";
-            }
+            return-rw _in(container[@steps[0]], @steps[1..*]);
         }
-
-        $root := step($root, @steps[$i]);
-
-        if %failed.keys.grep({.defined})
+        when WhateverCode
         {
-            # assess why it failed
-            given %failed.keys.grep({.defined})[0]
-            {
-                when 'X::Crane::NonAssociativeKeyAssociative'
-                {
-                    # change last step to Associative type (overwrite)
-                    chisel($container, @steps-taken) = {};
-                    $root := chisel($container, @steps);
-                    last;
-                }
-                when 'X::Crane::NonPositionalIndexInt'
-                {
-                    # change last step to Positional type (overwrite)
-                    chisel($container, @steps-taken) = [];
-                    $root := chisel($container, @steps);
-                    last;
-                }
-                when 'X::Crane::NonPositionalIndexWhateverCode'
-                {
-                    # change last step to Positional type (overwrite)
-                    chisel($container, @steps-taken) = [];
-                    $root := chisel(
-                        $container,
-                        @steps-taken,
-                        null-step(at($container, @steps-taken), @steps[$i]),
-                        @steps[$i+1..*]
-                    );
-                    last;
-                }
-            }
+            return-rw _in(container[@steps[0]], @steps[1..*]);
         }
-        else
+        default
         {
-            # step succeeded (convert would-be WhateverCode Positional
-            # indices into hard-coded Int indices)
-            push @steps-taken, @steps[$i].isa(WhateverCode)
-                ?? null-step(at($container, @steps-taken), @steps[$i])
-                !! @steps[$i];
+            return-rw _in(container{@steps[0]}, @steps[1..*]);
         }
     }
-
-    return-rw $root;
 }
 
-multi sub step($container where {$_ !~~ Positional}, Int $step)
+multi sub _in(\container, @steps where *.elems == 1) is rw
 {
-    X::Crane::NonPositionalIndexInt.new.throw;
-}
-
-multi sub step($container where {$_ !~~ Positional}, WhateverCode $step)
-{
-    X::Crane::NonPositionalIndexWhateverCode.new.throw;
-}
-
-multi sub step(Positional $container, Int $step) is rw
-{
-    my $root := $container;
-    try
+    given @steps[0]
     {
-        CATCH
+        when Int && $_ >= 0
         {
-            default
-            {
-                die X::Crane::ChiselInvalidStep.new(:error($_));
-            }
+            return-rw container[@steps[0]];
         }
-        $root := $root[$step];
-    }
-    return-rw $root;
-}
-
-multi sub step(Positional $container, WhateverCode $step) is rw
-{
-    my $root := $container;
-    try
-    {
-        CATCH
+        when WhateverCode
         {
-            default
-            {
-                die X::Crane::ChiselInvalidStep.new(:error($_));
-            }
+            return-rw container[@steps[0]];
         }
-        $root := $root[$step];
-    }
-    return-rw $root;
-}
-
-multi sub step($container where {$_ !~~ Associative}, $step)
-{
-    X::Crane::NonAssociativeKeyAssociative.new.throw;
-}
-
-multi sub step($container, $step) is rw
-{
-    my $root := $container;
-    try
-    {
-        CATCH
+        default
         {
-            default
-            {
-                die X::Crane::ChiselInvalidStep.new(:error($_));
-            }
+            return-rw container{@steps[0]};
         }
-        $root := $root{$step};
     }
-    return-rw $root;
 }
 
-# end chisel }}}
+multi sub _in(\container, @steps where *.elems == 0) is rw
+{
+    return-rw container;
+}
+
+multi sub _in(\container) is rw
+{
+    return-rw container;
+}
+
+# end Any handling }}}
+
+# end in }}}
 
 # exists {{{
 
@@ -281,7 +240,7 @@ multi sub exists-key(
     @path where *.elems == 0
 ) returns Bool
 {
-    die X::Crane::GetRootContainerKey.new;
+    die X::Crane::ExistsRootContainerKey.new;
 }
 
 multi sub exists-key(
@@ -298,7 +257,7 @@ multi sub exists-key(
     @path where *.elems == 0
 ) returns Bool
 {
-    die X::Crane::GetRootContainerKey.new;
+    die X::Crane::ExistsRootContainerKey.new;
 }
 
 multi sub exists-key($container, @path where *.elems > 0) returns Bool
@@ -1717,15 +1676,6 @@ multi sub test-positional-index-classifier(OTHER)
 sub validate-positional-index($step)
 {
     test-positional-index-classifier(get-positional-index-classifier($step));
-}
-
-# convert WhateverCode to Int Positional index
-# helps prevent infinite loops
-sub null-step(Positional $container, WhateverCode $step) returns Int
-{
-    # $container.elems for *-0
-    my Int $elems = $container.elems // 0;
-    my Int $null-index = $container[$step]:k ?? ($container[$step]:k) !! $elems;
 }
 
 multi sub path-is-child-of-from(

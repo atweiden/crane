@@ -63,7 +63,7 @@ Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 <!-- exported subroutines toc {{{ -->
 
 - [`at($container,*@path)`](#atcontainerpath)
-- [`chisel($container,*@path)`](#chiselcontainerpath)
+- [`in($container,*@path)`](#incontainerpath)
 
 <!-- end exported subroutines toc }}} -->
 
@@ -99,19 +99,70 @@ say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) })
 
 <!-- end at($container,*@path) }}} -->
 
-<!-- chisel($container,*@path) {{{ -->
+<!-- in($container,*@path) {{{ -->
 
-### `chisel($container,*@path)`
+### `in($container,*@path)`
 
-Navigates to and returns container `is rw`, creating keys and overwriting
-values along the way (recursively).
+`in` works like `at`, except `in` will create the structure of nonexisting
+containers based on `@path` input instead of aborting the operation, e.g.
 
-`chisel` makes changes to containers potentially many levels deep,
-and will change the structure of containers based on `@path` input.
+```perl6
+at(my %h, qw<a b c>) = 5 # ✗ Crane error: associative key does not exist
+in(my %i, qw<a b c>) = 5
+say %i.perl;
+{
+    :a({
+        :b({
+            :c(5)
+        })
+    })
+}
+```
 
-If the given `@path` calls for overwriting values in `$container`,
-those values will be overwritten even when the rest of the operation
-fails and even when not assigning values to the returned container.
+If `@path` contains keys that lead to a nonexisting container, the default
+behavior is to create a Positional container there if the key is an
+`Int >= 0` or a `WhateverCode`. Otherwise `in` creates an Associative
+container there, e.g.
+
+```perl6
+my %h;
+in(%h, qw<a b>, 0, *-1) = 'here';
+say %h.perl;
+{
+    :a({
+        :b([
+            ["here"]
+        ])
+    })
+}
+```
+
+If `@path` contains keys that lead to an existing Associative container,
+it will attempt to index the existing Associative container with the
+key regardless of the key's type (be it `Int` or `WhateverCode`), e.g.
+
+```perl6
+my @a = [ :i({:want({:my<MTV>})}) ];
+in(@a, 0, 'i', 'want', 2) = 'always';
+say @a.perl;
+[
+    :i({
+        :want({
+            "2" => "always",
+            :my("MTV")
+        })
+    })
+]
+
+my @b = [ :i({:want(['my', 'MTV'])}) ];
+in(@b, 0, 'i', 'want', 2) = 'always';
+say @b.perl;
+[
+    :i({
+        :want(["my", "MTV", "always"])
+    })
+]
+```
 
 _arguments:_
 
@@ -126,8 +177,8 @@ _example:_
 
 ```perl6
 my %archversion = :bamboo({ :up<0.0.1>, :aur<0.0.2> });
-chisel(%archversion, qw<fzf up>) = '0.11.3';
-chisel(%archversion, qw<fzf aur>) = '0.11.3';
+in(%archversion, qw<fzf up>) = '0.11.3';
+in(%archversion, qw<fzf aur>) = '0.11.3';
 say %archversion.perl;
 {
     :bamboo({ :aur<0.0.2>, :up<0.0.1> }),
@@ -135,7 +186,7 @@ say %archversion.perl;
 }
 ```
 
-<!-- end chisel($container,*@path) }}} -->
+<!-- end in($container,*@path) }}} -->
 
 -------------------------------------------------------------------------------
 

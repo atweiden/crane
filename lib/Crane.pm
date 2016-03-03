@@ -4,17 +4,17 @@ unit class Crane;
 
 # at {{{
 
-sub at($data, *@steps) is rw is export
+sub at($container, *@steps) is rw is export
 {
-    my $root := $data;
+    my $root := $container;
     return-rw _at($root, @steps);
 }
 
 # Associative handling {{{
 
-multi sub _at(Associative $data, @steps where *.elems > 1) is rw
+multi sub _at(Associative $container, @steps where *.elems > 1) is rw
 {
-    my $root := $data;
+    my $root := $container;
     if $root{@steps[0]}:exists
     {
         $root := $root{@steps[0]};
@@ -26,9 +26,9 @@ multi sub _at(Associative $data, @steps where *.elems > 1) is rw
     return-rw _at($root, @steps[1..*]);
 }
 
-multi sub _at(Associative $data, @steps where *.elems == 1) is rw
+multi sub _at(Associative $container, @steps where *.elems == 1) is rw
 {
-    my $root := $data;
+    my $root := $container;
     if $root{@steps[0]}:exists
     {
         $root := $root{@steps[0]};
@@ -40,23 +40,23 @@ multi sub _at(Associative $data, @steps where *.elems == 1) is rw
     return-rw $root;
 }
 
-multi sub _at(Associative $data, @steps where *.elems == 0) is rw
+multi sub _at(Associative $container, @steps where *.elems == 0) is rw
 {
-    return-rw $data;
+    return-rw $container;
 }
 
-multi sub _at(Associative $data) is rw
+multi sub _at(Associative $container) is rw
 {
-    return-rw $data;
+    return-rw $container;
 }
 
 # end Associative handling }}}
 
 # Positional handling {{{
 
-multi sub _at(Positional $data, @steps where *.elems > 1) is rw
+multi sub _at(Positional $container, @steps where *.elems > 1) is rw
 {
-    my $root := $data;
+    my $root := $container;
     validate-positional-index(@steps[0]);
     if $root[@steps[0]]:exists
     {
@@ -69,9 +69,9 @@ multi sub _at(Positional $data, @steps where *.elems > 1) is rw
     return-rw _at($root, @steps[1..*]);
 }
 
-multi sub _at(Positional $data, @steps where *.elems == 1) is rw
+multi sub _at(Positional $container, @steps where *.elems == 1) is rw
 {
-    my $root := $data;
+    my $root := $container;
     validate-positional-index(@steps[0]);
     if $root[@steps[0]]:exists
     {
@@ -84,15 +84,15 @@ multi sub _at(Positional $data, @steps where *.elems == 1) is rw
     return-rw $root;
 }
 
-multi sub _at(Positional $data, @steps where *.elems == 0) is rw
+multi sub _at(Positional $container, @steps where *.elems == 0) is rw
 {
-    return-rw $data;
+    return-rw $container;
 }
 
 
-multi sub _at(Positional $data) is rw
+multi sub _at(Positional $container) is rw
 {
-    return-rw $data;
+    return-rw $container;
 }
 
 # end Positional handling }}}

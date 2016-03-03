@@ -322,39 +322,31 @@ Pass an empty list as `@path` to operate on the root of the container.
 
 <!-- end .get($container,:@path!,:$k,:$v,:$p) }}} -->
 
-<!-- .set($container,:@path!,:$value!,:$in-place) {{{ -->
+<!-- .set($container,:@path!,:$value!) {{{ -->
 
-### `.set($container,:@path!,:$value!,:$in-place)`
+### `.set($container,:@path!,:$value!)`
 
 Sets the value at the specified path in the container. The default
-behavior is to create nonexistent paths (similar to `mkdir -p`) and to
-overwrite existing values where necessary.
+behavior is to create nonexistent paths (similar to `mkdir -p`).
 
 _arguments:_
 
 * `$container`: _Container, required_ — the target container
 * `:@path!`: _Path, required_ — a list of steps for navigating container
 * `:$value!`: _Any, required_ — the value to be set at the specified path
-* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
-                `$container` in-place
 
 _returns:_
 
-* Container (original container is unmodified unless `:in-place` flag
-  is passed)
+* Modified container
 
 _example:_
 
 ```perl6
-my %p0;
-my %p1 = Crane.set(%p0, :path(qw<peter piper>), :value<man>);
-my %p2 = Crane.set(%p1, :path(qw<peter pan>), :value<boy>);
-my %p3 = Crane.set(%p2, :path(qw<peter pickle>), :value<dunno>);
-
-say %p0.perl; # {}
-say %p1.perl; # { :peter({ :piper("man") }) }
-say %p2.perl; # { :peter({ :pan("boy"), :piper("man") }) }
-say %p3.perl; # { :peter({ :pan("boy"), :pickle("dunno"), :piper("man") }) }
+my %p;
+Crane.set(%p, :path(qw<peter piper>), :value<man>);
+Crane.set(%p, :path(qw<peter pan>), :value<boy>);
+Crane.set(%p, :path(qw<peter pickle>), :value<dunno>);
+say %p.perl; # { :peter({ :pan("boy"), :pickle("dunno"), :piper("man") }) }
 ```
 
 _What about operating on the root of the container?_
@@ -363,12 +355,11 @@ Pass an empty list as `@path` to operate on the root of the container.
 
 ```perl6
 my $a = (1, 2, 3);
-my $b = Crane.set($a, :path(), :value<foo>);
-say $a; # (1, 2, 3)
-say $b; # foo
+Crane.set($a, :path(), :value<foo>);
+say $a; # foo
 ```
 
-<!-- end .set($container,:@path!,:$value!,:$in-place) }}} -->
+<!-- end .set($container,:@path!,:$value!) }}} -->
 
 <!-- .add($container,:@path!,:$value!,:$in-place) {{{ -->
 

@@ -468,6 +468,33 @@ multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
 
 # end get }}}
 
+# set {{{
+
+method set(\container, :@path!, :$value!) returns Any
+{
+    # the Crane.set operation will fail when @path[*-1] is invalid for
+    # the container type according to Crane syntax rules:
+    #
+    #   if @path[*-2] is Positional, then @path[*-1] must be
+    #   Int/WhateverCode
+    #
+    # the Crane.set operation will fail when it's invalid to set
+    # $container at @path to $value, such as when $container at @path
+    # is an immutable value (X::Crane::OpSet::RO)
+    CATCH
+    {
+        when X::Assignment::RO
+        {
+            die X::Crane::OpSet::RO.new(:typename(.typename));
+        }
+    }
+
+    in(container, @path) = $value ~~ Positional ?? $value.clone !! $value;
+    container ~~ Positional ?? |container !! container;
+}
+
+# end set }}}
+
 # add {{{
 
 method add(\container, :@path!, :$value!, Bool :$in-place = False) returns Any

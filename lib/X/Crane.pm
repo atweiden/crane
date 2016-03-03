@@ -273,6 +273,19 @@ class Replace::RO is Exception
 
 # end X::Crane::Replace::RO }}}
 
+# X::Crane::OpSet::RO {{{
+
+class OpSet::RO is Exception
+{
+    has $.typename;
+    method message()
+    {
+        say "✗ Crane error: set requested modifying an immutable $.typename";
+    }
+}
+
+# end X::Crane::OpSet::RO }}}
+
 # X::Crane::TestPathNotFound {{{
 
 class TestPathNotFound is Exception

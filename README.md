@@ -201,7 +201,7 @@ say %archversion.perl;
 
 - [`.exists($container,:@path!,:$k,:$v)`](#existscontainerpathkv)
 - [`.get($container,:@path!,:$k,:$v,:$p)`](#getcontainerpathkvp)
-- [`.set($container,:@path!,:$value!,:$in-place)`](#setcontainerpathvaluein-place)
+- [`.set($container,:@path!,:$value!)`](#setcontainerpathvalue)
 - [`.add($container,:@path!,:$value!,:$in-place)`](#addcontainerpathvaluein-place)
 - [`.remove($container,:@path!,:$in-place)`](#removecontainerpathin-place)
 - [`.replace($container,:@path!,:$value!,:$in-place)`](#replacecontainerpathvaluein-place)

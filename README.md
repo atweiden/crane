@@ -17,16 +17,24 @@ and perform tasks.
 ```perl6
 use Crane;
 
-my %inxi = :info({
-    :memory([1564.9, 32140.1]),
-    :processes(244),
-    :uptime<3:16>
-});
+my %h0;
+my %h1 = Crane.add(%h0, :path['a'], :value({:b({:c<here>})}));
+my %h2 = Crane.add(%h1, :path(qw<a b d>), :value([]));
+my %h3 = Crane.add(%h2, :path(|qw<a b d>, 0), :value<diamond>);
+my %h4 = Crane.replace(%h3, :path(|qw<a b d>, *-1), :value<dangerous>);
+my %h5 = Crane.remove(%h4, :path(qw<a b c>));
+my %h6 = Crane.move(%h5, :from(qw<a b d>), :path['d']);
+my %h7 = Crane.copy(%h6, :from(qw<a b>), :path['b']);
+my %h8 = Crane.remove(%h7, :path(qw<a b>));
+my %h9 = Crane.replace(%h8, :path['a'], :value(['alligators']));
+my %h10 = Crane.replace(%h9, :path['b'], :value(['be']));
 
-at(%inxi, 'info')<uptime>:delete;
-at(%inxi, qw<info memory>)[0] = 31868.0;
-
-say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) })
+say Crane.list(%h10).perl;
+(
+    {:path(["a", 0]), :value("alligators")},
+    {:path(["b", 0]), :value("be")},
+    {:path(["d", 0]), :value("dangerous")}
+)
 ```
 
 <!-- end example code }}} -->

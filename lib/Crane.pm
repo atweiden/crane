@@ -387,6 +387,16 @@ multi sub get-key(Positional $container, @path where *.elems == 0) returns Any
     die X::Crane::GetRootContainerKey.new;
 }
 
+multi sub get-key($container, @path where *.elems > 0) returns Any
+{
+    die X::Crane::GetPathNotFound.new;
+}
+
+multi sub get-key($container, @path where *.elems == 0) returns Any
+{
+    die X::Crane::GetRootContainerKey.new;
+}
+
 # end get-key }}}
 
 # get-value {{{
@@ -421,6 +431,11 @@ multi sub get-value(Positional $container, @path where *.elems == 1) returns Any
 multi sub get-value(Positional $container, @path where *.elems == 0) returns Any
 {
     $container;
+}
+
+multi sub get-value($container, @path where *.elems > 0) returns Any
+{
+    die X::Crane::GetPathNotFound.new;
 }
 
 multi sub get-value($container, @path where *.elems == 0) returns Any
@@ -460,6 +475,16 @@ multi sub get-pair(Positional $container, @path where *.elems == 1) returns Any
 }
 
 multi sub get-pair(Positional $container, @path where *.elems == 0) returns Any
+{
+    die X::Crane::GetRootContainerKey.new;
+}
+
+multi sub get-pair($container, @path where *.elems > 0) returns Any
+{
+    die X::Crane::GetPathNotFound.new;
+}
+
+multi sub get-pair($container, @path where *.elems == 0) returns Any
 {
     die X::Crane::GetRootContainerKey.new;
 }

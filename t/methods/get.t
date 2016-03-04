@@ -63,6 +63,11 @@ subtest
     my @path = 'legumes', *-2, 'name';
     is Crane.get(%data, :@path), 'black eyed peas',
         'Is expected value';
+
+    my %toml = :a({:b({:c<doh>})});
+    throws-like {Crane.get(%toml, :path(qw<a b c d>))},
+        X::Crane::GetPathNotFound,
+        'Get operation fails when path not found';
 }
 
 # vim: ft=perl6

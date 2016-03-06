@@ -596,7 +596,8 @@ the container.
 Copies the source value identified by `@from` in container to destination
 container at location specified by `@path`. This operation is functionally
 identical to a `.add` operation at the `@path` location using the value
-specified in the `@from`.
+specified in the `@from`. As with `.move`, a location cannot be copied
+into one of its children.
 
 The default behavior is to raise an error if the source at `@from`
 is nonexistent.
@@ -831,10 +832,10 @@ my @second-veggie = |qw<foods veggies>, 1;
 
 my &oh-yeah = -> $s { $s ~ '!' };
 
-Crane.transform(%market, :path(@first-fruit), :with(&oh-yeah));
+Crane.transform(%market, :path(@first-fruit), :with(&oh-yeah), :in-place);
 say so Crane.get(%market, :path(@first-fruit)) eq 'blueberries!'; # True
 
-Crane.transform(%market, :path(@second-veggie), :with(&oh-yeah));
+Crane.transform(%market, :path(@second-veggie), :with(&oh-yeah), :in-place);
 say so Crane.get(%market, :path(@second-veggie)) eq 'onions!'; # True
 ```
 

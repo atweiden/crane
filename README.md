@@ -219,6 +219,7 @@ say %archversion.perl;
 - [`.list($container,:@path)`](#listcontainerpath)
 - [`.flatten($container,:@path)`](#flattencontainerpath)
 - [`.transform($container,:@path!,:&with!,:$in-place)`](#transformcontainerpathwithin-place)
+- [`.patch($container,@patch,:$in-place)`](#patchcontainerpatchin-place)
 
 <!-- end methods toc }}} -->
 
@@ -840,6 +841,95 @@ say so Crane.get(%market, :path(@second-veggie)) eq 'onions!'; # True
 ```
 
 <!-- end .transform($container,:@path!,:&with!,:$in-place) }}} -->
+
+<!-- .patch($container,@patch,:$in-place) {{{ -->
+
+### `.patch($container,@patch,:$in-place)`
+
+Apply `@patch`, a list of specially formatted Hashes representing
+individual 6902 operations implemented by Crane, to `$container`.
+
+**add**
+
+```perl6
+{ :op("add"), :path(qw<path to target>), :value("Value") }
+```
+
+**remove**
+
+```perl6
+{ :op("remove"), :path(qw<path to target>) }
+```
+
+**replace**
+
+```perl6
+{ :op("replace"), :path(qw<path to target>), :value("Value") }
+```
+
+**move**
+
+```perl6
+{ :op("move"), :from(qw<path to source>), :path(qw<path to target>) }
+```
+
+**copy**
+
+```perl6
+{ :op("copy"), :from(qw<path to source>), :path(qw<path to target>) }
+```
+
+**test**
+
+```perl6
+{ :op("test"), :path(qw<path to target>), :value("Is value") }
+```
+
+If an operation is not successful, the default behavior is to raise an
+exception. If a test operation as part of the `@patch` returns False,
+the default behavior is to raise an exception.
+
+_arguments:_
+
+* `$container`: _Container, required_ — the target container
+* `@patch`: _Patch, required_ — a list of 6902 instructions to apply
+* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+                `$container` in-place
+
+_returns:_
+
+* Container (original container is unmodified unless `:in-place` flag
+  is passed)
+
+_example:_
+
+```perl6
+my %h;
+my @patch =
+    { :op<add>, :path['a'], :value({:b({:c<here>})}) },
+    { :op<add>, :path(qw<a b d>), :value([]) },
+    { :op<add>, :path(|qw<a b d>, 0), :value<diamond> },
+    { :op<replace>, :path(|qw<a b d>, *-1), :value<dangerous> },
+    { :op<remove>, :path(qw<a b c>) },
+    { :op<move>, :from(qw<a b d>), :path['d'] },
+    { :op<copy>, :from(qw<a b>), :path['b'] },
+    { :op<remove>, :path(qw<a b>) },
+    { :op<replace>, :path['a'], :value(['alligators']) },
+    { :op<replace>, :path['b'], :value(['be']) };
+my %i = Crane.patch(%h, @patch);
+```
+
+Exception: `42 !== 'C'`
+
+```perl6
+my %h = :a({:b({:c})});
+my @patch =
+    { :op<replace>, :path(qw<a b c>), :value(42) },
+    { :op<test>, :path(qw<a b c>), :value<C> };
+my %i = Crane.patch(%h, @patch); # ✗ Crane error: patch operation failed, test failed
+```
+
+<!-- end .patch($container,@patch,:$in-place) }}} -->
 
 -------------------------------------------------------------------------------
 

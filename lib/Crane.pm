@@ -1688,6 +1688,145 @@ method transform(
 
 # end transform }}}
 
+# patch {{{
+
+method patch(\container, @patch, Bool :$in-place = False) returns Any
+{
+    my $root;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    for @patch -> %patch
+    {
+        try
+        {
+            CATCH
+            {
+                when X::Crane::PatchAddFailed
+                {
+                    die X::Crane::Patch.new(:help-text(.message));
+                }
+                when X::Crane::PatchRemoveFailed
+                {
+                    die X::Crane::Patch.new(:help-text(.message));
+                }
+                when X::Crane::PatchReplaceFailed
+                {
+                    die X::Crane::Patch.new(:help-text(.message));
+                }
+                when X::Crane::PatchMoveFailed
+                {
+                    die X::Crane::Patch.new(:help-text(.message));
+                }
+                when X::Crane::PatchCopyFailed
+                {
+                    die X::Crane::Patch.new(:help-text(.message));
+                }
+                when X::Crane::PatchTestFailed
+                {
+                    die X::Crane::Patch.new(:help-text(.message));
+                }
+                default
+                {
+                    die '✗ Crane accident: patch operation failed';
+                }
+            }
+            patch($root, %patch)
+        }
+    }
+    $root;
+}
+
+# add
+multi sub patch(
+    \container,
+    %patch (:$op! where $_ eq 'add', :@path!, :$value!)
+)
+{
+    CATCH
+    {
+        default
+        {
+            X::Crane::PatchAddFailed.new.throw;
+        }
+    }
+    Crane.add(container, :@path, :$value, :in-place);
+}
+
+# remove
+multi sub patch(
+    \container,
+    %patch (:$op! where $_ eq 'remove', :@path!)
+)
+{
+    CATCH
+    {
+        default
+        {
+            X::Crane::PatchRemoveFailed.new.throw;
+        }
+    }
+    Crane.remove(container, :@path, :in-place);
+}
+
+# replace
+multi sub patch(
+    \container,
+    %patch (:$op! where $_ eq 'replace', :@path!, :$value!)
+)
+{
+    CATCH
+    {
+        default
+        {
+            X::Crane::PatchReplaceFailed.new.throw;
+        }
+    }
+    Crane.replace(container, :@path, :$value, :in-place);
+}
+
+# move
+multi sub patch(
+    \container,
+    %patch (:$op! where $_ eq 'move', :@from!, :@path!)
+)
+{
+    CATCH
+    {
+        default
+        {
+            X::Crane::PatchMoveFailed.new.throw;
+        }
+    }
+    Crane.move(container, :@from, :@path, :in-place);
+}
+
+# copy
+multi sub patch(
+    \container,
+    %patch (:$op! where $_ eq 'copy', :@from!, :@path!)
+)
+{
+    CATCH
+    {
+        default
+        {
+            X::Crane::PatchCopyFailed.new.throw;
+        }
+    }
+    Crane.copy(container, :@from, :@path, :in-place)
+}
+
+# test
+multi sub patch(
+    \container,
+    %patch (:$op! where $_ eq 'test', :@path!, :$value!)
+)
+{
+    Crane.test(container, :@path, :$value)
+        or X::Crane::PatchTestFailed.new.throw;
+}
+
+# end patch }}}
+
 # helper functions {{{
 
 # INT0P: Int where * >= 0 (valid)

@@ -7,7 +7,7 @@ class AddPathNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: add operation failed, path not found in container';
+        '✗ Crane error: add operation failed, path not found in container';
     }
 }
 
@@ -20,7 +20,7 @@ class Add::RO is Exception
     has $.typename;
     method message()
     {
-        say "✗ Crane error: add requested modifying an immutable $.typename";
+        "✗ Crane error: add requested modifying an immutable $.typename";
     }
 }
 
@@ -32,7 +32,7 @@ class AssociativeKeyDNE is Exception
 {
     method message()
     {
-        say '✗ Crane error: associative key does not exist';
+        '✗ Crane error: associative key does not exist';
     }
 }
 
@@ -44,7 +44,7 @@ class CopyFromNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: copy operation failed, from location nonexistent';
+        '✗ Crane error: copy operation failed, from location nonexistent';
     }
 }
 
@@ -56,7 +56,7 @@ class CopyParentToChild is Exception
 {
     method message()
     {
-        say '✗ Crane error: a location cannot be copied into one of its children';
+        '✗ Crane error: a location cannot be copied into one of its children';
     }
 }
 
@@ -68,7 +68,7 @@ class CopyPathNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: copy operation failed, path nonexistent';
+        '✗ Crane error: copy operation failed, path nonexistent';
     }
 }
 
@@ -81,7 +81,7 @@ class CopyPath::RO is Exception
     has $.typename;
     method message()
     {
-        say "✗ Crane error: requested copy path is immutable $.typename";
+        "✗ Crane error: requested copy path is immutable $.typename";
     }
 }
 
@@ -93,7 +93,7 @@ class GetPathNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: get operation failed, path nonexistent';
+        '✗ Crane error: get operation failed, path nonexistent';
     }
 }
 
@@ -105,7 +105,7 @@ class GetRootContainerKey is Exception
 {
     method message()
     {
-        say '✗ Crane error: cannot request key operations on container root';
+        '✗ Crane error: cannot request key operations on container root';
     }
 }
 
@@ -117,7 +117,7 @@ class ExistsRootContainerKey is Exception
 {
     method message()
     {
-        say '✗ Crane error: cannot request key operations on container root';
+        '✗ Crane error: cannot request key operations on container root';
     }
 }
 
@@ -129,7 +129,7 @@ class MoveFromNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: move operation failed, from location nonexistent';
+        '✗ Crane error: move operation failed, from location nonexistent';
     }
 }
 
@@ -142,7 +142,7 @@ class MoveFrom::RO is Exception
     has $.typename;
     method message()
     {
-        say "✗ Crane error: requested move from immutable $.typename";
+        "✗ Crane error: requested move from immutable $.typename";
     }
 }
 
@@ -154,7 +154,7 @@ class MoveParentToChild is Exception
 {
     method message()
     {
-        say '✗ Crane error: a location cannot be moved into one of its children';
+        '✗ Crane error: a location cannot be moved into one of its children';
     }
 }
 
@@ -166,7 +166,7 @@ class MovePathNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: move operation failed, path nonexistent';
+        '✗ Crane error: move operation failed, path nonexistent';
     }
 }
 
@@ -179,11 +179,96 @@ class MovePath::RO is Exception
     has $.typename;
     method message()
     {
-        say "✗ Crane error: requested move path is immutable $.typename";
+        "✗ Crane error: requested move path is immutable $.typename";
     }
 }
 
 # end X::Crane::MovePath::RO }}}
+
+# X::Crane::Patch {{{
+
+class Patch is Exception
+{
+    has Str $.help-text;
+    method message()
+    {
+        $.help-text;
+    }
+}
+
+# end X::Crane::Patch }}}
+
+# X::Crane::PatchAddFailed {{{
+
+class PatchAddFailed is Exception
+{
+    method message()
+    {
+        '✗ Crane error: patch operation failed, add failed';
+    }
+}
+
+# end X::Crane::PatchAddFailed }}}
+
+# X::Crane::PatchCopyFailed {{{
+
+class PatchCopyFailed is Exception
+{
+    method message()
+    {
+        '✗ Crane error: patch operation failed, copy failed';
+    }
+}
+
+# end X::Crane::PatchCopyFailed }}}
+
+# X::Crane::PatchMoveFailed {{{
+
+class PatchMoveFailed is Exception
+{
+    method message()
+    {
+        '✗ Crane error: patch operation failed, move failed';
+    }
+}
+
+# end X::Crane::PatchMoveFailed }}}
+
+# X::Crane::PatchRemoveFailed {{{
+
+class PatchRemoveFailed is Exception
+{
+    method message()
+    {
+        '✗ Crane error: patch operation failed, remove failed';
+    }
+}
+
+# end X::Crane::PatchRemoveFailed }}}
+
+# X::Crane::PatchReplaceFailed {{{
+
+class PatchReplaceFailed is Exception
+{
+    method message()
+    {
+        '✗ Crane error: patch operation failed, replace failed';
+    }
+}
+
+# end X::Crane::PatchReplaceFailed }}}
+
+# X::Crane::PatchTestFailed {{{
+
+class PatchTestFailed is Exception
+{
+    method message()
+    {
+        '✗ Crane error: patch operation failed, test failed';
+    }
+}
+
+# end X::Crane::PatchTestFailed }}}
 
 # X::Crane::PositionalIndexDNE {{{
 
@@ -191,7 +276,7 @@ class PositionalIndexDNE is Exception
 {
     method message()
     {
-        say '✗ Crane error: positional index does not exist';
+        '✗ Crane error: positional index does not exist';
     }
 }
 
@@ -217,7 +302,7 @@ class PositionalIndexInvalid is Exception
                 $error-message = 'given Positional index invalid';
             }
         }
-        say "✗ Crane error: $error-message";
+        "✗ Crane error: $error-message";
     }
 }
 
@@ -229,7 +314,7 @@ class RemovePathNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: remove operation failed, path not found in container';
+        '✗ Crane error: remove operation failed, path not found in container';
     }
 }
 
@@ -242,7 +327,7 @@ class Remove::RO is Exception
     has $.typename;
     method message()
     {
-        say "✗ Crane error: requested remove operation on immutable $.typename";
+        "✗ Crane error: requested remove operation on immutable $.typename";
     }
 }
 
@@ -254,7 +339,7 @@ class ReplacePathNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: replace operation failed, path not found in container';
+        '✗ Crane error: replace operation failed, path not found in container';
     }
 }
 
@@ -267,7 +352,7 @@ class Replace::RO is Exception
     has $.typename;
     method message()
     {
-        say "✗ Crane error: replace requested modifying an immutable $.typename";
+        "✗ Crane error: replace requested modifying an immutable $.typename";
     }
 }
 
@@ -280,7 +365,7 @@ class OpSet::RO is Exception
     has $.typename;
     method message()
     {
-        say "✗ Crane error: set requested modifying an immutable $.typename";
+        "✗ Crane error: set requested modifying an immutable $.typename";
     }
 }
 
@@ -292,7 +377,7 @@ class TestPathNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: test operation failed, path nonexistent';
+        '✗ Crane error: test operation failed, path nonexistent';
     }
 }
 
@@ -304,7 +389,7 @@ class TransformCallableRaisedException is Exception
 {
     method message()
     {
-        say '✗ Crane error: transform operation failed, callable raised exception';
+        '✗ Crane error: transform operation failed, callable raised exception';
     }
 }
 
@@ -316,7 +401,7 @@ class TransformCallableSignatureParams is Exception
 {
     method message()
     {
-        say '✗ Crane error: transform operation failed, faulty callable signature';
+        '✗ Crane error: transform operation failed, faulty callable signature';
     }
 }
 
@@ -328,7 +413,7 @@ class TransformPathNotFound is Exception
 {
     method message()
     {
-        say '✗ Crane error: transform operation failed, path nonexistent';
+        '✗ Crane error: transform operation failed, path nonexistent';
     }
 }
 
@@ -341,7 +426,7 @@ class Transform::RO is Exception
     has $.typename;
     method message()
     {
-        say "✗ Crane error: transform requested modifying an immutable $.typename";
+        "✗ Crane error: transform requested modifying an immutable $.typename";
     }
 }
 

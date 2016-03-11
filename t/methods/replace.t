@@ -76,7 +76,7 @@ subtest
 {
     # container root
     my @a = qw<zero one two>;
-    my @b = Crane.replace(@a, :path(), :value(qw<Zero One Two>));
+    my @b = Crane.replace(@a, :path(), :value([qw<Zero One Two>]));
     is-deeply @b, [qw<Zero One Two>], 'Is expected value';
     is-deeply @a, [qw<zero one two>], 'Original container is unchanged';
 

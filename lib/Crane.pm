@@ -1526,7 +1526,8 @@ method copy(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
 {
     # the Crane.copy operation will fail when @from or @path DNE in
     # $container with rules similar to JSON Patch
-    # (X::Crane::CopyFromNotFound, X::Crane::CopyPathNotFound)
+    # (X::Crane::CopyFromNotFound, X::Crane::CopyPathNotFound,
+    # X::Crane::CopyPathOutOfRange)
     #
     # the Crane.copy operation will fail when @from is to be copied into
     # one of its children (X::Crane::CopyParentToChild)

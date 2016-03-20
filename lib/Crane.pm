@@ -525,7 +525,8 @@ method set(\container, :@path!, :$value!) returns Any
 method add(\container, :@path!, :$value!, Bool :$in-place = False) returns Any
 {
     # the Crane.add operation will fail when @path DNE in $container
-    # with rules similar to JSON Patch (X::Crane::AddPathNotFound)
+    # with rules similar to JSON Patch (X::Crane::AddPathNotFound,
+    # X::Crane::AddPathOutOfRange)
     #
     # the Crane.add operation will fail when @path[*-1] is invalid for
     # the container type according to Crane syntax rules:
@@ -552,6 +553,13 @@ method add(\container, :@path!, :$value!, Bool :$in-place = False) returns Any
             {
                 die X::Crane::Add::RO.new(:typename(~$0));
             }
+        }
+        when X::OutOfRange
+        {
+            die X::Crane::AddPathOutOfRange.new(
+                :operation<add>,
+                :out-of-range($_)
+            );
         }
     }
 
@@ -1446,7 +1454,8 @@ method move(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
 {
     # the Crane.move operation will fail when @from or @path DNE in
     # $container with rules similar to JSON Patch
-    # (X::Crane::MoveFromNotFound, X::Crane::MovePathNotFound)
+    # (X::Crane::MoveFromNotFound, X::Crane::MovePathNotFound,
+    # X::Crane::MovePathOutOfRange)
     #
     # the Crane.move operation will fail when @from is to be moved into
     # one of its children (X::Crane::MoveParentToChild)
@@ -1473,6 +1482,12 @@ method move(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
         when X::Crane::AddPathNotFound
         {
             die X::Crane::MovePathNotFound.new;
+        }
+        when X::Crane::AddPathOutOfRange
+        {
+            die X::Crane::MovePathOutOfRange.new(
+                :add-path-out-of-range(.message)
+            );
         }
         when X::Crane::Add::RO
         {
@@ -1534,6 +1549,12 @@ method copy(\container, :@from!, :@path!, Bool :$in-place = False) returns Any
         when X::Crane::AddPathNotFound
         {
             die X::Crane::CopyPathNotFound.new;
+        }
+        when X::Crane::AddPathOutOfRange
+        {
+            die X::Crane::CopyPathOutOfRange.new(
+                :add-path-out-of-range(.message)
+            );
         }
         when X::Crane::Add::RO
         {

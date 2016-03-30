@@ -1913,9 +1913,7 @@ multi sub path-is-child-of-from(
 # verify @from[$_] !eqv @path[$_] for 0..@from.end
 multi sub path-is-child-of-from(@from, @path) returns Bool
 {
-    (@from[$_] eqv @path[$_] for 0..@from.end).grep(*.so).elems == @from.elems
-        ?? True
-        !! False;
+    (@from[$_] eqv @path[$_] for 0..@from.end).grep(*.so).elems == @from.elems;
 }
 
 sub is-valid-callable-signature(&c) returns Bool

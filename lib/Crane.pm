@@ -1751,7 +1751,7 @@ method patch(\container, @patch, Bool :$in-place = False) returns Any
                     die '✗ Crane accident: patch operation failed';
                 }
             }
-            patch($root, %patch)
+            patch($root, %patch);
         }
     }
     $root;
@@ -1834,7 +1834,7 @@ multi sub patch(
             X::Crane::PatchCopyFailed.new.throw;
         }
     }
-    Crane.copy(container, :@from, :@path, :in-place)
+    Crane.copy(container, :@from, :@path, :in-place);
 }
 
 # test

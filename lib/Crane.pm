@@ -213,7 +213,7 @@ multi sub _in(\container) is rw
 
 # exists {{{
 
-method exists($container, :@path!, Bool :$k = True, Bool :$v) returns Bool:D
+method exists($container, :@path!, Bool :k($) = True, Bool :$v) returns Bool:D
 {
     $v.so ?? exists-value($container, @path) !! exists-key($container, @path);
 }
@@ -317,9 +317,9 @@ multi sub exists-value($container, @path where *.elems > 0) returns Bool:D
 multi method get(
     $container,
     :@path!,
-    Bool:D :$k! where *.so,
-    Bool :$v where *.not,
-    Bool :$p where *.not
+    Bool:D :k($)! where *.so,
+    Bool :v($) where *.not,
+    Bool :p($) where *.not
 ) returns Any:D
 {
     get-key($container, @path);
@@ -328,9 +328,9 @@ multi method get(
 multi method get(
     $container,
     :@path!,
-    Bool :$k where *.not,
-    Bool:D :$v = True,
-    Bool :$p where *.not
+    Bool :k($) where *.not,
+    Bool:D :v($) = True,
+    Bool :p($) where *.not
 ) returns Any:D
 {
     get-value($container, @path);
@@ -339,9 +339,9 @@ multi method get(
 multi method get(
     $container,
     :@path!,
-    Bool :$k where *.not,
-    Bool :$v where *.not,
-    Bool:D :$p! where *.so
+    Bool :k($) where *.not,
+    Bool :v($) where *.not,
+    Bool:D :p($)! where *.so
 ) returns Any:D
 {
     get-pair($container, @path);
@@ -751,7 +751,7 @@ multi sub add-to-associative(
 multi sub add-to-associative(
     \container,
     :$value!,
-    Bool :$in-place where *.not
+    Bool :in-place($) where *.not
 ) returns Any:D
 {
     my $root = container.deepmap(*.clone);
@@ -762,7 +762,7 @@ multi sub add-to-associative(
 multi sub add-to-associative(
     \container,
     :$value!,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = $value;
@@ -825,7 +825,7 @@ multi sub add-to-positional(
 multi sub add-to-positional(
     \container,
     :$value!,
-    Bool :$in-place where *.not
+    Bool :in-place($) where *.not
 ) returns Any:D
 {
     my $root = container.deepmap(*.clone);
@@ -836,7 +836,7 @@ multi sub add-to-positional(
 multi sub add-to-positional(
     \container,
     :$value!,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = $value.WHAT ~~ Positional ?? $value.clone !! $value;
@@ -850,7 +850,7 @@ multi sub add-to-positional(
 multi sub add-to-any(
     \container,
     :$value!,
-    Bool :$in-place where *.not
+    Bool :in-place($) where *.not
 ) returns Any:D
 {
     my $root = container.deepmap(*.clone);
@@ -861,7 +861,7 @@ multi sub add-to-any(
 multi sub add-to-any(
     \container,
     :$value!,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = $value;
@@ -1064,7 +1064,7 @@ multi sub remove-from-associative(
 
 multi sub remove-from-associative(
     \container,
-    Bool :$in-place where *.not
+    Bool :in-place($) where *.not
 ) returns Any:D
 {
     my $root = container.deepmap(*.clone);
@@ -1074,7 +1074,7 @@ multi sub remove-from-associative(
 
 multi sub remove-from-associative(
     \container,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = Empty;
@@ -1112,7 +1112,7 @@ multi sub remove-from-positional(
 
 multi sub remove-from-positional(
     \container,
-    Bool :$in-place where *.not
+    Bool :in-place($) where *.not
 ) returns Any:D
 {
     my $root = container.deepmap(*.clone);
@@ -1122,7 +1122,7 @@ multi sub remove-from-positional(
 
 multi sub remove-from-positional(
     \container,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = Empty;
@@ -1133,7 +1133,7 @@ multi sub remove-from-positional(
 
 # Any handling {{{
 
-multi sub remove-from-any(\container, Bool :$in-place where *.not) returns Any
+multi sub remove-from-any(\container, Bool :in-place($) where *.not) returns Any
 {
     my $root = container.deepmap(*.clone);
     $root = Nil;
@@ -1142,7 +1142,7 @@ multi sub remove-from-any(\container, Bool :$in-place where *.not) returns Any
 
 multi sub remove-from-any(
     \container,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = Nil;
@@ -1363,7 +1363,7 @@ multi sub replace-in-associative(
 multi sub replace-in-associative(
     \container,
     :$value!,
-    Bool :$in-place where *.not
+    Bool :in-place($) where *.not
 ) returns Any:D
 {
     my $root = container.deepmap(*.clone);
@@ -1374,7 +1374,7 @@ multi sub replace-in-associative(
 multi sub replace-in-associative(
     \container,
     :$value!,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = $value;
@@ -1431,7 +1431,7 @@ multi sub replace-in-positional(
 multi sub replace-in-positional(
     \container,
     :$value!,
-    Bool :$in-place where *.not
+    Bool :in-place($) where *.not
 ) returns Any:D
 {
     my $root = container.deepmap(*.clone);
@@ -1442,7 +1442,7 @@ multi sub replace-in-positional(
 multi sub replace-in-positional(
     \container,
     :$value!,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = $value.WHAT ~~ Positional ?? $value.clone !! $value;
@@ -1456,7 +1456,7 @@ multi sub replace-in-positional(
 multi sub replace-in-any(
     \container,
     :$value!,
-    Bool :$in-place where *.not
+    Bool :in-place($) where *.not
 ) returns Any:D
 {
     my $root = container.deepmap(*.clone);
@@ -1467,7 +1467,7 @@ multi sub replace-in-any(
 multi sub replace-in-any(
     \container,
     :$value!,
-    Bool:D :$in-place where *.so
+    Bool:D :in-place($) where *.so
 ) returns Any:D
 {
     container = $value;
@@ -1797,7 +1797,7 @@ method patch(\container, @patch, Bool :$in-place = False) returns Any:D
 # add
 multi sub patch(
     \container,
-    %patch (:$op! where {$_ eq 'add'}, :@path!, :$value!)
+    %patch (:op($)! where {$_ eq 'add'}, :@path!, :$value!)
 )
 {
     CATCH
@@ -1813,7 +1813,7 @@ multi sub patch(
 # remove
 multi sub patch(
     \container,
-    %patch (:$op! where {$_ eq 'remove'}, :@path!)
+    %patch (:op($)! where {$_ eq 'remove'}, :@path!)
 )
 {
     CATCH
@@ -1829,7 +1829,7 @@ multi sub patch(
 # replace
 multi sub patch(
     \container,
-    %patch (:$op! where {$_ eq 'replace'}, :@path!, :$value!)
+    %patch (:op($)! where {$_ eq 'replace'}, :@path!, :$value!)
 )
 {
     CATCH
@@ -1845,7 +1845,7 @@ multi sub patch(
 # move
 multi sub patch(
     \container,
-    %patch (:$op! where {$_ eq 'move'}, :@from!, :@path!)
+    %patch (:op($)! where {$_ eq 'move'}, :@from!, :@path!)
 )
 {
     CATCH
@@ -1861,7 +1861,7 @@ multi sub patch(
 # copy
 multi sub patch(
     \container,
-    %patch (:$op! where {$_ eq 'copy'}, :@from!, :@path!)
+    %patch (:op($)! where {$_ eq 'copy'}, :@from!, :@path!)
 )
 {
     CATCH
@@ -1877,7 +1877,7 @@ multi sub patch(
 # test
 multi sub patch(
     \container,
-    %patch (:$op! where {$_ eq 'test'}, :@path!, :$value!)
+    %patch (:op($)! where {$_ eq 'test'}, :@path!, :$value!)
 )
 {
     Crane.test(container, :@path, :$value)

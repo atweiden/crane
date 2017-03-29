@@ -574,6 +574,17 @@ method add(\container, :@path!, :$value!, Bool :$in-place = False --> Any:D)
     # is an immutable value (X::Crane::Add::RO)
     CATCH
     {
+        when X::Multi::NoMatch
+        {
+            my rule cannot-resolve-caller-splice-list
+            {
+                'Cannot resolve caller splice(List'
+            }
+            if .message ~~ &cannot-resolve-caller-splice-list
+            {
+                die X::Crane::Add::RO.new(:typename<List>);
+            }
+        }
         when X::Assignment::RO
         {
             die X::Crane::Add::RO.new(:typename(.typename));
@@ -931,6 +942,17 @@ method remove(\container, :@path!, Bool :$in-place = False --> Any)
                 die X::Crane::Remove::RO.new(:typename(~$0));
             }
         }
+        when X::Multi::NoMatch
+        {
+            my rule cannot-resolve-caller-splice-list
+            {
+                'Cannot resolve caller splice(List'
+            }
+            if .message ~~ &cannot-resolve-caller-splice-list
+            {
+                die X::Crane::Remove::RO.new(:typename<List>);
+            }
+        }
         when X::Method::NotFound
         {
             my rule no-such-method-splice
@@ -1222,6 +1244,17 @@ method replace(
         when X::Assignment::RO
         {
             die X::Crane::Replace::RO.new(:typename(.typename));
+        }
+        when X::Multi::NoMatch
+        {
+            my rule cannot-resolve-caller-splice-list
+            {
+                'Cannot resolve caller splice(List'
+            }
+            if .message ~~ &cannot-resolve-caller-splice-list
+            {
+                die X::Crane::Replace::RO.new(:typename<List>);
+            }
         }
         when X::Method::NotFound
         {

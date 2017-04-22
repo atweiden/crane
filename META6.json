@@ -9,8 +9,7 @@
     "source-url"  : "git://github.com/atweiden/crane.git",
     "support"     : {
         "bugtracker" : "https://github.com/atweiden/crane/issues",
-        "source"     : "https://github.com/atweiden/crane",
-        "license"    : "http://unlicense.org/UNLICENSE"
+        "source"     : "https://github.com/atweiden/crane"
     },
     "provides" : {
         "Crane"    : "lib/Crane.pm",

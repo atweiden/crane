@@ -12,7 +12,7 @@ sub at($container, *@steps) is rw is export
 
 # Associative handling {{{
 
-multi sub _at(Associative:D $container, @steps where *.elems > 1) is rw
+multi sub _at(Associative:D $container, @steps where *.elems() > 1) is rw
 {
     my $root := $container;
     if $root{@steps[0]}:exists
@@ -21,12 +21,12 @@ multi sub _at(Associative:D $container, @steps where *.elems > 1) is rw
     }
     else
     {
-        die X::Crane::AssociativeKeyDNE.new;
+        die(X::Crane::AssociativeKeyDNE.new());
     }
     return-rw _at($root, @steps[1..*]);
 }
 
-multi sub _at(Associative:D $container, @steps where *.elems == 1) is rw
+multi sub _at(Associative:D $container, @steps where *.elems() == 1) is rw
 {
     my $root := $container;
     if $root{@steps[0]}:exists
@@ -35,12 +35,12 @@ multi sub _at(Associative:D $container, @steps where *.elems == 1) is rw
     }
     else
     {
-        die X::Crane::AssociativeKeyDNE.new;
+        die(X::Crane::AssociativeKeyDNE.new());
     }
     return-rw $root;
 }
 
-multi sub _at(Associative:D $container, @steps where *.elems == 0) is rw
+multi sub _at(Associative:D $container, @steps where *.elems() == 0) is rw
 {
     return-rw $container;
 }
@@ -54,7 +54,7 @@ multi sub _at(Associative:D $container) is rw
 
 # Positional handling {{{
 
-multi sub _at(Positional:D $container, @steps where *.elems > 1) is rw
+multi sub _at(Positional:D $container, @steps where *.elems() > 1) is rw
 {
     my $root := $container;
     validate-positional-index(@steps[0]);
@@ -64,12 +64,12 @@ multi sub _at(Positional:D $container, @steps where *.elems > 1) is rw
     }
     else
     {
-        die X::Crane::PositionalIndexDNE.new;
+        die(X::Crane::PositionalIndexDNE.new());
     }
     return-rw _at($root, @steps[1..*]);
 }
 
-multi sub _at(Positional:D $container, @steps where *.elems == 1) is rw
+multi sub _at(Positional:D $container, @steps where *.elems() == 1) is rw
 {
     my $root := $container;
     validate-positional-index(@steps[0]);
@@ -79,12 +79,12 @@ multi sub _at(Positional:D $container, @steps where *.elems == 1) is rw
     }
     else
     {
-        die X::Crane::PositionalIndexDNE.new;
+        die(X::Crane::PositionalIndexDNE.new());
     }
     return-rw $root;
 }
 
-multi sub _at(Positional:D $container, @steps where *.elems == 0) is rw
+multi sub _at(Positional:D $container, @steps where *.elems() == 0) is rw
 {
     return-rw $container;
 }
@@ -215,12 +215,12 @@ multi sub _in(\container) is rw
 
 method exists($container, :@path!, Bool :k($) = True, Bool :$v --> Bool:D)
 {
-    $v.so ?? exists-value($container, @path) !! exists-key($container, @path);
+    $v.so() ?? exists-value($container, @path) !! exists-key($container, @path);
 }
 
 # exists-key {{{
 
-multi sub exists-key($container, @path where *.elems > 1 --> Bool:D)
+multi sub exists-key($container, @path where *.elems() > 1 --> Bool:D)
 {
     exists-key($container, [@path[0]])
         ?? exists-key(at($container, @path[0]), @path[1..*])
@@ -229,21 +229,21 @@ multi sub exists-key($container, @path where *.elems > 1 --> Bool:D)
 
 multi sub exists-key(
     Associative:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Bool:D
 )
 {
     $container{@path[0]}:exists;
 }
 
-multi sub exists-key(Associative:D $container, @path where *.elems == 0)
+multi sub exists-key(Associative:D $container, @path where *.elems() == 0)
 {
-    die X::Crane::ExistsRootContainerKey.new;
+    die(X::Crane::ExistsRootContainerKey.new());
 }
 
 multi sub exists-key(
     Positional:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Bool:D
 )
 {
@@ -251,12 +251,12 @@ multi sub exists-key(
     $container[@path[0]]:exists;
 }
 
-multi sub exists-key(Positional:D $container, @path where *.elems == 0)
+multi sub exists-key(Positional:D $container, @path where *.elems() == 0)
 {
-    die X::Crane::ExistsRootContainerKey.new;
+    die(X::Crane::ExistsRootContainerKey.new());
 }
 
-multi sub exists-key($container, @path where *.elems > 0 --> Bool:D)
+multi sub exists-key($container, @path where *.elems() > 0 --> Bool:D)
 {
     False;
 }
@@ -265,7 +265,7 @@ multi sub exists-key($container, @path where *.elems > 0 --> Bool:D)
 
 # exists-value {{{
 
-multi sub exists-value($container, @path where *.elems > 1 --> Bool:D)
+multi sub exists-value($container, @path where *.elems() > 1 --> Bool:D)
 {
     exists-value($container, [@path[0]])
         ?? exists-value(at($container, @path[0]), @path[1..*])
@@ -274,42 +274,42 @@ multi sub exists-value($container, @path where *.elems > 1 --> Bool:D)
 
 multi sub exists-value(
     Associative:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Bool:D
 )
 {
-    $container{@path[0]}.defined;
+    $container{@path[0]}.defined();
 }
 
 multi sub exists-value(
     Associative:D $container,
-    @path where *.elems == 0
+    @path where *.elems() == 0
     --> Bool:D
 )
 {
-    $container.defined;
+    $container.defined();
 }
 
 multi sub exists-value(
     Positional:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Bool:D
 )
 {
     validate-positional-index(@path[0]);
-    $container[@path[0]].defined;
+    $container[@path[0]].defined();
 }
 
 multi sub exists-value(
     Positional:D $container,
-    @path where *.elems == 0
+    @path where *.elems() == 0
     --> Bool:D
 )
 {
-    $container.defined;
+    $container.defined();
 }
 
-multi sub exists-value($container, @path where *.elems > 0 --> Bool:D)
+multi sub exists-value($container, @path where *.elems() > 0 --> Bool:D)
 {
     False;
 }
@@ -323,9 +323,9 @@ multi sub exists-value($container, @path where *.elems > 0 --> Bool:D)
 multi method get(
     $container,
     :@path!,
-    Bool:D :k($)! where *.so,
-    Bool :v($) where *.not,
-    Bool :p($) where *.not
+    Bool:D :k($)! where *.so(),
+    Bool :v($) where *.not(),
+    Bool :p($) where *.not()
     --> Any:D
 )
 {
@@ -335,9 +335,9 @@ multi method get(
 multi method get(
     $container,
     :@path!,
-    Bool :k($) where *.not,
+    Bool :k($) where *.not(),
     Bool:D :v($) = True,
-    Bool :p($) where *.not
+    Bool :p($) where *.not()
     --> Any:D
 )
 {
@@ -347,9 +347,9 @@ multi method get(
 multi method get(
     $container,
     :@path!,
-    Bool :k($) where *.not,
-    Bool :v($) where *.not,
-    Bool:D :p($)! where *.so
+    Bool :k($) where *.not(),
+    Bool :v($) where *.not(),
+    Bool:D :p($)! where *.so()
     --> Any:D
 )
 {
@@ -358,81 +358,81 @@ multi method get(
 
 # get-key {{{
 
-multi sub get-key($container, @path where *.elems > 1 --> Any:D)
+multi sub get-key($container, @path where *.elems() > 1 --> Any:D)
 {
     exists-key($container, [@path[0]])
         ?? get-key(at($container, @path[0]), @path[1..*])
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
 multi sub get-key(
     Associative:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Any:D
 )
 {
     exists-key($container, [@path[0]])
         ?? ($container{@path[0]}:!k)
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
-multi sub get-key(Associative:D $container, @path where *.elems == 0)
+multi sub get-key(Associative:D $container, @path where *.elems() == 0)
 {
-    die X::Crane::GetRootContainerKey.new;
+    die(X::Crane::GetRootContainerKey.new());
 }
 
 multi sub get-key(
     Positional:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Any:D
 )
 {
     validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!k)
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
-multi sub get-key(Positional:D $container, @path where *.elems == 0)
+multi sub get-key(Positional:D $container, @path where *.elems() == 0)
 {
-    die X::Crane::GetRootContainerKey.new;
+    die(X::Crane::GetRootContainerKey.new());
 }
 
-multi sub get-key($container, @path where *.elems > 0)
+multi sub get-key($container, @path where *.elems() > 0)
 {
-    die X::Crane::GetPathNotFound.new;
+    die(X::Crane::GetPathNotFound.new());
 }
 
-multi sub get-key($container, @path where *.elems == 0)
+multi sub get-key($container, @path where *.elems() == 0)
 {
-    die X::Crane::GetRootContainerKey.new;
+    die(X::Crane::GetRootContainerKey.new());
 }
 
 # end get-key }}}
 
 # get-value {{{
 
-multi sub get-value($container, @path where *.elems > 1 --> Any:D)
+multi sub get-value($container, @path where *.elems() > 1 --> Any:D)
 {
     exists-key($container, [@path[0]])
         ?? get-value(at($container, @path[0]), @path[1..*])
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
 multi sub get-value(
     Associative:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Any:D
 )
 {
     exists-key($container, [@path[0]])
         ?? ($container{@path[0]}:!v)
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
 multi sub get-value(
     Associative:D $container,
-    @path where *.elems == 0
+    @path where *.elems() == 0
     --> Any:D
 )
 {
@@ -441,31 +441,31 @@ multi sub get-value(
 
 multi sub get-value(
     Positional:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Any:D
 )
 {
     validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!v)
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
 multi sub get-value(
     Positional:D $container,
-    @path where *.elems == 0
+    @path where *.elems() == 0
     --> Any:D
 )
 {
     $container;
 }
 
-multi sub get-value($container, @path where *.elems > 0)
+multi sub get-value($container, @path where *.elems() > 0)
 {
-    die X::Crane::GetPathNotFound.new;
+    die(X::Crane::GetPathNotFound.new());
 }
 
-multi sub get-value($container, @path where *.elems == 0 --> Any:D)
+multi sub get-value($container, @path where *.elems() == 0 --> Any:D)
 {
     $container;
 }
@@ -474,54 +474,54 @@ multi sub get-value($container, @path where *.elems == 0 --> Any:D)
 
 # get-pair {{{
 
-multi sub get-pair($container, @path where *.elems > 1 --> Any:D)
+multi sub get-pair($container, @path where *.elems() > 1 --> Any:D)
 {
     exists-key($container, [@path[0]])
         ?? get-pair(at($container, @path[0]), @path[1..*])
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
 multi sub get-pair(
     Associative:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Any:D
 )
 {
     exists-key($container, [@path[0]])
         ?? ($container{@path[0]}:!p)
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
-multi sub get-pair(Associative:D $container, @path where *.elems == 0)
+multi sub get-pair(Associative:D $container, @path where *.elems() == 0)
 {
-    die X::Crane::GetRootContainerKey.new;
+    die(X::Crane::GetRootContainerKey.new());
 }
 
 multi sub get-pair(
     Positional:D $container,
-    @path where *.elems == 1
+    @path where *.elems() == 1
     --> Any:D
 )
 {
     validate-positional-index(@path[0]);
     exists-key($container, [@path[0]])
         ?? ($container[@path[0]]:!p)
-        !! die X::Crane::GetPathNotFound.new;
+        !! die(X::Crane::GetPathNotFound.new());
 }
 
-multi sub get-pair(Positional:D $container, @path where *.elems == 0)
+multi sub get-pair(Positional:D $container, @path where *.elems() == 0)
 {
-    die X::Crane::GetRootContainerKey.new;
+    die(X::Crane::GetRootContainerKey.new());
 }
 
-multi sub get-pair($container, @path where *.elems > 0)
+multi sub get-pair($container, @path where *.elems() > 0)
 {
-    die X::Crane::GetPathNotFound.new;
+    die(X::Crane::GetPathNotFound.new());
 }
 
-multi sub get-pair($container, @path where *.elems == 0)
+multi sub get-pair($container, @path where *.elems() == 0)
 {
-    die X::Crane::GetRootContainerKey.new;
+    die(X::Crane::GetRootContainerKey.new());
 }
 
 # end get-pair }}}
@@ -545,11 +545,11 @@ method set(\container, :@path!, :$value! --> Any:D)
     {
         when X::Assignment::RO
         {
-            die X::Crane::OpSet::RO.new(:typename(.typename));
+            die(X::Crane::OpSet::RO.new(:typename(.typename)));
         }
     }
 
-    in(container, @path) = $value ~~ Positional ?? $value.clone !! $value;
+    in(container, @path) = $value ~~ Positional ?? $value.clone() !! $value;
     container ~~ Positional ?? |container !! container;
 }
 
@@ -580,14 +580,14 @@ method add(\container, :@path!, :$value!, Bool :$in-place = False --> Any:D)
             {
                 'Cannot resolve caller splice(List'
             }
-            if .message ~~ &cannot-resolve-caller-splice-list
+            if .message() ~~ &cannot-resolve-caller-splice-list
             {
-                die X::Crane::Add::RO.new(:typename<List>);
+                die(X::Crane::Add::RO.new(:typename<List>));
             }
         }
         when X::Assignment::RO
         {
-            die X::Crane::Add::RO.new(:typename(.typename));
+            die(X::Crane::Add::RO.new(:typename(.typename)));
         }
         when X::Method::NotFound
         {
@@ -595,16 +595,18 @@ method add(\container, :@path!, :$value!, Bool :$in-place = False --> Any:D)
             {
                 No such method \'splice\' for invocant of type \'(\w+)\'
             }
-            if .message ~~ &no-such-method-splice
+            if .message() ~~ &no-such-method-splice
             {
-                die X::Crane::Add::RO.new(:typename(~$0));
+                die(X::Crane::Add::RO.new(:typename(~$0)));
             }
         }
         when X::OutOfRange
         {
-            die X::Crane::AddPathOutOfRange.new(
-                :operation<add>,
-                :out-of-range($_)
+            die(
+                X::Crane::AddPathOutOfRange.new(
+                    :operation<add>,
+                    :out-of-range($_)
+                )
             );
         }
     }
@@ -615,7 +617,7 @@ method add(\container, :@path!, :$value!, Bool :$in-place = False --> Any:D)
 
 multi sub add(
     \container,
-    :@path! where *.elems > 1,
+    :@path! where *.elems() > 1,
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -623,7 +625,7 @@ multi sub add(
 {
     unless Crane.exists(container, :path(@path[0..^*-1]), :v)
     {
-        die X::Crane::AddPathNotFound.new;
+        die(X::Crane::AddPathNotFound.new());
     }
 
     # route add operation based on destination type
@@ -664,14 +666,14 @@ multi sub add(
             # and we have a path with >1 elems, then we must be entering
             # either an Associative or a Positional container
             # at($container, @path[0..^*-1])
-            die '✗ Crane accident: add operation failed, invalid path';
+            die('✗ Crane accident: add operation failed, invalid path');
         }
     }
 }
 
 multi sub add(
     \container,
-    :@path! where *.elems == 1,
+    :@path! where *.elems() == 1,
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -679,7 +681,7 @@ multi sub add(
 {
     unless Crane.exists(container, :path(), :v)
     {
-        die X::Crane::AddPathNotFound.new;
+        die(X::Crane::AddPathNotFound.new());
     }
 
     # route add operation based on destination type
@@ -718,14 +720,14 @@ multi sub add(
             # and we have a path with 1 elem, then we must be entering
             # either an Associative or a Positional container
             # at($container, @path[0..^*-1])
-            die '✗ Crane accident: add operation failed, invalid path';
+            die('✗ Crane accident: add operation failed, invalid path');
         }
     }
 }
 
 multi sub add(
     \container,
-    :@path! where *.elems == 0,
+    :@path! where *.elems() == 0,
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -760,9 +762,9 @@ multi sub add-to-associative(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     at($root, @path){$step} = $value.WHAT ~~ Positional
-        ?? $value.clone
+        ?? $value.clone()
         !! $value;
     $root;
 }
@@ -776,19 +778,19 @@ multi sub add-to-associative(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
-    $root{$step} = $value.WHAT ~~ Positional ?? $value.clone !! $value;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
+    $root{$step} = $value.WHAT ~~ Positional ?? $value.clone() !! $value;
     $root;
 }
 
 multi sub add-to-associative(
     \container,
     :$value!,
-    Bool :in-place($) where *.not
+    Bool :in-place($) where *.not()
     --> Any:D
 )
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = $value;
     $root;
 }
@@ -796,7 +798,7 @@ multi sub add-to-associative(
 multi sub add-to-associative(
     \container,
     :$value!,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
@@ -818,7 +820,7 @@ multi sub add-to-positional(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
 
     # XXX when $value is a multi-dimensional array, splice ruins it by
     # flattening it (splice's signature is *@target-to-splice-in)
@@ -846,7 +848,7 @@ multi sub add-to-positional(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     if $value ~~ Positional
     {
         my @value = $value;
@@ -862,11 +864,11 @@ multi sub add-to-positional(
 multi sub add-to-positional(
     \container,
     :$value!,
-    Bool :in-place($) where *.not
+    Bool :in-place($) where *.not()
     --> Any:D
 )
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = $value;
     |$root;
 }
@@ -874,11 +876,11 @@ multi sub add-to-positional(
 multi sub add-to-positional(
     \container,
     :$value!,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
-    container = $value.WHAT ~~ Positional ?? $value.clone !! $value;
+    container = $value.WHAT ~~ Positional ?? $value.clone() !! $value;
     |container;
 }
 
@@ -889,11 +891,11 @@ multi sub add-to-positional(
 multi sub add-to-any(
     \container,
     :$value!,
-    Bool :in-place($) where *.not
+    Bool :in-place($) where *.not()
     --> Any:D
 )
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = $value;
     $root;
 }
@@ -901,7 +903,7 @@ multi sub add-to-any(
 multi sub add-to-any(
     \container,
     :$value!,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
@@ -937,9 +939,9 @@ method remove(\container, :@path!, Bool :$in-place = False --> Any)
             {
                 Can not remove [values|elements] from a (\w+)
             }
-            if .payload ~~ &can-not-remove
+            if .payload() ~~ &can-not-remove
             {
-                die X::Crane::Remove::RO.new(:typename(~$0));
+                die(X::Crane::Remove::RO.new(:typename(~$0)));
             }
         }
         when X::Multi::NoMatch
@@ -948,9 +950,9 @@ method remove(\container, :@path!, Bool :$in-place = False --> Any)
             {
                 'Cannot resolve caller splice(List'
             }
-            if .message ~~ &cannot-resolve-caller-splice-list
+            if .message() ~~ &cannot-resolve-caller-splice-list
             {
-                die X::Crane::Remove::RO.new(:typename<List>);
+                die(X::Crane::Remove::RO.new(:typename<List>));
             }
         }
         when X::Method::NotFound
@@ -959,9 +961,9 @@ method remove(\container, :@path!, Bool :$in-place = False --> Any)
             {
                 No such method \'splice\' for invocant of type \'(\w+)\'
             }
-            if .message ~~ &no-such-method-splice
+            if .message() ~~ &no-such-method-splice
             {
-                die X::Crane::Remove::RO.new(:typename(~$0));
+                die(X::Crane::Remove::RO.new(:typename(~$0)));
             }
         }
     }
@@ -972,14 +974,14 @@ method remove(\container, :@path!, Bool :$in-place = False --> Any)
 
 multi sub remove(
     \container,
-    :@path! where *.elems > 1,
+    :@path! where *.elems() > 1,
     Bool :$in-place = False
     --> Any:D
 )
 {
     unless Crane.exists(container, :@path)
     {
-        die X::Crane::RemovePathNotFound.new;
+        die(X::Crane::RemovePathNotFound.new());
     }
 
     # route remove operation based on destination type
@@ -1018,21 +1020,21 @@ multi sub remove(
             # and we have a path with >1 elems, then we must be entering
             # either an Associative or a Positional container
             # at($container, @path[0..^*-1])
-            die '✗ Crane accident: remove operation failed, invalid path';
+            die('✗ Crane accident: remove operation failed, invalid path');
         }
     }
 }
 
 multi sub remove(
     \container,
-    :@path! where *.elems == 1,
+    :@path! where *.elems() == 1,
     Bool :$in-place = False
     --> Any:D
 )
 {
     unless Crane.exists(container, :@path)
     {
-        die X::Crane::RemovePathNotFound.new;
+        die(X::Crane::RemovePathNotFound.new());
     }
 
     # route remove operation based on destination type
@@ -1061,14 +1063,14 @@ multi sub remove(
             # and we have a path with 1 elem, then we must be entering
             # either an Associative or a Positional container
             # at($container, @path[0..^*-1])
-            die '✗ Crane accident: remove operation failed, invalid path';
+            die('✗ Crane accident: remove operation failed, invalid path');
         }
     }
 }
 
 multi sub remove(
     \container,
-    :@path! where *.elems == 0,
+    :@path! where *.elems() == 0,
     Bool :$in-place = False
     --> Any
 )
@@ -1101,7 +1103,7 @@ multi sub remove-from-associative(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     at($root, @path){$step}:delete;
     $root;
 }
@@ -1114,25 +1116,25 @@ multi sub remove-from-associative(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     $root{$step}:delete;
     $root;
 }
 
 multi sub remove-from-associative(
     \container,
-    Bool :in-place($) where *.not
+    Bool :in-place($) where *.not()
     --> Any:D
 )
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = Empty;
     $root;
 }
 
 multi sub remove-from-associative(
     \container,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
@@ -1153,7 +1155,7 @@ multi sub remove-from-positional(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     at($root, @path).splice($step, 1);
     |$root;
 }
@@ -1166,25 +1168,25 @@ multi sub remove-from-positional(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     $root.splice($step, 1);
     |$root;
 }
 
 multi sub remove-from-positional(
     \container,
-    Bool :in-place($) where *.not
+    Bool :in-place($) where *.not()
     --> Any:D
 )
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = Empty;
     |$root;
 }
 
 multi sub remove-from-positional(
     \container,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
@@ -1196,16 +1198,16 @@ multi sub remove-from-positional(
 
 # Any handling {{{
 
-multi sub remove-from-any(\container, Bool :in-place($) where *.not --> Any)
+multi sub remove-from-any(\container, Bool :in-place($) where *.not() --> Any)
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = Nil;
     $root;
 }
 
 multi sub remove-from-any(
     \container,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
@@ -1243,7 +1245,7 @@ method replace(
     {
         when X::Assignment::RO
         {
-            die X::Crane::Replace::RO.new(:typename(.typename));
+            die(X::Crane::Replace::RO.new(:typename(.typename)));
         }
         when X::Multi::NoMatch
         {
@@ -1251,9 +1253,9 @@ method replace(
             {
                 'Cannot resolve caller splice(List'
             }
-            if .message ~~ &cannot-resolve-caller-splice-list
+            if .message() ~~ &cannot-resolve-caller-splice-list
             {
-                die X::Crane::Replace::RO.new(:typename<List>);
+                die(X::Crane::Replace::RO.new(:typename<List>));
             }
         }
         when X::Method::NotFound
@@ -1262,9 +1264,9 @@ method replace(
             {
                 No such method \'splice\' for invocant of type \'(\w+)\'
             }
-            if .message ~~ &no-such-method-splice
+            if .message() ~~ &no-such-method-splice
             {
-                die X::Crane::Replace::RO.new(:typename(~$0));
+                die(X::Crane::Replace::RO.new(:typename(~$0)));
             }
         }
     }
@@ -1275,7 +1277,7 @@ method replace(
 
 multi sub replace(
     \container,
-    :@path! where *.elems > 1,
+    :@path! where *.elems() > 1,
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1283,7 +1285,7 @@ multi sub replace(
 {
     unless Crane.exists(container, :@path)
     {
-        die X::Crane::ReplacePathNotFound.new;
+        die(X::Crane::ReplacePathNotFound.new());
     }
 
     # route replace operation based on destination type
@@ -1324,14 +1326,14 @@ multi sub replace(
             # and we have a path with >1 elems, then we must be entering
             # either an Associative or a Positional container
             # at($container, @path[0..^*-1])
-            die '✗ Crane accident: replace operation failed, invalid path';
+            die('✗ Crane accident: replace operation failed, invalid path');
         }
     }
 }
 
 multi sub replace(
     \container,
-    :@path! where *.elems == 1,
+    :@path! where *.elems() == 1,
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1339,7 +1341,7 @@ multi sub replace(
 {
     unless Crane.exists(container, :@path)
     {
-        die X::Crane::ReplacePathNotFound.new;
+        die(X::Crane::ReplacePathNotFound.new());
     }
 
     # route replace operation based on destination type
@@ -1378,14 +1380,14 @@ multi sub replace(
             # and we have a path with 1 elem, then we must be entering
             # either an Associative or a Positional container
             # at($container, @path[0..^*-1])
-            die '✗ Crane accident: replace operation failed, invalid path';
+            die('✗ Crane accident: replace operation failed, invalid path');
         }
     }
 }
 
 multi sub replace(
     \container,
-    :@path! where *.elems == 0,
+    :@path! where *.elems() == 0,
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1420,9 +1422,9 @@ multi sub replace-in-associative(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     at($root, @path){$step} = $value.WHAT ~~ Positional
-        ?? $value.clone
+        ?? $value.clone()
         !! $value;
     $root;
 }
@@ -1436,19 +1438,19 @@ multi sub replace-in-associative(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
-    $root{$step} = $value.WHAT ~~ Positional ?? $value.clone !! $value;
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
+    $root{$step} = $value.WHAT ~~ Positional ?? $value.clone() !! $value;
     $root;
 }
 
 multi sub replace-in-associative(
     \container,
     :$value!,
-    Bool :in-place($) where *.not
+    Bool :in-place($) where *.not()
     --> Any:D
 )
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = $value;
     $root;
 }
@@ -1456,7 +1458,7 @@ multi sub replace-in-associative(
 multi sub replace-in-associative(
     \container,
     :$value!,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
@@ -1478,7 +1480,7 @@ multi sub replace-in-positional(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     if $value ~~ Positional
     {
         my @value = $value;
@@ -1500,7 +1502,7 @@ multi sub replace-in-positional(
 )
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     if $value ~~ Positional
     {
         my @value = $value;
@@ -1516,11 +1518,11 @@ multi sub replace-in-positional(
 multi sub replace-in-positional(
     \container,
     :$value!,
-    Bool :in-place($) where *.not
+    Bool :in-place($) where *.not()
     --> Any:D
 )
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = $value;
     |$root;
 }
@@ -1528,11 +1530,11 @@ multi sub replace-in-positional(
 multi sub replace-in-positional(
     \container,
     :$value!,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
-    container = $value.WHAT ~~ Positional ?? $value.clone !! $value;
+    container = $value.WHAT ~~ Positional ?? $value.clone() !! $value;
     |container;
 }
 
@@ -1543,11 +1545,11 @@ multi sub replace-in-positional(
 multi sub replace-in-any(
     \container,
     :$value!,
-    Bool :in-place($) where *.not
+    Bool :in-place($) where *.not()
     --> Any:D
 )
 {
-    my $root = container.deepmap(*.clone);
+    my $root = container.deepmap(*.clone());
     $root = $value;
     $root;
 }
@@ -1555,7 +1557,7 @@ multi sub replace-in-any(
 multi sub replace-in-any(
     \container,
     :$value!,
-    Bool:D :in-place($) where *.so
+    Bool:D :in-place($) where *.so()
     --> Any:D
 )
 {
@@ -1600,38 +1602,40 @@ method move(\container, :@from!, :@path!, Bool :$in-place = False --> Any:D)
     {
         when X::Crane::AddPathNotFound
         {
-            die X::Crane::MovePathNotFound.new;
+            die(X::Crane::MovePathNotFound.new());
         }
         when X::Crane::AddPathOutOfRange
         {
-            die X::Crane::MovePathOutOfRange.new(
-                :add-path-out-of-range(.message)
+            die(
+                X::Crane::MovePathOutOfRange.new(
+                    :add-path-out-of-range(.message())
+                )
             );
         }
         when X::Crane::Add::RO
         {
-            die X::Crane::MovePath::RO.new(:typename(.typename));
+            die(X::Crane::MovePath::RO.new(:typename(.typename())));
         }
         when X::Crane::GetPathNotFound
         {
-            die X::Crane::MoveFromNotFound.new;
+            die(X::Crane::MoveFromNotFound.new());
         }
         when X::Crane::Remove::RO
         {
-            die X::Crane::MoveFrom::RO.new(:typename(.typename));
+            die(X::Crane::MoveFrom::RO.new(:typename(.typename)));
         }
     }
 
     # a location cannot be moved into one of its children
     if path-is-child-of-from(@from, @path)
     {
-        die X::Crane::MoveParentToChild.new;
+        die(X::Crane::MoveParentToChild.new());
     }
 
     my $value = Crane.get(container, :path(@from), :v);
 
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     Crane.remove($root, :path(@from), :in-place);
     Crane.add($root, :@path, :$value, :in-place);
     $root ~~ Positional ?? |$root !! $root;
@@ -1668,34 +1672,36 @@ method copy(\container, :@from!, :@path!, Bool :$in-place = False --> Any:D)
     {
         when X::Crane::AddPathNotFound
         {
-            die X::Crane::CopyPathNotFound.new;
+            die(X::Crane::CopyPathNotFound.new());
         }
         when X::Crane::AddPathOutOfRange
         {
-            die X::Crane::CopyPathOutOfRange.new(
-                :add-path-out-of-range(.message)
+            die(
+                X::Crane::CopyPathOutOfRange.new(
+                    :add-path-out-of-range(.message)
+                )
             );
         }
         when X::Crane::Add::RO
         {
-            die X::Crane::CopyPath::RO.new(:typename(.typename));
+            die(X::Crane::CopyPath::RO.new(:typename(.typename)));
         }
         when X::Crane::GetPathNotFound
         {
-            die X::Crane::CopyFromNotFound.new;
+            die(X::Crane::CopyFromNotFound.new());
         }
     }
 
     # a location cannot be copied into one of its children
     if path-is-child-of-from(@from, @path)
     {
-        die X::Crane::CopyParentToChild.new;
+        die(X::Crane::CopyParentToChild.new());
     }
 
     my $value = Crane.get(container, :path(@from), :v);
 
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     Crane.add($root, :@path, :$value, :in-place);
     $root ~~ Positional ?? |$root !! $root;
 }
@@ -1708,7 +1714,7 @@ method test($container, :@path!, :$value! --> Bool:D)
 {
     unless Crane.exists($container, :@path)
     {
-        die X::Crane::TestPathNotFound.new;
+        die(X::Crane::TestPathNotFound.new());
     }
     at($container, @path) eqv $value;
 }
@@ -1733,33 +1739,33 @@ multi method list($container --> List:D)
 }
 
 multi sub list(
-    Associative:D $container where *.elems > 0,
+    Associative:D $container where *.elems() > 0,
     :@carry = ()
     --> List:D
 )
 {
     my @tree;
-    for $container.keys -> $toplevel
+    for $container.keys() -> $toplevel
     {
         my @current = |@carry, $toplevel;
-        push @tree, |list(at($container, $toplevel), :carry(@current));
+        push(@tree, |list(at($container, $toplevel), :carry(@current)));
     }
-    @tree.sort.List;
+    @tree.sort().List();
 }
 
 multi sub list(
-    Positional:D $container where *.elems > 0,
+    Positional:D $container where *.elems() > 0,
     :@carry = ()
     --> List:D
 )
 {
     my @tree;
-    for $container.keys -> $toplevel
+    for $container.keys() -> $toplevel
     {
         my @current = |@carry, $toplevel;
-        push @tree, |list(at($container, $toplevel), :carry(@current));
+        push(@tree, |list(at($container, $toplevel), :carry(@current)));
     }
-    @tree.sort.List;
+    @tree.sort.List();
 }
 
 multi sub list($container, :@carry = () --> List:D)
@@ -1774,7 +1780,7 @@ multi sub list($container, :@carry = () --> List:D)
 method flatten($container, :@path --> Hash[Any:D,List:D])
 {
     my Any:D %tree{List:D} =
-        Crane.list($container,:@path).map({ $_<path> => $_<value> });
+        Crane.list($container, :@path).map({ $_<path> => $_<value> });
 }
 
 # end flatten }}}
@@ -1791,19 +1797,19 @@ method transform(
 {
     unless is-valid-callable-signature(&with)
     {
-        die X::Crane::TransformCallableSignatureParams.new;
+        die(X::Crane::TransformCallableSignatureParams.new());
     }
 
-    if @path.elems > 0
+    if @path.elems() > 0
     {
         unless Crane.exists(container, :@path)
         {
-            die X::Crane::TransformPathNotFound.new;
+            die(X::Crane::TransformPathNotFound.new());
         }
     }
 
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
 
     my $value;
     try
@@ -1812,7 +1818,7 @@ method transform(
         {
             default
             {
-                die X::Crane::TransformCallableRaisedException.new;
+                die(X::Crane::TransformCallableRaisedException.new());
             }
         }
         $value = with(at($root, @path));
@@ -1824,11 +1830,11 @@ method transform(
         {
             when X::Crane::Replace::RO
             {
-                die X::Crane::Transform::RO.new(:typename(.typename));
+                die(X::Crane::Transform::RO.new(:typename(.typename)));
             }
             default
             {
-                die '✗ Crane error: something went wrong during transform';
+                die('✗ Crane error: something went wrong during transform');
             }
         }
         Crane.replace($root, :@path, :$value, :in-place);
@@ -1844,7 +1850,7 @@ method transform(
 method patch(\container, @patch, Bool :$in-place = False --> Any:D)
 {
     my $root;
-    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone));
+    $in-place ?? ($root := container) !! ($root = container.deepmap(*.clone()));
     for @patch -> %patch
     {
         try
@@ -1853,31 +1859,31 @@ method patch(\container, @patch, Bool :$in-place = False --> Any:D)
             {
                 when X::Crane::PatchAddFailed
                 {
-                    die X::Crane::Patch.new(:help-text(.message));
+                    die(X::Crane::Patch.new(:help-text(.message())));
                 }
                 when X::Crane::PatchRemoveFailed
                 {
-                    die X::Crane::Patch.new(:help-text(.message));
+                    die(X::Crane::Patch.new(:help-text(.message())));
                 }
                 when X::Crane::PatchReplaceFailed
                 {
-                    die X::Crane::Patch.new(:help-text(.message));
+                    die(X::Crane::Patch.new(:help-text(.message())));
                 }
                 when X::Crane::PatchMoveFailed
                 {
-                    die X::Crane::Patch.new(:help-text(.message));
+                    die(X::Crane::Patch.new(:help-text(.message())));
                 }
                 when X::Crane::PatchCopyFailed
                 {
-                    die X::Crane::Patch.new(:help-text(.message));
+                    die(X::Crane::Patch.new(:help-text(.message())));
                 }
                 when X::Crane::PatchTestFailed
                 {
-                    die X::Crane::Patch.new(:help-text(.message));
+                    die(X::Crane::Patch.new(:help-text(.message())));
                 }
                 default
                 {
-                    die '✗ Crane accident: patch operation failed';
+                    die('✗ Crane accident: patch operation failed');
                 }
             }
             patch($root, %patch);
@@ -1896,7 +1902,7 @@ multi sub patch(
     {
         default
         {
-            X::Crane::PatchAddFailed.new.throw;
+            X::Crane::PatchAddFailed.new().throw();
         }
     }
     Crane.add(container, :@path, :$value, :in-place);
@@ -1912,7 +1918,7 @@ multi sub patch(
     {
         default
         {
-            X::Crane::PatchRemoveFailed.new.throw;
+            X::Crane::PatchRemoveFailed.new().throw();
         }
     }
     Crane.remove(container, :@path, :in-place);
@@ -1928,7 +1934,7 @@ multi sub patch(
     {
         default
         {
-            X::Crane::PatchReplaceFailed.new.throw;
+            X::Crane::PatchReplaceFailed.new().throw();
         }
     }
     Crane.replace(container, :@path, :$value, :in-place);
@@ -1944,7 +1950,7 @@ multi sub patch(
     {
         default
         {
-            X::Crane::PatchMoveFailed.new.throw;
+            X::Crane::PatchMoveFailed.new().throw();
         }
     }
     Crane.move(container, :@from, :@path, :in-place);
@@ -1960,7 +1966,7 @@ multi sub patch(
     {
         default
         {
-            X::Crane::PatchCopyFailed.new.throw;
+            X::Crane::PatchCopyFailed.new().throw();
         }
     }
     Crane.copy(container, :@from, :@path, :in-place);
@@ -1973,7 +1979,7 @@ multi sub patch(
 )
 {
     Crane.test(container, :@path, :$value)
-        or X::Crane::PatchTestFailed.new.throw;
+        or X::Crane::PatchTestFailed.new().throw();
 }
 
 # end patch }}}
@@ -2008,11 +2014,11 @@ multi sub test-positional-index-classifier(INT0P) {*}
 multi sub test-positional-index-classifier(WEC) {*}
 multi sub test-positional-index-classifier(INTM)
 {
-    die X::Crane::PositionalIndexInvalid.new(:classifier<INTM>);
+    die(X::Crane::PositionalIndexInvalid.new(:classifier<INTM>));
 }
 multi sub test-positional-index-classifier(OTHER)
 {
-    die X::Crane::PositionalIndexInvalid.new(:classifier<OTHER>);
+    die(X::Crane::PositionalIndexInvalid.new(:classifier<OTHER>));
 }
 
 sub validate-positional-index($step)
@@ -2022,7 +2028,7 @@ sub validate-positional-index($step)
 
 multi sub path-is-child-of-from(
     @from,
-    @path where *.elems == @from.elems
+    @path where *.elems() == @from.elems()
     --> Bool:D
 )
 {
@@ -2032,7 +2038,7 @@ multi sub path-is-child-of-from(
 
 multi sub path-is-child-of-from(
     @from,
-    @path where *.elems < @from.elems
+    @path where *.elems() < @from.elems()
     --> Bool:D
 )
 {
@@ -2044,13 +2050,15 @@ multi sub path-is-child-of-from(
 # verify @from[$_] !eqv @path[$_] for 0..@from.end
 multi sub path-is-child-of-from(@from, @path --> Bool:D)
 {
-    (@from[$_] eqv @path[$_] for 0..@from.end).grep(*.so).elems == @from.elems;
+    (@from[$_] eqv @path[$_] for 0..@from.end)
+    .grep(*.so())
+    .elems() == @from.elems();
 }
 
 sub is-valid-callable-signature(&c --> Bool:D)
 {
-    &c.signature.params.elems == 1
-        && &c.signature.params.grep(*.positional).elems == 1;
+    &c.signature().params().elems() == 1
+        && &c.signature().params().grep(*.positional()).elems() == 1;
 }
 
 # end helper functions }}}

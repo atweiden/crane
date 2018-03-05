@@ -26,17 +26,17 @@ class PathOutOfRange is Exception
     }
     my class RangeStrActions
     {
-        method integer($/)
+        method integer($/ --> Nil)
         {
             make(+$/);
         }
-        method range-str($/)
+        method range-str($/ --> Nil)
         {
             my Int:D @integer = @<integer>.hyper.map({ .made });
             my Range:D $r = @integer[0] .. @integer[1];
             make($r);
         }
-        method TOP($/)
+        method TOP($/ --> Nil)
         {
             make($<range-str>.made);
         }

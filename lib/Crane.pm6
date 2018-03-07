@@ -127,7 +127,7 @@ multi sub _at(
 
 multi sub _at(
     Positional:D $container,
-    @steps where *.elems == 0
+    @steps where { .elems == 0 }
     --> Any
 ) is rw
 {
@@ -161,7 +161,7 @@ sub in(
 
 multi sub _in(
     Associative:D \container,
-    @steps where *.elems > 1
+    @steps where { .elems > 1 }
     --> Any
 ) is rw
 {
@@ -170,7 +170,7 @@ multi sub _in(
 
 multi sub _in(
     Associative:D \container,
-    @steps where *.elems == 1
+    @steps where { .elems == 1 }
     --> Any
 ) is rw
 {
@@ -179,7 +179,7 @@ multi sub _in(
 
 multi sub _in(
     Associative:D \container,
-    @steps where *.elems == 0
+    @steps where { .elems == 0 }
     --> Any
 ) is rw
 {
@@ -291,7 +291,7 @@ multi sub _in(
 
 multi sub _in(
     \container,
-    @steps where *.elems == 0
+    @steps where { .elems == 0 }
     --> Any
 ) is rw
 {
@@ -315,18 +315,18 @@ multi sub _in(
 method exists(
     $container,
     :@path!,
-    Bool :k($) = True,
+    Bool :$k,
     Bool :$v
     --> Bool:D
 )
 {
-    exists($container, :@path, :k, :$v);
+    exists($container, :@path, :$k, :$v);
 }
 
 multi sub exists(
     $container,
     :@path!,
-    Bool :k($) = True,
+    Bool :k($),
     Bool:D :v($)! where *.so
     --> Bool:D
 )
@@ -337,7 +337,18 @@ multi sub exists(
 multi sub exists(
     $container,
     :@path!,
-    Bool :k($) = True,
+    Bool:D :k($)! where *.so,
+    Bool :v($)
+    --> Bool:D
+)
+{
+    exists-key($container, @path);
+}
+
+multi sub exists(
+    $container,
+    :@path!,
+    Bool :k($),
     Bool :v($)
     --> Bool:D
 )
@@ -485,9 +496,9 @@ method get(
     $container,
     :@path!,
     *%h (
-        Bool :$k,
-        Bool :$v,
-        Bool :$p
+        Bool :k($),
+        Bool :v($),
+        Bool :p($)
     )
     --> Any:D
 )
@@ -511,7 +522,7 @@ multi sub get(
     $container,
     :@path!,
     Bool :k($) where *.not,
-    Bool:D :v($) = True,
+    Bool:D :v($)! where *.so,
     Bool :p($) where *.not
     --> Any:D
 )
@@ -529,6 +540,18 @@ multi sub get(
 )
 {
     get-pair($container, @path);
+}
+
+multi sub get(
+    $container,
+    :@path!,
+    Bool :k($),
+    Bool :v($),
+    Bool :p($)
+    --> Any:D
+)
+{
+    get-value($container, @path);
 }
 
 # --- sub get-key {{{
@@ -949,7 +972,7 @@ method add(
 
 multi sub add(
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -964,7 +987,7 @@ multi sub add(
 multi sub add(
     Associative,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -982,7 +1005,7 @@ multi sub add(
 multi sub add(
     Positional,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1001,7 +1024,7 @@ multi sub add(
 multi sub add(
     Any,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     :$value!,
     Bool :$in-place = False
     --> Nil
@@ -1012,7 +1035,7 @@ multi sub add(
 
 multi sub add(
     Associative \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1030,7 +1053,7 @@ multi sub add(
 
 multi sub add(
     Positional \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1049,7 +1072,7 @@ multi sub add(
 
 multi sub add(
     \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     :$value!,
     Bool :$in-place = False
     --> Nil
@@ -1062,7 +1085,7 @@ multi sub add(
 
 multi sub add(
     Associative \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1073,7 +1096,7 @@ multi sub add(
 
 multi sub add(
     Positional \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1084,7 +1107,7 @@ multi sub add(
 
 multi sub add(
     \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1476,7 +1499,7 @@ method remove(
 
 multi sub remove(
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     Bool :$in-place = False
     --> Any
 )
@@ -1490,7 +1513,7 @@ multi sub remove(
 multi sub remove(
     Associative,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     Bool :$in-place = False
     --> Any
 )
@@ -1506,7 +1529,7 @@ multi sub remove(
 multi sub remove(
     Positional,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     Bool :$in-place = False
     --> Any
 )
@@ -1523,7 +1546,7 @@ multi sub remove(
 multi sub remove(
     Any,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     Bool :$in-place = False
     --> Nil
 )
@@ -1533,7 +1556,7 @@ multi sub remove(
 
 multi sub remove(
     Associative \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     Bool :$in-place = False
     --> Any
 )
@@ -1545,7 +1568,7 @@ multi sub remove(
 
 multi sub remove(
     Positional \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     Bool :$in-place = False
     --> Any
 )
@@ -1558,7 +1581,7 @@ multi sub remove(
 
 multi sub remove(
     \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     Bool :$in-place = False
     --> Nil
 )
@@ -1570,7 +1593,7 @@ multi sub remove(
 
 multi sub remove(
     Associative \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     Bool :$in-place = False
     --> Any
 )
@@ -1580,7 +1603,7 @@ multi sub remove(
 
 multi sub remove(
     Positional \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     Bool :$in-place = False
     --> Any
 )
@@ -1590,7 +1613,7 @@ multi sub remove(
 
 multi sub remove(
     \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     Bool :$in-place = False
     --> Any
 )
@@ -1820,7 +1843,7 @@ method replace(
 
 multi sub replace(
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1835,7 +1858,7 @@ multi sub replace(
 multi sub replace(
     Associative,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1853,7 +1876,7 @@ multi sub replace(
 multi sub replace(
     Positional,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1872,7 +1895,7 @@ multi sub replace(
 multi sub replace(
     Any,
     \container,
-    :@path! where *.elems > 1,
+    :@path! where { .elems > 1 },
     :$value!,
     Bool :$in-place = False
     --> Nil
@@ -1883,7 +1906,7 @@ multi sub replace(
 
 multi sub replace(
     Associative \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1901,7 +1924,7 @@ multi sub replace(
 
 multi sub replace(
     Positional \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1920,7 +1943,7 @@ multi sub replace(
 
 multi sub replace(
     \container,
-    :@path! where *.elems == 1,
+    :@path! where { .elems == 1 },
     :$value!,
     Bool :$in-place = False
     --> Nil
@@ -1933,7 +1956,7 @@ multi sub replace(
 
 multi sub replace(
     Associative \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1944,7 +1967,7 @@ multi sub replace(
 
 multi sub replace(
     Positional \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -1955,7 +1978,7 @@ multi sub replace(
 
 multi sub replace(
     \container,
-    :@path! where *.elems == 0,
+    :@path! where { .elems == 0 },
     :$value!,
     Bool :$in-place = False
     --> Any:D
@@ -2555,7 +2578,7 @@ multi sub list(
 
 multi sub list(
     'do',
-    Associative:D $container where *.elems > 0,
+    Associative:D $container where { .elems > 0 },
     :@carry = ()
     --> List:D
 )
@@ -2570,7 +2593,7 @@ multi sub list(
 
 multi sub list(
     'do',
-    Positional:D $container where *.elems > 0,
+    Positional:D $container where { .elems > 0 },
     :@carry = ()
     --> List:D
 )
@@ -2845,7 +2868,7 @@ multi sub is-valid-positional-index($step --> Bool:D)
 {
     $step
     ==> is-valid-positional-index('classify')
-    ==> is-valid-positional-index('do')
+    ==> is-valid-positional-index('do');
 }
 
 # classify positional index requests for better error messages

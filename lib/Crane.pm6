@@ -2,21 +2,21 @@ use v6;
 use X::Crane;
 unit class Crane;
 
-# sub at {{{
+# method at {{{
 
-sub at(
+method at(
     $container,
     *@steps
     --> Any
-) is rw is export
+) is rw
 {
     my $root := $container;
-    return-rw _at($root, @steps);
+    return-rw at($root, @steps);
 }
 
 # --- type Associative handling {{{
 
-multi sub _at(
+multi sub at(
     Associative:D $container,
     @steps where { .elems > 1 and $container{@steps[0]}:exists }
     --> Any
@@ -24,10 +24,10 @@ multi sub _at(
 {
     my $root := $container;
     $root := $root{@steps[0]};
-    return-rw _at($root, @steps[1..*]);
+    return-rw at($root, @steps[1..*]);
 }
 
-multi sub _at(
+multi sub at(
     Associative:D $container,
     @steps where { .elems > 1 }
     --> Nil
@@ -36,7 +36,7 @@ multi sub _at(
     die(X::Crane::AssociativeKeyDNE.new);
 }
 
-multi sub _at(
+multi sub at(
     Associative:D $container,
     @steps where { .elems == 1 and $container{@steps[0]}:exists }
     --> Any
@@ -47,7 +47,7 @@ multi sub _at(
     return-rw $root;
 }
 
-multi sub _at(
+multi sub at(
     Associative:D $container,
     @steps where { .elems == 1 }
     --> Nil
@@ -56,7 +56,7 @@ multi sub _at(
     die(X::Crane::AssociativeKeyDNE.new);
 }
 
-multi sub _at(
+multi sub at(
     Associative:D $container,
     @steps where { .elems == 0 }
     --> Any
@@ -65,7 +65,7 @@ multi sub _at(
     return-rw $container;
 }
 
-multi sub _at(
+multi sub at(
     Associative:D $container
     --> Any
 ) is rw
@@ -77,7 +77,7 @@ multi sub _at(
 # --- type Positional handling {{{
 
 # XXX may need waterfall handling here
-multi sub _at(
+multi sub at(
     Positional:D $container,
     @steps where {
         .elems > 1
@@ -89,10 +89,10 @@ multi sub _at(
 {
     my $root := $container;
     $root := $root[@steps[0]];
-    return-rw _at($root, @steps[1..*]);
+    return-rw at($root, @steps[1..*]);
 }
 
-multi sub _at(
+multi sub at(
     Positional:D $container,
     @steps where { .elems > 1 }
     --> Nil
@@ -101,7 +101,7 @@ multi sub _at(
     die(X::Crane::PositionalIndexDNE.new);
 }
 
-multi sub _at(
+multi sub at(
     Positional:D $container,
     @steps where {
         .elems == 1
@@ -116,7 +116,7 @@ multi sub _at(
     return-rw $root;
 }
 
-multi sub _at(
+multi sub at(
     Positional:D $container,
     @steps where { .elems == 1 }
     --> Nil
@@ -125,7 +125,7 @@ multi sub _at(
     die(X::Crane::PositionalIndexDNE.new);
 }
 
-multi sub _at(
+multi sub at(
     Positional:D $container,
     @steps where { .elems == 0 }
     --> Any
@@ -135,7 +135,7 @@ multi sub _at(
 }
 
 
-multi sub _at(
+multi sub at(
     Positional:D $container
     --> Any
 ) is rw
@@ -145,30 +145,30 @@ multi sub _at(
 
 # --- end type Positional handling }}}
 
-# end sub at }}}
-# sub in {{{
+# end method at }}}
+# method in {{{
 
-sub in(
+method in(
     \container,
     *@steps
     --> Any
-) is rw is export
+) is rw
 {
-    return-rw _in(container, @steps);
+    return-rw in(container, @steps);
 }
 
 # --- type Associative handling {{{
 
-multi sub _in(
+multi sub in(
     Associative:D \container,
     @steps where { .elems > 1 }
     --> Any
 ) is rw
 {
-    return-rw _in(container{@steps[0]}, @steps[1..*]);
+    return-rw in(container{@steps[0]}, @steps[1..*]);
 }
 
-multi sub _in(
+multi sub in(
     Associative:D \container,
     @steps where { .elems == 1 }
     --> Any
@@ -177,7 +177,7 @@ multi sub _in(
     return-rw container{@steps[0]};
 }
 
-multi sub _in(
+multi sub in(
     Associative:D \container,
     @steps where { .elems == 0 }
     --> Any
@@ -186,7 +186,7 @@ multi sub _in(
     return-rw container;
 }
 
-multi sub _in(
+multi sub in(
     Associative:D \container
     --> Any
 ) is rw
@@ -197,16 +197,16 @@ multi sub _in(
 # --- end type Associative handling }}}
 # --- type Positional handling {{{
 
-multi sub _in(
+multi sub in(
     Positional:D \container,
     @steps where { .elems > 1 and is-valid-positional-index(@steps[0]) }
     --> Any
 ) is rw
 {
-    return-rw _in(container[@steps[0]], @steps[1..*]);
+    return-rw in(container[@steps[0]], @steps[1..*]);
 }
 
-multi sub _in(
+multi sub in(
     Positional:D \container,
     @steps where { .elems == 1 and is-valid-positional-index(@steps[0]) }
     --> Any
@@ -215,7 +215,7 @@ multi sub _in(
     return-rw container[@steps[0]];
 }
 
-multi sub _in(
+multi sub in(
     Positional:D \container,
     @steps where { .elems == 0 }
     --> Any
@@ -224,7 +224,7 @@ multi sub _in(
     return-rw container;
 }
 
-multi sub _in(
+multi sub in(
     Positional:D \container
     --> Any
 ) is rw
@@ -235,34 +235,34 @@ multi sub _in(
 # --- end type Positional handling }}}
 # --- type Any handling {{{
 
-multi sub _in(
+multi sub in(
     \container,
     @steps where { .elems > 1 and @steps[0] ~~ Int and @steps[0] >= 0 }
     --> Any
 ) is rw
 {
-    return-rw _in(container[@steps[0]], @steps[1..*]);
+    return-rw in(container[@steps[0]], @steps[1..*]);
 }
 
-multi sub _in(
+multi sub in(
     \container,
     @steps where { .elems > 1 and @steps[0] ~~ WhateverCode }
     --> Any
 ) is rw
 {
-    return-rw _in(container[@steps[0]], @steps[1..*]);
+    return-rw in(container[@steps[0]], @steps[1..*]);
 }
 
-multi sub _in(
+multi sub in(
     \container,
     @steps where { .elems > 1 }
     --> Any
 ) is rw
 {
-    return-rw _in(container{@steps[0]}, @steps[1..*]);
+    return-rw in(container{@steps[0]}, @steps[1..*]);
 }
 
-multi sub _in(
+multi sub in(
     \container,
     @steps where { .elems == 1 and @steps[0] ~~ Int and @steps[0] >= 0 }
     --> Any
@@ -271,7 +271,7 @@ multi sub _in(
     return-rw container[@steps[0]];
 }
 
-multi sub _in(
+multi sub in(
     \container,
     @steps where { .elems == 1 and @steps[0] ~~ WhateverCode }
     --> Any
@@ -280,7 +280,7 @@ multi sub _in(
     return-rw container[@steps[0]];
 }
 
-multi sub _in(
+multi sub in(
     \container,
     @steps where { .elems == 1 }
     --> Any
@@ -289,7 +289,7 @@ multi sub _in(
     return-rw container{@steps[0]};
 }
 
-multi sub _in(
+multi sub in(
     \container,
     @steps where { .elems == 0 }
     --> Any
@@ -298,7 +298,7 @@ multi sub _in(
     return-rw container;
 }
 
-multi sub _in(
+multi sub in(
     \container
     --> Any
 ) is rw
@@ -308,7 +308,7 @@ multi sub _in(
 
 # --- end type Any handling }}}
 
-# end sub in }}}
+# end method in }}}
 
 # method exists {{{
 
@@ -364,7 +364,7 @@ multi sub exists-key(
     --> Bool:D
 )
 {
-    exists-key(at($container, @path[0]), @path[1..*]);
+    exists-key(Crane.at($container, @path[0]), @path[1..*]);
 }
 
 multi sub exists-key(
@@ -430,7 +430,7 @@ multi sub exists-value(
     --> Bool:D
 )
 {
-    exists-value(at($container, @path[0]), @path[1..*]);
+    exists-value(Crane.at($container, @path[0]), @path[1..*]);
 }
 
 multi sub exists-value(
@@ -562,7 +562,7 @@ multi sub get-key(
     --> Any:D
 )
 {
-    get-key(at($container, @path[0]), @path[1..*]);
+    get-key(Crane.at($container, @path[0]), @path[1..*]);
 }
 
 multi sub get-key(
@@ -659,7 +659,7 @@ multi sub get-pair(
     --> Any:D
 )
 {
-    get-pair(at($container, @path[0]), @path[1..*]);
+    get-pair(Crane.at($container, @path[0]), @path[1..*]);
 }
 
 multi sub get-pair(
@@ -756,7 +756,7 @@ multi sub get-value(
     --> Any:D
 )
 {
-    get-value(at($container, @path[0]), @path[1..*]);
+    get-value(Crane.at($container, @path[0]), @path[1..*]);
 }
 
 multi sub get-value(
@@ -882,7 +882,7 @@ multi sub set(
     --> Any:D
 )
 {
-    in(container, @path) = $value.clone;
+    Crane.in(container, @path) = $value.clone;
     |container;
 }
 
@@ -893,7 +893,7 @@ multi sub set(
     --> Any:D
 )
 {
-    in(container, @path) = $value.clone;
+    Crane.in(container, @path) = $value.clone;
     container;
 }
 
@@ -904,7 +904,7 @@ multi sub set(
     --> Any:D
 )
 {
-    in(container, @path) = $value;
+    Crane.in(container, @path) = $value;
     |container;
 }
 
@@ -915,7 +915,7 @@ multi sub set(
     --> Any:D
 )
 {
-    in(container, @path) = $value;
+    Crane.in(container, @path) = $value;
     container;
 }
 
@@ -980,7 +980,7 @@ multi sub add(
 {
     unless Crane.exists(container, :path(@path[0..^*-1]), :v)
     { die(X::Crane::AddPathNotFound.new) }
-    my $what = at(container, @path[0..^*-1]).WHAT;
+    my $what = Crane.at(container, @path[0..^*-1]).WHAT;
     add($what, container, :@path, :$value, :$in-place);
 }
 
@@ -1128,7 +1128,7 @@ multi sub add-to-associative(
 )
 {
     my $root := container;
-    at($root, @path){$step} = $value.clone;
+    Crane.at($root, @path){$step} = $value.clone;
     $root;
 }
 
@@ -1142,7 +1142,7 @@ multi sub add-to-associative(
 )
 {
     my $root := container;
-    at($root, @path){$step} = $value;
+    Crane.at($root, @path){$step} = $value;
     $root;
 }
 
@@ -1156,7 +1156,7 @@ multi sub add-to-associative(
 )
 {
     my $root = container.deepmap(*.clone);
-    at($root, @path){$step} = $value.clone;
+    Crane.at($root, @path){$step} = $value.clone;
     $root;
 }
 
@@ -1170,7 +1170,7 @@ multi sub add-to-associative(
 )
 {
     my $root = container.deepmap(*.clone);
-    at($root, @path){$step} = $value;
+    Crane.at($root, @path){$step} = $value;
     $root;
 }
 
@@ -1271,7 +1271,7 @@ multi sub add-to-positional(
 {
     my $root := container;
     my @value = $value;
-    at($root, @path).splice($step, 0, $@value);
+    Crane.at($root, @path).splice($step, 0, $@value);
     |$root;
 }
 
@@ -1285,7 +1285,7 @@ multi sub add-to-positional(
 )
 {
     my $root := container;
-    at($root, @path).splice($step, 0, $value);
+    Crane.at($root, @path).splice($step, 0, $value);
     |$root;
 }
 
@@ -1300,7 +1300,7 @@ multi sub add-to-positional(
 {
     my $root = container.deepmap(*.clone);
     my @value = $value;
-    at($root, @path).splice($step, 0, $@value);
+    Crane.at($root, @path).splice($step, 0, $@value);
     |$root;
 }
 
@@ -1314,7 +1314,7 @@ multi sub add-to-positional(
 )
 {
     my $root = container.deepmap(*.clone);
-    at($root, @path).splice($step, 0, $value);
+    Crane.at($root, @path).splice($step, 0, $value);
     |$root;
 }
 
@@ -1506,7 +1506,7 @@ multi sub remove(
 {
     unless Crane.exists(container, :@path)
     { die(X::Crane::RemovePathNotFound.new) }
-    my $what = at(container, @path[0..^*-1]).WHAT;
+    my $what = Crane.at(container, @path[0..^*-1]).WHAT;
     remove($what, container, :@path, :$in-place);
 }
 
@@ -1632,7 +1632,7 @@ multi sub remove-from-associative(
 )
 {
     my $root := container;
-    at($root, @path){$step}:delete;
+    Crane.at($root, @path){$step}:delete;
     $root;
 }
 
@@ -1645,7 +1645,7 @@ multi sub remove-from-associative(
 )
 {
     my $root = container.deepmap(*.clone);
-    at($root, @path){$step}:delete;
+    Crane.at($root, @path){$step}:delete;
     $root;
 }
 
@@ -1706,7 +1706,7 @@ multi sub remove-from-positional(
 )
 {
     my $root := container;
-    at($root, @path).splice($step, 1);
+    Crane.at($root, @path).splice($step, 1);
     |$root;
 }
 
@@ -1719,7 +1719,7 @@ multi sub remove-from-positional(
 )
 {
     my $root = container.deepmap(*.clone);
-    at($root, @path).splice($step, 1);
+    Crane.at($root, @path).splice($step, 1);
     |$root;
 }
 
@@ -1851,7 +1851,7 @@ multi sub replace(
 {
     unless Crane.exists(container, :@path)
     { die(X::Crane::ReplacePathNotFound.new) }
-    my $what = at(container, @path[0..^*-1]).WHAT;
+    my $what = Crane.at(container, @path[0..^*-1]).WHAT;
     replace($what, container, :@path, :$value, :$in-place);
 }
 
@@ -1999,7 +1999,7 @@ multi sub replace-in-associative(
 )
 {
     my $root := container;
-    at($root, @path){$step} = $value.clone;
+    Crane.at($root, @path){$step} = $value.clone;
     $root;
 }
 
@@ -2013,7 +2013,7 @@ multi sub replace-in-associative(
 )
 {
     my $root := container;
-    at($root, @path){$step} = $value;
+    Crane.at($root, @path){$step} = $value;
     $root;
 }
 
@@ -2027,7 +2027,7 @@ multi sub replace-in-associative(
 )
 {
     my $root = container.deepmap(*.clone);
-    at($root, @path){$step} = $value.clone;
+    Crane.at($root, @path){$step} = $value.clone;
     $root;
 }
 
@@ -2041,7 +2041,7 @@ multi sub replace-in-associative(
 )
 {
     my $root = container.deepmap(*.clone);
-    at($root, @path){$step} = $value;
+    Crane.at($root, @path){$step} = $value;
     $root;
 }
 
@@ -2134,7 +2134,7 @@ multi sub replace-in-positional(
 {
     my $root := container;
     my @value = $value;
-    at($root, @path).splice($step, 1, $@value);
+    Crane.at($root, @path).splice($step, 1, $@value);
     |$root;
 }
 
@@ -2148,7 +2148,7 @@ multi sub replace-in-positional(
 )
 {
     my $root := container;
-    at($root, @path).splice($step, 1, $value);
+    Crane.at($root, @path).splice($step, 1, $value);
     |$root;
 }
 
@@ -2163,7 +2163,7 @@ multi sub replace-in-positional(
 {
     my $root = container.deepmap(*.clone);
     my @value = $value;
-    at($root, @path).splice($step, 1, $@value);
+    Crane.at($root, @path).splice($step, 1, $@value);
     |$root;
 }
 
@@ -2177,7 +2177,7 @@ multi sub replace-in-positional(
 )
 {
     my $root = container.deepmap(*.clone);
-    at($root, @path).splice($step, 1, $value);
+    Crane.at($root, @path).splice($step, 1, $value);
     |$root;
 }
 
@@ -2533,7 +2533,7 @@ method test(
 {
     unless Crane.exists($container, :@path)
     { die(X::Crane::TestPathNotFound.new) }
-    at($container, @path) eqv $value;
+    Crane.at($container, @path) eqv $value;
 }
 
 # end method test }}}
@@ -2555,7 +2555,7 @@ multi sub list(
     --> List:D
 )
 {
-    list('do', at($container, @path));
+    list('do', Crane.at($container, @path));
 }
 
 multi sub list(
@@ -2564,7 +2564,7 @@ multi sub list(
     --> List:D
 )
 {
-    list('do', at($container, @path));
+    list('do', Crane.at($container, @path));
 }
 
 multi sub list(
@@ -2586,7 +2586,10 @@ multi sub list(
     my @tree;
     $container.keys.map(-> $toplevel {
         my @current = |@carry, $toplevel;
-        push(@tree, |list('do', at($container, $toplevel), :carry(@current)));
+        push(
+            @tree,
+            |list('do', Crane.at($container, $toplevel), :carry(@current))
+        );
     });
     @tree.sort.List;
 }
@@ -2601,7 +2604,10 @@ multi sub list(
     my @tree;
     $container.keys.map(-> $toplevel {
         my @current = |@carry, $toplevel;
-        push(@tree, |list('do', at($container, $toplevel), :carry(@current)));
+        push(
+            @tree,
+            |list('do', Crane.at($container, $toplevel), :carry(@current))
+        );
     });
     @tree.sort.List;
 }
@@ -2690,7 +2696,7 @@ multi sub transform(
     my $value = do try
     {
         CATCH { default { die(X::Crane::TransformCallableRaisedException.new) } }
-        with(at(container, @path));
+        with(Crane.at(container, @path));
     }
 
     try

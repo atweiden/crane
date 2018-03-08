@@ -16,6 +16,7 @@
         "Crane::Add"       : "lib/Crane/Add.pm6",
         "Crane::At"        : "lib/Crane/At.pm6",
         "Crane::Copy"      : "lib/Crane/Copy.pm6",
+        "Crane::Exists"    : "lib/Crane/Exists.pm6",
         "Crane::Flatten"   : "lib/Crane/Flatten.pm6",
         "Crane::Get"       : "lib/Crane/Get.pm6",
         "Crane::In"        : "lib/Crane/In.pm6",

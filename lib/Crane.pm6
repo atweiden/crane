@@ -948,8 +948,8 @@ method add(
         {
             my rule cannot-resolve-caller-splice-list
             { 'Cannot resolve caller splice(List' }
-            if .message ~~ &cannot-resolve-caller-splice-list
-            { die(X::Crane::Add::RO.new(:typename<List>)) }
+            die(X::Crane::Add::RO.new(:typename<List>))
+                if .message ~~ &cannot-resolve-caller-splice-list;
         }
         when X::Assignment::RO
         { die(X::Crane::Add::RO.new(:typename(.typename))) }
@@ -957,8 +957,8 @@ method add(
         {
             my rule no-such-method-splice
             { No such method \'splice\' for invocant of type \'(\w+)\' }
-            if .message ~~ &no-such-method-splice
-            { die(X::Crane::Add::RO.new(:typename(~$0))) }
+            die(X::Crane::Add::RO.new(:typename(~$0)))
+                if .message ~~ &no-such-method-splice;
         }
         when X::OutOfRange
         { die(X::Crane::AddPathOutOfRange.new(:operation<add>, :out-of-range($_))) }
@@ -976,8 +976,8 @@ multi sub add(
     --> Any:D
 )
 {
-    unless Crane.exists(container, :path(@path[0..^*-1]), :v)
-    { die(X::Crane::AddPathNotFound.new) }
+    die(X::Crane::AddPathNotFound.new)
+        unless Crane.exists(container, :path(@path[0..^*-1]), :v);
     my $what = Crane.at(container, @path[0..^*-1]).WHAT;
     add($what, container, :@path, :$value, :$in-place);
 }
@@ -1039,8 +1039,8 @@ multi sub add(
     --> Any:D
 )
 {
-    unless Crane.exists(container, :path(), :v)
-    { die(X::Crane::AddPathNotFound.new) }
+    die(X::Crane::AddPathNotFound.new)
+        unless Crane.exists(container, :path(), :v);
     add-to-associative(
         container,
         :step(@path[*-1]),
@@ -1057,8 +1057,8 @@ multi sub add(
     --> Any:D
 )
 {
-    unless Crane.exists(container, :path(), :v)
-    { die(X::Crane::AddPathNotFound.new) }
+    die(X::Crane::AddPathNotFound.new)
+        unless Crane.exists(container, :path(), :v);
     is-valid-positional-index(@path[*-1]);
     add-to-positional(
         container,
@@ -1076,8 +1076,8 @@ multi sub add(
     --> Nil
 )
 {
-    unless Crane.exists(container, :path(), :v)
-    { die(X::Crane::AddPathNotFound.new) }
+    die(X::Crane::AddPathNotFound.new)
+        unless Crane.exists(container, :path(), :v);
     die('✗ Crane accident: add operation failed, invalid path');
 }
 
@@ -1472,22 +1472,22 @@ method remove(
         {
             my rule can-not-remove
             { Can not remove [values|elements] from a (\w+) }
-            if .payload ~~ &can-not-remove
-            { die(X::Crane::Remove::RO.new(:typename(~$0))) }
+            die(X::Crane::Remove::RO.new(:typename(~$0)))
+                if .payload ~~ &can-not-remove;
         }
         when X::Multi::NoMatch
         {
             my rule cannot-resolve-caller-splice-list
             { 'Cannot resolve caller splice(List' }
-            if .message ~~ &cannot-resolve-caller-splice-list
-            { die(X::Crane::Remove::RO.new(:typename<List>)) }
+            die(X::Crane::Remove::RO.new(:typename<List>))
+                if .message ~~ &cannot-resolve-caller-splice-list;
         }
         when X::Method::NotFound
         {
             my rule no-such-method-splice
             { No such method \'splice\' for invocant of type \'(\w+)\' }
-            if .message ~~ &no-such-method-splice
-            { die(X::Crane::Remove::RO.new(:typename(~$0))) }
+            die(X::Crane::Remove::RO.new(:typename(~$0)))
+                if .message ~~ &no-such-method-splice;
         }
     }
 
@@ -1502,8 +1502,8 @@ multi sub remove(
     --> Any
 )
 {
-    unless Crane.exists(container, :@path)
-    { die(X::Crane::RemovePathNotFound.new) }
+    die(X::Crane::RemovePathNotFound.new)
+        unless Crane.exists(container, :@path);
     my $what = Crane.at(container, @path[0..^*-1]).WHAT;
     remove($what, container, :@path, :$in-place);
 }
@@ -1559,8 +1559,8 @@ multi sub remove(
     --> Any
 )
 {
-    unless Crane.exists(container, :@path)
-    { die(X::Crane::RemovePathNotFound.new) }
+    die(X::Crane::RemovePathNotFound.new)
+        unless Crane.exists(container, :@path);
     remove-from-associative(container, :step(@path[*-1]), :$in-place);
 }
 
@@ -1571,8 +1571,8 @@ multi sub remove(
     --> Any
 )
 {
-    unless Crane.exists(container, :@path)
-    { die(X::Crane::RemovePathNotFound.new) }
+    die(X::Crane::RemovePathNotFound.new)
+        unless Crane.exists(container, :@path);
     is-valid-positional-index(@path[*-1]);
     remove-from-positional(container, :step(@path[*-1]), :$in-place);
 }
@@ -1584,8 +1584,8 @@ multi sub remove(
     --> Nil
 )
 {
-    unless Crane.exists(container, :@path)
-    { die(X::Crane::RemovePathNotFound.new) }
+    die(X::Crane::RemovePathNotFound.new)
+        unless Crane.exists(container, :@path);
     die('✗ Crane accident: remove operation failed, invalid path');
 }
 
@@ -1823,15 +1823,15 @@ method replace(
         {
             my rule cannot-resolve-caller-splice-list
             { 'Cannot resolve caller splice(List' }
-            if .message ~~ &cannot-resolve-caller-splice-list
-            { die(X::Crane::Replace::RO.new(:typename<List>)) }
+            die(X::Crane::Replace::RO.new(:typename<List>))
+                if .message ~~ &cannot-resolve-caller-splice-list;
         }
         when X::Method::NotFound
         {
             my rule no-such-method-splice
             { No such method \'splice\' for invocant of type \'(\w+)\' }
-            if .message ~~ &no-such-method-splice
-            { die(X::Crane::Replace::RO.new(:typename(~$0))) }
+            die(X::Crane::Replace::RO.new(:typename(~$0)))
+                if .message ~~ &no-such-method-splice;
         }
     }
 
@@ -1847,8 +1847,8 @@ multi sub replace(
     --> Any:D
 )
 {
-    unless Crane.exists(container, :@path)
-    { die(X::Crane::ReplacePathNotFound.new) }
+    die(X::Crane::ReplacePathNotFound.new)
+        unless Crane.exists(container, :@path);
     my $what = Crane.at(container, @path[0..^*-1]).WHAT;
     replace($what, container, :@path, :$value, :$in-place);
 }
@@ -1910,8 +1910,8 @@ multi sub replace(
     --> Any:D
 )
 {
-    unless Crane.exists(container, :@path)
-    { die(X::Crane::ReplacePathNotFound.new) }
+    die(X::Crane::ReplacePathNotFound.new)
+        unless Crane.exists(container, :@path);
     replace-in-associative(
         container,
         :step(@path[*-1]),
@@ -1928,8 +1928,8 @@ multi sub replace(
     --> Any:D
 )
 {
-    unless Crane.exists(container, :@path)
-    { die(X::Crane::ReplacePathNotFound.new) }
+    die(X::Crane::ReplacePathNotFound.new)
+        unless Crane.exists(container, :@path);
     is-valid-positional-index(@path[*-1]);
     replace-in-positional(
         container,
@@ -1947,8 +1947,8 @@ multi sub replace(
     --> Nil
 )
 {
-    unless Crane.exists(container, :@path)
-    { die(X::Crane::ReplacePathNotFound.new) }
+    die(X::Crane::ReplacePathNotFound.new)
+        unless Crane.exists(container, :@path);
     die('✗ Crane accident: replace operation failed, invalid path');
 }
 
@@ -2347,8 +2347,9 @@ method move(
     }
 
     # a location cannot be moved into one of its children
-    if path-is-child-of-from(@from, @path)
-    { die(X::Crane::MoveParentToChild.new) }
+    die(X::Crane::MoveParentToChild.new)
+        if path-is-child-of-from(@from, @path);
+
     move(container, :@from, :@path, :$in-place);
 }
 
@@ -2457,8 +2458,9 @@ method copy(
     }
 
     # a location cannot be copied into one of its children
-    if path-is-child-of-from(@from, @path)
-    { die(X::Crane::CopyParentToChild.new) }
+    die(X::Crane::CopyParentToChild.new)
+        if path-is-child-of-from(@from, @path);
+
     copy(container, :@from, :@path, :$in-place);
 }
 
@@ -2529,8 +2531,8 @@ method test(
     --> Bool:D
 )
 {
-    unless Crane.exists($container, :@path)
-    { die(X::Crane::TestPathNotFound.new) }
+    die(X::Crane::TestPathNotFound.new)
+        unless Crane.exists($container, :@path);
     Crane.at($container, @path) eqv $value;
 }
 
@@ -2645,13 +2647,13 @@ method transform(
     --> Any:D
 )
 {
-    unless is-valid-callable-signature(&with)
-    { die(X::Crane::TransformCallableSignatureParams.new) }
+    die(X::Crane::TransformCallableSignatureParams.new)
+        unless is-valid-callable-signature(&with);
 
     if @path.elems > 0
     {
-        unless Crane.exists(container, :@path)
-        { die(X::Crane::TransformPathNotFound.new) }
+        die(X::Crane::TransformPathNotFound.new)
+            unless Crane.exists(container, :@path);
     }
 
     transform(container, :@path, :&with, :$in-place);

@@ -76,7 +76,6 @@ multi sub at(
 # --- end type Associative handling }}}
 # --- type Positional handling {{{
 
-# XXX may need waterfall handling here
 multi sub at(
     Positional:D $container,
     @steps where {
@@ -133,7 +132,6 @@ multi sub at(
 {
     return-rw $container;
 }
-
 
 multi sub at(
     Positional:D $container

@@ -27,6 +27,7 @@
         "Crane::Set"       : "lib/Crane/Set.pm6",
         "Crane::Test"      : "lib/Crane/Test.pm6",
         "Crane::Transform" : "lib/Crane/Transform.pm6",
+        "Crane::Utils"     : "lib/Crane/Utils.pm6",
         "X::Crane"         : "lib/X/Crane.pm6"
     }
 }

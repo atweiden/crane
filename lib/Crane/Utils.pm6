@@ -9,7 +9,7 @@ unit class Crane::Utils;
 sub is-valid-callable-signature(&c --> Bool:D) is export
 {
     &c.signature.params.elems == 1
-        && &c.signature.params.grep(*.positional).elems == 1;
+        && &c.signature.params.grep({ .positional }).elems == 1;
 }
 
 # --- end sub is-valid-callable-signature }}}
@@ -130,7 +130,7 @@ multi sub path-is-child-of-from(
 {
     (0..@from.end)
         .map({ @from[$_] eqv @path[$_] })
-        .grep(*.so)
+        .grep({ .so })
         .elems == @from.elems;
 }
 

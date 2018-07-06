@@ -1,9 +1,8 @@
 use v6;
-unit module X::Crane;
 
 # X::Crane::PathOutOfRange {{{
 
-class PathOutOfRange
+class X::Crane::PathOutOfRange
 {
     also is Exception;
 
@@ -64,7 +63,7 @@ class PathOutOfRange
 # end X::Crane::PathOutOfRange }}}
 # X::Crane::AddPathNotFound {{{
 
-class AddPathNotFound
+class X::Crane::AddPathNotFound
 {
     also is Exception;
 
@@ -78,15 +77,15 @@ class AddPathNotFound
 # end X::Crane::AddPathNotFound }}}
 # X::Crane::AddPathOutOfRange {{{
 
-class AddPathOutOfRange
+class X::Crane::AddPathOutOfRange
 {
-    also is PathOutOfRange;
+    also is X::Crane::PathOutOfRange;
 }
 
 # end X::Crane::AddPathOutOfRange }}}
 # X::Crane::Add::RO {{{
 
-class Add::RO
+class X::Crane::Add::RO
 {
     also is Exception;
 
@@ -102,7 +101,7 @@ class Add::RO
 # end X::Crane::Add::RO }}}
 # X::Crane::AssociativeKeyDNE {{{
 
-class AssociativeKeyDNE
+class X::Crane::AssociativeKeyDNE
 {
     also is Exception;
 
@@ -115,7 +114,7 @@ class AssociativeKeyDNE
 # end X::Crane::AssociativeKeyDNE }}}
 # X::Crane::CopyFromNotFound {{{
 
-class CopyFromNotFound
+class X::Crane::CopyFromNotFound
 {
     also is Exception;
 
@@ -129,7 +128,7 @@ class CopyFromNotFound
 # end X::Crane::CopyFromNotFound }}}
 # X::Crane::CopyParentToChild {{{
 
-class CopyParentToChild
+class X::Crane::CopyParentToChild
 {
     also is Exception;
 
@@ -144,7 +143,7 @@ class CopyParentToChild
 # end X::Crane::CopyParentToChild }}}
 # X::Crane::CopyPathNotFound {{{
 
-class CopyPathNotFound
+class X::Crane::CopyPathNotFound
 {
     also is Exception;
 
@@ -158,7 +157,7 @@ class CopyPathNotFound
 # end X::Crane::CopyPathNotFound }}}
 # X::Crane::CopyPathOutOfRange {{{
 
-class CopyPathOutOfRange
+class X::Crane::CopyPathOutOfRange
 {
     also is Exception;
 
@@ -174,7 +173,7 @@ class CopyPathOutOfRange
 # end X::Crane::CopyPathOutOfRange }}}
 # X::Crane::CopyPath::RO {{{
 
-class CopyPath::RO
+class X::Crane::CopyPath::RO
 {
     also is Exception;
 
@@ -190,7 +189,7 @@ class CopyPath::RO
 # end X::Crane::CopyPath::RO }}}
 # X::Crane::GetPathNotFound {{{
 
-class GetPathNotFound
+class X::Crane::GetPathNotFound
 {
     also is Exception;
 
@@ -204,7 +203,7 @@ class GetPathNotFound
 # end X::Crane::GetPathNotFound }}}
 # X::Crane::GetRootContainerKey {{{
 
-class GetRootContainerKey
+class X::Crane::GetRootContainerKey
 {
     also is Exception;
 
@@ -218,7 +217,7 @@ class GetRootContainerKey
 # end X::Crane::GetRootContainerKey }}}
 # X::Crane::ExistsRootContainerKey {{{
 
-class ExistsRootContainerKey
+class X::Crane::ExistsRootContainerKey
 {
     also is Exception;
 
@@ -232,7 +231,7 @@ class ExistsRootContainerKey
 # end X::Crane::ExistsRootContainerKey }}}
 # X::Crane::MoveFromNotFound {{{
 
-class MoveFromNotFound
+class X::Crane::MoveFromNotFound
 {
     also is Exception;
 
@@ -246,7 +245,7 @@ class MoveFromNotFound
 # end X::Crane::MoveFromNotFound }}}
 # X::Crane::MoveFrom::RO {{{
 
-class MoveFrom::RO
+class X::Crane::MoveFrom::RO
 {
     also is Exception;
 
@@ -262,7 +261,7 @@ class MoveFrom::RO
 # end X::Crane::MoveFrom::RO }}}
 # X::Crane::MoveParentToChild {{{
 
-class MoveParentToChild
+class X::Crane::MoveParentToChild
 {
     also is Exception;
 
@@ -277,7 +276,7 @@ class MoveParentToChild
 # end X::Crane::MoveParentToChild }}}
 # X::Crane::MovePathNotFound {{{
 
-class MovePathNotFound
+class X::Crane::MovePathNotFound
 {
     also is Exception;
 
@@ -291,7 +290,7 @@ class MovePathNotFound
 # end X::Crane::MovePathNotFound }}}
 # X::Crane::MovePathOutOfRange {{{
 
-class MovePathOutOfRange
+class X::Crane::MovePathOutOfRange
 {
     also is Exception;
 
@@ -307,7 +306,7 @@ class MovePathOutOfRange
 # end X::Crane::MovePathOutOfRange }}}
 # X::Crane::MovePath::RO {{{
 
-class MovePath::RO
+class X::Crane::MovePath::RO
 {
     also is Exception;
 
@@ -323,7 +322,7 @@ class MovePath::RO
 # end X::Crane::MovePath::RO }}}
 # X::Crane::Patch {{{
 
-class Patch
+class X::Crane::Patch
 {
     also is Exception;
 
@@ -338,7 +337,7 @@ class Patch
 # end X::Crane::Patch }}}
 # X::Crane::PatchAddFailed {{{
 
-class PatchAddFailed
+class X::Crane::PatchAddFailed
 {
     also is Exception;
 
@@ -351,7 +350,7 @@ class PatchAddFailed
 # end X::Crane::PatchAddFailed }}}
 # X::Crane::PatchCopyFailed {{{
 
-class PatchCopyFailed
+class X::Crane::PatchCopyFailed
 {
     also is Exception;
 
@@ -365,7 +364,7 @@ class PatchCopyFailed
 # end X::Crane::PatchCopyFailed }}}
 # X::Crane::PatchMoveFailed {{{
 
-class PatchMoveFailed
+class X::Crane::PatchMoveFailed
 {
     also is Exception;
 
@@ -379,7 +378,7 @@ class PatchMoveFailed
 # end X::Crane::PatchMoveFailed }}}
 # X::Crane::PatchRemoveFailed {{{
 
-class PatchRemoveFailed
+class X::Crane::PatchRemoveFailed
 {
     also is Exception;
 
@@ -393,7 +392,7 @@ class PatchRemoveFailed
 # end X::Crane::PatchRemoveFailed }}}
 # X::Crane::PatchReplaceFailed {{{
 
-class PatchReplaceFailed
+class X::Crane::PatchReplaceFailed
 {
     also is Exception;
 
@@ -407,7 +406,7 @@ class PatchReplaceFailed
 # end X::Crane::PatchReplaceFailed }}}
 # X::Crane::PatchTestFailed {{{
 
-class PatchTestFailed
+class X::Crane::PatchTestFailed
 {
     also is Exception;
 
@@ -421,7 +420,7 @@ class PatchTestFailed
 # end X::Crane::PatchTestFailed }}}
 # X::Crane::PositionalIndexDNE {{{
 
-class PositionalIndexDNE
+class X::Crane::PositionalIndexDNE
 {
     also is Exception;
 
@@ -434,7 +433,7 @@ class PositionalIndexDNE
 # end X::Crane::PositionalIndexDNE }}}
 # X::Crane::PositionalIndexInvalid {{{
 
-class PositionalIndexInvalid
+class X::Crane::PositionalIndexInvalid
 {
     also is Exception;
 
@@ -466,7 +465,7 @@ class PositionalIndexInvalid
 # end X::Crane::PositionalIndexInvalid }}}
 # X::Crane::RemovePathNotFound {{{
 
-class RemovePathNotFound
+class X::Crane::RemovePathNotFound
 {
     also is Exception;
 
@@ -481,7 +480,7 @@ class RemovePathNotFound
 # end X::Crane::RemovePathNotFound }}}
 # X::Crane::Remove::RO {{{
 
-class Remove::RO
+class X::Crane::Remove::RO
 {
     also is Exception;
 
@@ -497,7 +496,7 @@ class Remove::RO
 # end X::Crane::Remove::RO }}}
 # X::Crane::ReplacePathNotFound {{{
 
-class ReplacePathNotFound
+class X::Crane::ReplacePathNotFound
 {
     also is Exception;
 
@@ -512,7 +511,7 @@ class ReplacePathNotFound
 # end X::Crane::ReplacePathNotFound }}}
 # X::Crane::Replace::RO {{{
 
-class Replace::RO
+class X::Crane::Replace::RO
 {
     also is Exception;
 
@@ -529,7 +528,7 @@ class Replace::RO
 # end X::Crane::Replace::RO }}}
 # X::Crane::OpSet::RO {{{
 
-class OpSet::RO
+class X::Crane::OpSet::RO
 {
     also is Exception;
 
@@ -545,7 +544,7 @@ class OpSet::RO
 # end X::Crane::OpSet::RO }}}
 # X::Crane::TestPathNotFound {{{
 
-class TestPathNotFound
+class X::Crane::TestPathNotFound
 {
     also is Exception;
 
@@ -559,7 +558,7 @@ class TestPathNotFound
 # end X::Crane::TestPathNotFound }}}
 # X::Crane::TransformCallableRaisedException {{{
 
-class TransformCallableRaisedException
+class X::Crane::TransformCallableRaisedException
 {
     also is Exception;
 
@@ -574,7 +573,7 @@ class TransformCallableRaisedException
 # end X::Crane::TransformCallableRaisedException }}}
 # X::Crane::TransformCallableSignatureParams {{{
 
-class TransformCallableSignatureParams
+class X::Crane::TransformCallableSignatureParams
 {
     also is Exception;
 
@@ -589,7 +588,7 @@ class TransformCallableSignatureParams
 # end X::Crane::TransformCallableSignatureParams }}}
 # X::Crane::TransformPathNotFound {{{
 
-class TransformPathNotFound
+class X::Crane::TransformPathNotFound
 {
     also is Exception;
 
@@ -603,7 +602,7 @@ class TransformPathNotFound
 # end X::Crane::TransformPathNotFound }}}
 # X::Crane::Transform::RO {{{
 
-class Transform::RO
+class X::Crane::Transform::RO
 {
     also is Exception;
 

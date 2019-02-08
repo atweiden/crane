@@ -2,7 +2,7 @@
 
 <!-- intro {{{ -->
 
-Navigate Perl6 [containers](http://doc.perl6.org/language/containers)
+Navigate Perl 6 [containers](http://doc.perl6.org/language/containers)
 and perform tasks.
 
 <!-- end intro }}} -->
@@ -48,7 +48,7 @@ say Crane.list(%h10).perl;
 
 ## Description
 
-Crane aims to be for Perl6 containers what [JSON
+Crane aims to be for Perl 6 containers what [JSON
 Pointer](http://tools.ietf.org/html/rfc6901) and [JSON
 Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 

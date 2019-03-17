@@ -34,7 +34,7 @@ class X::Crane::PathOutOfRange
         }
         method range-str($/ --> Nil)
         {
-            my Int:D @integer = @<integer>.hyper.map({ .made });
+            my Int:D @integer = @<integer>.map({ .made });
             my Range:D $r = @integer[0] .. @integer[1];
             make($r);
         }

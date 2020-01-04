@@ -166,4 +166,4 @@ multi sub in(
 
 # end method in }}}
 
-# vim: set filetype=perl6 foldmethod=marker foldlevel=0:
+# vim: set filetype=raku foldmethod=marker foldlevel=0:

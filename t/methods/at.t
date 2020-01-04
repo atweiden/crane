@@ -29,4 +29,4 @@ subtest({
     is(Crane.at(%data, 'legumes', 3, 'instock'), 8, "It's the value expected");
 });
 
-# vim: set filetype=perl6 foldmethod=marker foldlevel=0:
+# vim: set filetype=raku foldmethod=marker foldlevel=0:

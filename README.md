@@ -2,7 +2,7 @@
 
 <!-- intro {{{ -->
 
-Navigate Perl 6 [containers](http://doc.perl6.org/language/containers)
+Navigate Raku [containers](https://docs.raku.org/language/containers)
 and perform tasks.
 
 <!-- end intro }}} -->
@@ -48,7 +48,7 @@ say Crane.list(%h10).perl;
 
 ## Description
 
-Crane aims to be for Perl 6 containers what [JSON
+Crane aims to be for Raku containers what [JSON
 Pointer](http://tools.ietf.org/html/rfc6901) and [JSON
 Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 
@@ -248,9 +248,9 @@ say %archversion.perl;
 
 Determines whether a key exists in the container at the
 specified path. Works similar to the p6 Hash `:exists` [subscript
-adverb](http://doc.perl6.org/type/Hash#%3Aexists). Pass the `:v` flag to
-determine whether a defined value is paired to the key at the specified
-path.
+adverb](https://docs.raku.org/type/Hash#%3Aexists). Pass the `:v`
+flag to determine whether a defined value is paired to the key at the
+specified path.
 
 _arguments:_
 
@@ -445,8 +445,8 @@ say @b.perl; # ["foo"]
 
 Removes the pair at path from `Associative`
 types, similar to the p6 Hash `:delete` [subscript
-adverb](http://doc.perl6.org/type/Hash#%3Adelete). Splices elements out
-from `Positional` types.
+adverb](https://docs.raku.org/type/Hash#%3Adelete). Splices elements
+out from `Positional` types.
 
 The default behavior is to raise an error if the target location is
 nonexistent.

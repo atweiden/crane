@@ -14,7 +14,7 @@ and perform tasks.
 
 <!-- example code {{{ -->
 
-```perl6
+```raku
 use Crane;
 
 my %h0;
@@ -92,7 +92,7 @@ Patch](http://tools.ietf.org/html/rfc6902) are for JSON.
 
 All example code assumes `%data` has this structure:
 
-```perl6
+```raku
 my %data =
     :legumes([
         {
@@ -137,7 +137,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %inxi = :info({
     :memory([1564.9, 32140.1]),
     :processes(244),
@@ -160,7 +160,7 @@ say %inxi.perl; # :info({ :memory(31868.0, 32140.1), :processes(244) })
 of nonexisting containers based on `@path` input instead of aborting
 the operation, e.g.
 
-```perl6
+```raku
 Crane.at(my %h, qw<a b c>) = 5 # ✗ Crane error: associative key does not exist
 Crane.in(my %i, qw<a b c>) = 5
 say %i.perl;
@@ -178,7 +178,7 @@ behavior is to create a Positional container there if the key is an
 `Int >= 0` or a `WhateverCode`. Otherwise `in` creates an Associative
 container there, e.g.
 
-```perl6
+```raku
 my %h;
 Crane.in(%h, qw<a b>, 0, *-1) = 'here';
 say %h.perl;
@@ -195,7 +195,7 @@ If `@path` contains keys that lead to an existing Associative container,
 it will attempt to index the existing Associative container with the
 key regardless of the key's type (be it `Int` or `WhateverCode`), e.g.
 
-```perl6
+```raku
 my @a = [ :i({:want({:my<MTV>})}) ];
 Crane.in(@a, 0, 'i', 'want', 2) = 'always';
 say @a.perl;
@@ -229,7 +229,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %archversion = :bamboo({ :up<0.0.1>, :aur<0.0.2> });
 Crane.in(%archversion, qw<fzf up>) = '0.11.3';
 Crane.in(%archversion, qw<fzf aur>) = '0.11.3';
@@ -246,8 +246,8 @@ say %archversion.perl;
 
 ### `.exists($container,:@path!,:$k,:$v)`
 
-Determines whether a key exists in the container at the
-specified path. Works similar to the p6 Hash `:exists` [subscript
+Determines whether a key exists in the container at the specified
+path. Works similar to the Raku Hash `:exists` [subscript
 adverb](https://docs.raku.org/type/Hash#%3Aexists). Pass the `:v`
 flag to determine whether a defined value is paired to the key at the
 specified path.
@@ -295,7 +295,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my $value = Crane.get(%data, :path('legumes', 1));
 say $value.perl; # { :instock(21), :name("lima beans"), :unit("lbs") }
 
@@ -337,7 +337,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %p;
 Crane.set(%p, :path(qw<peter piper>), :value<man>);
 Crane.set(%p, :path(qw<peter pan>), :value<boy>);
@@ -349,7 +349,7 @@ _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
 
-```perl6
+```raku
 my $a = (1, 2, 3);
 Crane.set($a, :path(), :value<foo>);
 say $a; # foo
@@ -374,14 +374,14 @@ type or a `Positional` type containing it does need to exist, and it
 remains an error for that not to be the case. For example, a `.add`
 operation with a target location of `<a b>` starting with this Hash:
 
-```perl6
+```raku
 { :a({ :foo(1) }) }
 ```
 
 is not an error, because "a" exists, and "b" will be added to its
 value. It is an error in this Hash:
 
-```perl6
+```raku
 { :q({ :bar(2) }) }
 ```
 
@@ -421,7 +421,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %legume = :name<carrots>, :unit<lbs>, :instock(3);
 my %data-new = Crane.add(%data, :path('legumes', 0), :value(%legume));
 ```
@@ -430,7 +430,7 @@ _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
 
-```perl6
+```raku
 my @a;
 my @b = Crane.add(@a, :path([]), :value<foo>);
 say @a.perl; # []
@@ -444,7 +444,7 @@ say @b.perl; # ["foo"]
 ### `.remove($container,:@path!,:$in-place)`
 
 Removes the pair at path from `Associative`
-types, similar to the p6 Hash `:delete` [subscript
+types, similar to the Raku Hash `:delete` [subscript
 adverb](https://docs.raku.org/type/Hash#%3Adelete). Splices elements
 out from `Positional` types.
 
@@ -465,7 +465,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %h = :example<hello>;
 my %h2 = Crane.remove(%h, :path(['example']));
 say %h.perl; # { :example<hello> }
@@ -474,13 +474,13 @@ say %h2.perl; # {}
 
 This:
 
-```perl6
+```raku
 %h<a><b>:delete;
 ```
 
 is equivalent to this:
 
-```perl6
+```raku
 Crane.remove(%h, :path(qw<a b>));
 ```
 
@@ -488,7 +488,7 @@ _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
 
-```perl6
+```raku
 my $a = [1, 2, 3];
 my $b = Crane.remove($a, :path([])); # equivalent to `$a = Empty`
 say $a.perl; [1, 2, 3]
@@ -523,7 +523,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %legume = :name("green beans"), :unit<lbs>, :instock(3);
 my %data-new = Crane.replace(%data, :path('legumes', 0), :value(%legume));
 ```
@@ -532,7 +532,7 @@ _What about operating on the root of the container?_
 
 Pass an empty list as `@path` to operate on the root of the container.
 
-```perl6
+```raku
 my %a = :a<aaa>, :b<bbb>, :c<ccc>;
 my %b = Crane.replace(%a, :path([]), :value({ :vm<moar> }));
 say %a.perl; # { :a<aaa>, :b<bbb>, :c<ccc> }
@@ -605,7 +605,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %h = :example<hello>;
 my %h2 = Crane.copy(%h, :from(['example']), :path(['sample']));
 say %h.perl; # { :example("hello") }
@@ -638,7 +638,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 say so Crane.test(%data, :path('legumes', 0, 'name'), :value("pinto beans")); # True
 ```
 
@@ -667,7 +667,7 @@ _example:_
 
 Listing a `Hash`:
 
-```perl6
+```raku
 say Crane.list(%data);
 (
     {
@@ -723,7 +723,7 @@ say Crane.list(%data);
 
 Listing a List:
 
-```perl6
+```raku
 my $a = qw<zero one two>;
 say Crane.list($a);
 (
@@ -761,7 +761,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 say Crane.flatten(%data);
 {
     ("legumes", 0, "instock") => 4,
@@ -808,7 +808,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %market =
     :foods({
         :fruits([qw<blueberries marionberries>]),
@@ -838,37 +838,37 @@ individual 6902 operations implemented by Crane, to `$container`.
 
 **add**
 
-```perl6
+```raku
 { :op("add"), :path(qw<path to target>), :value("Value") }
 ```
 
 **remove**
 
-```perl6
+```raku
 { :op("remove"), :path(qw<path to target>) }
 ```
 
 **replace**
 
-```perl6
+```raku
 { :op("replace"), :path(qw<path to target>), :value("Value") }
 ```
 
 **move**
 
-```perl6
+```raku
 { :op("move"), :from(qw<path to source>), :path(qw<path to target>) }
 ```
 
 **copy**
 
-```perl6
+```raku
 { :op("copy"), :from(qw<path to source>), :path(qw<path to target>) }
 ```
 
 **test**
 
-```perl6
+```raku
 { :op("test"), :path(qw<path to target>), :value("Is value") }
 ```
 
@@ -890,7 +890,7 @@ _returns:_
 
 _example:_
 
-```perl6
+```raku
 my %h;
 my @patch =
     { :op<add>, :path['a'], :value({:b({:c<here>})}) },
@@ -908,7 +908,7 @@ my %i = Crane.patch(%h, @patch);
 
 Exception: `42 !== 'C'`
 
-```perl6
+```raku
 my %h = :a({:b({:c})});
 my @patch =
     { :op<replace>, :path(qw<a b c>), :value(42) },

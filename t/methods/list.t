@@ -12,7 +12,7 @@ subtest({
     my $x = 1;
     is-deeply(
         Crane.list($x),
-        List({:path(()), :value(1)}),
+        List.new({:path(()), :value(1)}),
         'Is expected value'
     );
 
@@ -120,7 +120,7 @@ subtest({
     my %from-toml = :hello({});
     is-deeply(
         Crane.list(%from-toml),
-        List({:path["hello"], :value({})}),
+        List.new({:path["hello"], :value({})}),
         'Is expected value'
     );
 
@@ -128,14 +128,14 @@ subtest({
     %from-toml = :hello([{}]);
     is-deeply(
         Crane.list(%from-toml),
-        List({:path["hello"], :value([{}])}),
+        List.new({:path["hello"], :value([{}])}),
         'Is expected value'
     );
 
     %from-toml = :hello([]);
     is-deeply(
         Crane.list(%from-toml),
-        List({:path["hello"], :value([])}),
+        List.new({:path["hello"], :value([])}),
         'Is expected value'
     );
 });

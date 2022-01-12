@@ -83,7 +83,7 @@ multi sub list(
     --> List:D
 )
 {
-    List({:path(@carry), :value($container)});
+    List.new({:path(@carry), :value($container)});
 }
 
 # end method list }}}

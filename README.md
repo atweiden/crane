@@ -393,7 +393,7 @@ Think of the `.add` operation as behaving similarly to `mkdir`, not
 ```
 $ ls # empty directory
 $ mkdir a/b/c
-mkdir: cannot create directory ‘a/b/c’: No such file or directory
+mkdir: cannot create directory 'a/b/c': No such file or directory
 ```
 
 Without the `-p` flag, you'd have to do:

@@ -128,8 +128,8 @@ Navigates to and returns container `is rw`.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `*@path`: _Path, optional_ — a list of steps for navigating container
+* `$container`: _Container, required_ - the target container
+* `*@path`: _Path, optional_ - a list of steps for navigating container
 
 _returns:_
 
@@ -220,8 +220,8 @@ say @b.perl;
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `*@path`: _Path, optional_ — a list of steps for navigating container
+* `$container`: _Container, required_ - the target container
+* `*@path`: _Path, optional_ - a list of steps for navigating container
 
 _returns:_
 
@@ -254,11 +254,11 @@ specified path.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@path!`: _Path, required_ — a list of steps for navigating container
-* `:$k`: _Bool, optional, defaults to True_ — indicates whether to
+* `$container`: _Container, required_ - the target container
+* `:@path!`: _Path, required_ - a list of steps for navigating container
+* `:$k`: _Bool, optional, defaults to True_ - indicates whether to
          check for an existing key at path
-* `:$v`: _Bool, optional_ — indicates whether to check for a defined
+* `:$v`: _Bool, optional_ - indicates whether to check for a defined
          value at path
 
 _returns:_
@@ -282,12 +282,12 @@ behavior is to raise an error if path is nonexistent.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@path!`: _Path, required_ — a list of steps for navigating container
-* `:$k`: _Bool, optional_ — only return the key at path
-* `:$v`: _Bool, optional, defaults to True_ — only return the value
+* `$container`: _Container, required_ - the target container
+* `:@path!`: _Path, required_ - a list of steps for navigating container
+* `:$k`: _Bool, optional_ - only return the key at path
+* `:$v`: _Bool, optional, defaults to True_ - only return the value
          at path
-* `:$p`: _Bool, optional_ — return the key-value pair at path
+* `:$p`: _Bool, optional_ - return the key-value pair at path
 
 _returns:_
 
@@ -327,9 +327,9 @@ behavior is to create nonexistent paths (similar to `mkdir -p`).
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@path!`: _Path, required_ — a list of steps for navigating container
-* `:$value!`: _Any, required_ — the value to be set at the specified path
+* `$container`: _Container, required_ - the target container
+* `:@path!`: _Path, required_ - a list of steps for navigating container
+* `:$value!`: _Any, required_ - the value to be set at the specified path
 
 _returns:_
 
@@ -407,11 +407,11 @@ $ mkdir a/b/c
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@path!`: _Path, required_ — a list of steps for navigating container
-* `:$value!`: _Any, required_ — the value to be added/inserted at the
+* `$container`: _Container, required_ - the target container
+* `:@path!`: _Path, required_ - a list of steps for navigating container
+* `:$value!`: _Any, required_ - the value to be added/inserted at the
               specified path
-* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+* `:$in-place`: _Bool, optional, defaults to False_ - whether to modify
                 `$container` in-place
 
 _returns:_
@@ -453,9 +453,9 @@ nonexistent.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@path!`: _Path, required_ — a list of steps for navigating container
-* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+* `$container`: _Container, required_ - the target container
+* `:@path!`: _Path, required_ - a list of steps for navigating container
+* `:$in-place`: _Bool, optional, defaults to False_ - whether to modify
                 `$container` in-place
 
 _returns:_
@@ -510,10 +510,10 @@ nonexistent.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@path!`: _Path, required_ — a list of steps for navigating container
-* `:$value!`: _Any, required_ — the value to be set at the specified path
-* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+* `$container`: _Container, required_ - the target container
+* `:@path!`: _Path, required_ - a list of steps for navigating container
+* `:$value!`: _Any, required_ - the value to be set at the specified path
+* `:$in-place`: _Bool, optional, defaults to False_ - whether to modify
                 `$container` in-place
 
 _returns:_
@@ -559,10 +559,10 @@ into one of its children.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@from!`: _Path, required_ — a list of steps to the source
-* `:@path!`: _Path, required_ — a list of steps to the destination
-* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+* `$container`: _Container, required_ - the target container
+* `:@from!`: _Path, required_ - a list of steps to the source
+* `:@path!`: _Path, required_ - a list of steps to the destination
+* `:$in-place`: _Bool, optional, defaults to False_ - whether to modify
                 `$container` in-place
 
 _returns:_
@@ -592,10 +592,10 @@ is nonexistent.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@from!`: _Path, required_ — a list of steps to the source
-* `:@path!`: _Path, required_ — a list of steps to the destination
-* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+* `$container`: _Container, required_ - the target container
+* `:@from!`: _Path, required_ - a list of steps to the source
+* `:@path!`: _Path, required_ - a list of steps to the destination
+* `:$in-place`: _Bool, optional, defaults to False_ - whether to modify
                 `$container` in-place
 
 _returns:_
@@ -628,9 +628,9 @@ document.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@path!`: _Path, required_ — a list of steps for navigating container
-* `:$value!`: _Any, required_ — the value expected at the specified path
+* `$container`: _Container, required_ - the target container
+* `:@path!`: _Path, required_ - a list of steps for navigating container
+* `:$value!`: _Any, required_ - the value expected at the specified path
 
 _returns:_
 
@@ -656,8 +656,8 @@ Lists all of the paths available in `$container`.
 
 _arguments:_
 
-* `$container` : _Container, required_ — the target container
-* `:@path`: _Path, optional_ — a list of steps for navigating container
+* `$container` : _Container, required_ - the target container
+* `:@path`: _Path, optional_ - a list of steps for navigating container
 
 _returns:_
 
@@ -752,8 +752,8 @@ Flattens a container into a single-level `Hash` of path-value pairs.
 
 _arguments:_
 
-* `$container` : _Container, required_ — the target container
-* `:@path`: _Path, optional_ — a list of steps for navigating container
+* `$container` : _Container, required_ - the target container
+* `:@path`: _Path, optional_ - a list of steps for navigating container
 
 _returns:_
 
@@ -794,11 +794,11 @@ and return a value.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `:@path!`: _Path, required_ — a list of steps to the destination
-* `:&with!`: _Callable, required_ — instructions for changing the
+* `$container`: _Container, required_ - the target container
+* `:@path!`: _Path, required_ - a list of steps to the destination
+* `:&with!`: _Callable, required_ - instructions for changing the
              value at `@path`
-* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+* `:$in-place`: _Bool, optional, defaults to False_ - whether to modify
                 `$container` in-place
 
 _returns:_
@@ -878,9 +878,9 @@ the default behavior is to raise an exception.
 
 _arguments:_
 
-* `$container`: _Container, required_ — the target container
-* `@patch`: _Patch, required_ — a list of 6902 instructions to apply
-* `:$in-place`: _Bool, optional, defaults to False_ — whether to modify
+* `$container`: _Container, required_ - the target container
+* `@patch`: _Patch, required_ - a list of 6902 instructions to apply
+* `:$in-place`: _Bool, optional, defaults to False_ - whether to modify
                 `$container` in-place
 
 _returns:_

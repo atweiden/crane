@@ -1,7 +1,7 @@
 {
     "perl"        : "6.*",
     "name"        : "Crane",
-    "version"     : "0.1.0",
+    "version"     : "0.1.1",
     "author"      : "atweiden",
     "description" : "Navigate Raku containers and perform tasks",
     "license"     : "Unlicense",
